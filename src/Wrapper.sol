@@ -12,9 +12,11 @@ contract Wrapper {
     address public constant DAO = address(0x0);
     address public constant MORPHO = address(0x0);
 
-    function wrap(uint256 amount) external {
+    // Compliant to ERC20Wrapper for convenience.
+    function depositFor(address account, uint256 amount) public returns (bool) {
         IERC20(LEGACY_MORPHO).transferFrom(msg.sender, address(this), amount);
         IBurn(LEGACY_MORPHO).burn(amount);
-        IERC20(MORPHO).transferFrom(DAO, msg.sender, amount);
+        IERC20(MORPHO).transferFrom(DAO, account, amount);
+        return true;
     }
 }

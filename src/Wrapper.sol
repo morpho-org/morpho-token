@@ -18,11 +18,19 @@ contract Wrapper {
     /// @dev The address of the new morpho token.
     address public immutable NEW_MORPHO;
 
+	/* ERRORS */
+
+	/// @notice Reverts if the address is the zero address.
+	error ZeroAddress();
+
+	/// @notice Reverts if the address is the contract address.
+	error SelfAddress();
+
     /* CONSTRUCTOR */
 
     /// @dev morphoToken address can be precomputed using create2.
     constructor(address morphoToken) {
-        require(morphoToken != address(0), "Wrapper: zero address");
+        require(morphoToken != address(0),  ZeroAddress());
 
         NEW_MORPHO = morphoToken;
     }
@@ -31,8 +39,8 @@ contract Wrapper {
 
     /// @dev Compliant to `ERC20Wrapper` contract from OZ for convenience.
     function depositFor(address account, uint256 amount) public returns (bool) {
-        require(account != address(0), "Wrapper: zero address");
-        require(account != address(this), "Wrapper: self address");
+        require(account != address(0),  ZeroAddress());
+        require(account != address(this), SelfAddress());
 
         IERC20(LEGACY_MORPHO).transferFrom(msg.sender, address(this), amount);
         IERC20(NEW_MORPHO).transfer(account, amount);

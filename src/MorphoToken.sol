@@ -24,11 +24,16 @@ contract MorphoToken is ERC20VotesUpgradeable, ERC20PermitUpgradeable, Ownable2S
     /// @dev the symbol of the token.
     string internal constant SYMBOL = "MORPHO";
 
+	/* ERRORS */
+
+	/// @notice Reverts if the address is the zero address.
+	error ZeroAddress();
+
     /* PUBLIC */
 
     function initialize(address dao, address wrapper) public initializer {
-        require(dao != address(0), "MorphoToken: wrapper is the zero address");
-        require(wrapper != address(0), "MorphoToken: wrapper is the zero address");
+        require(dao != address(0), ZeroAddress());
+        require(wrapper != address(0), ZeroAddress());
 
         ERC20VotesUpgradeable.__ERC20Votes_init();
         ERC20Upgradeable.__ERC20_init(NAME, SYMBOL);

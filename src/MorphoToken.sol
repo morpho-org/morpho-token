@@ -10,12 +10,13 @@ import {
     ERC20PermitUpgradeable,
     NoncesUpgradeable
 } from "lib/openzeppelin-contracts-upgradeable/contracts/token/ERC20/extensions/ERC20PermitUpgradeable.sol";
+import { UUPSUpgradeable } from "lib/openzeppelin-contracts-upgradeable/contracts/proxy/utils/UUPSUpgradeable.sol";
 
 // TODO:
 // - add natspecs
 // - add events?
 // - add error messages
-contract MorphoToken is ERC20VotesUpgradeable, ERC20PermitUpgradeable, Ownable2StepUpgradeable {
+contract MorphoToken is ERC20VotesUpgradeable, ERC20PermitUpgradeable, Ownable2StepUpgradeable, UUPSUpgradeable {
     /* CONSTANTS */
 
     /// @dev the name of the token.
@@ -56,4 +57,7 @@ contract MorphoToken is ERC20VotesUpgradeable, ERC20PermitUpgradeable, Ownable2S
     {
         ERC20VotesUpgradeable._update(from, to, value);
     }
+
+	/// @inheritdoc UUPSUpgradeable
+	function _authorizeUpgrade(address) internal override onlyOwner {}
 }

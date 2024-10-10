@@ -30,9 +30,9 @@ contract MorphoToken is ERC20VotesUpgradeable, ERC20PermitUpgradeable, Ownable2S
         require(dao != address(0), "MorphoToken: wrapper is the zero address");
         require(wrapper != address(0), "MorphoToken: wrapper is the zero address");
 
-        ERC20VotesUpgradeable.__ERC20Votes_init_unchained();
-        ERC20Upgradeable.__ERC20_init_unchained(NAME, SYMBOL);
-        Ownable2StepUpgradeable.__Ownable2Step_init_unchained();
+        ERC20VotesUpgradeable.__ERC20Votes_init();
+        ERC20Upgradeable.__ERC20_init(NAME, SYMBOL);
+        Ownable2StepUpgradeable.__Ownable2Step_init();
         ERC20PermitUpgradeable.__ERC20Permit_init(NAME);
 
         _transferOwnership(dao); // Transfer ownership to the DAO.

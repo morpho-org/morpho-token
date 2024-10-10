@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: UNLICENSED
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.13;
 
 import {ERC20Upgradeable} from "lib/openzeppelin-contracts-upgradeable/contracts/token/ERC20/ERC20Upgradeable.sol";
@@ -15,28 +15,40 @@ import {
 // - add natspecs
 // - add events?
 // - add error messages
-// - update license
 contract MorphoToken is ERC20VotesUpgradeable, ERC20PermitUpgradeable, Ownable2StepUpgradeable {
-    string constant NAME = "Morpho Token";
-    string constant SYMBOL = "MORPHO";
+    /* CONSTANTS */
 
-    function initialize(address wrapper) public initializer {
+    /// @dev the name of the token.
+    string internal constant NAME = "Morpho Token";
+
+    /// @dev the symbol of the token.
+    string internal constant SYMBOL = "MORPHO";
+
+    /* PUBLIC */
+
+    function initialize(address dao, address wrapper) public initializer {
+        require(dao != address(0), "MorphoToken: wrapper is the zero address");
+        require(wrapper != address(0), "MorphoToken: wrapper is the zero address");
+
         ERC20VotesUpgradeable.__ERC20Votes_init_unchained();
         ERC20Upgradeable.__ERC20_init_unchained(NAME, SYMBOL);
-        Ownable2StepUpgradeable.__Ownable2Step_init();
+        Ownable2StepUpgradeable.__Ownable2Step_init_unchained();
         ERC20PermitUpgradeable.__ERC20Permit_init(NAME);
 
+        _transferOwnership(dao); // Transfer ownership to the DAO.
         _mint(wrapper, 1_000_000_000e18); // Mint 1B to the wrapper contract.
     }
+
+    function nonces(address owner) public view override(ERC20PermitUpgradeable, NoncesUpgradeable) returns (uint256) {
+        return ERC20PermitUpgradeable.nonces(owner);
+    }
+
+    /* INTERNAL */
 
     function _update(address from, address to, uint256 value)
         internal
         override(ERC20Upgradeable, ERC20VotesUpgradeable)
     {
         ERC20VotesUpgradeable._update(from, to, value);
-    }
-
-    function nonces(address owner) public view override(ERC20PermitUpgradeable, NoncesUpgradeable) returns (uint256) {
-        return ERC20PermitUpgradeable.nonces(owner);
     }
 }

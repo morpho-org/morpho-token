@@ -108,10 +108,10 @@ abstract contract DelegatesUpgradeable is
     function _transferVotingUnits(address from, address to, uint256 amount) internal virtual {
         VotesStorage storage $ = _getVotesStorage();
         if (from == address(0)) {
-            $._totalCheckpoints += amount;
+            $._totalVotingPower += amount;
         }
         if (to == address(0)) {
-            $._totalCheckpoints -= amount;
+            $._totalVotingPower -= amount;
         }
         _moveDelegateVotes(delegates(from), delegates(to), amount);
     }

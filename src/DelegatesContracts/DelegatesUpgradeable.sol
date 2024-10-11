@@ -2,8 +2,8 @@
 
 pragma solidity ^0.8.20;
 
-import {IERC5805} from
-    "lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/interfaces/IERC5805.sol";
+import {IVotes} from
+    "lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/governance/utils/IVotes.sol";
 import {ECDSA} from
     "lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts//contracts/utils/cryptography/ECDSA.sol";
 import {ContextUpgradeable} from "lib/openzeppelin-contracts-upgradeable/contracts//utils/ContextUpgradeable.sol";
@@ -17,7 +17,7 @@ abstract contract DelegatesUpgradeable is
     ContextUpgradeable,
     EIP712Upgradeable,
     NoncesUpgradeable,
-    IERC5805
+    IVotes
 {
     bytes32 private constant DELEGATION_TYPEHASH =
         keccak256("Delegation(address delegatee,uint256 nonce,uint256 expiry)");
@@ -30,11 +30,12 @@ abstract contract DelegatesUpgradeable is
     }
 
     // keccak256(abi.encode(uint256(keccak256("morpho.storage.Delegates")) - 1)) & ~bytes32(uint256(0xff))
-    bytes32 private constant VotesStorageLocation = 0xe96d6a46d8feefe49b223986c94a74a56f4e1500280e36600ec085ab28160200;
+    bytes32 private constant DelegatesStorageLocation =
+        0xe96d6a46d8feefe49b223986c94a74a56f4e1500280e36600ec085ab28160200;
 
-    function _getDeleguatesStorage() private pure returns (VotesStorage storage $) {
+    function _getDelegatesStorage() private pure returns (DelegatesStorage storage $) {
         assembly {
-            $.slot := VotesStorageLocation
+            $.slot := DelegatesStorageLocation
         }
     }
 
@@ -42,7 +43,7 @@ abstract contract DelegatesUpgradeable is
      * @dev Returns the current amount of votes that `account` has.
      */
     function getVotes(address account) public view virtual returns (uint256) {
-        VotesStorage storage $ = _getVotesStorage();
+        DelegatesStorage storage $ = _getDelegatesStorage();
         return $._votingPower[account];
     }
 
@@ -50,7 +51,7 @@ abstract contract DelegatesUpgradeable is
      * @dev Returns the current total supply of votes.
      */
     function _getTotalSupply() internal view virtual returns (uint256) {
-        VotesStorage storage $ = _getVotesStorage();
+        DelegatesStorage storage $ = _getDelegatesStorage();
         return $._totalVotingPower;
     }
 
@@ -58,7 +59,7 @@ abstract contract DelegatesUpgradeable is
      * @dev Returns the delegate that `account` has chosen.
      */
     function delegates(address account) public view virtual returns (address) {
-        VotesStorage storage $ = _getVotesStorage();
+        DelegatesStorage storage $ = _getDelegatesStorage();
         return $._delegatee[account];
     }
 
@@ -93,7 +94,7 @@ abstract contract DelegatesUpgradeable is
      * Emits events {IVotes-DelegateChanged} and {IVotes-DelegateVotesChanged}.
      */
     function _delegate(address account, address delegatee) internal virtual {
-        VotesStorage storage $ = _getVotesStorage();
+        DelegatesStorage storage $ = _getDelegatesStorage();
         address oldDelegate = delegates(account);
         $._delegatee[account] = delegatee;
 
@@ -106,7 +107,7 @@ abstract contract DelegatesUpgradeable is
      * should be zero. Total supply of voting units will be adjusted with mints and burns.
      */
     function _transferVotingUnits(address from, address to, uint256 amount) internal virtual {
-        VotesStorage storage $ = _getVotesStorage();
+        DelegatesStorage storage $ = _getDelegatesStorage();
         if (from == address(0)) {
             $._totalVotingPower += amount;
         }
@@ -120,7 +121,7 @@ abstract contract DelegatesUpgradeable is
      * @dev Moves delegated votes from one delegate to another.
      */
     function _moveDelegateVotes(address from, address to, uint256 amount) private {
-        VotesStorage storage $ = _getVotesStorage();
+        DelegatesStorage storage $ = _getDelegatesStorage();
         if (from != to && amount > 0) {
             if (from != address(0)) {
                 uint256 oldValue = $._votingPower[from];

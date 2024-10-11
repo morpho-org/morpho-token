@@ -52,7 +52,7 @@ contract MorphoToken is ERC20DelegatesUpgradeable, ERC20PermitUpgradeable, Ownab
 
     function _update(address from, address to, uint256 value)
         internal
-        override(ERC20Upgradeable, ERC20VotesUpgradeable)
+        override(ERC20Upgradeable, ERC20DelegatesUpgradeable)
     {
         ERC20DelegatesUpgradeable._update(from, to, value);
     }

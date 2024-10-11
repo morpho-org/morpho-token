@@ -2,12 +2,11 @@
 
 pragma solidity ^0.8.20;
 
-import {IVotes} from
-    "lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/governance/utils/IVotes.sol";
+import {IDelegates} from "./IDelegates.sol";
 import {ECDSA} from
-    "lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts//contracts/utils/cryptography/ECDSA.sol";
-import {ContextUpgradeable} from "lib/openzeppelin-contracts-upgradeable/contracts//utils/ContextUpgradeable.sol";
-import {NoncesUpgradeable} from "lib/openzeppelin-contracts-upgradeable/contracts//utils/NoncesUpgradeable.sol";
+    "lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/utils/cryptography/ECDSA.sol";
+import {ContextUpgradeable} from "lib/openzeppelin-contracts-upgradeable/contracts/utils/ContextUpgradeable.sol";
+import {NoncesUpgradeable} from "lib/openzeppelin-contracts-upgradeable/contracts/utils/NoncesUpgradeable.sol";
 import {EIP712Upgradeable} from
     "lib/openzeppelin-contracts-upgradeable/contracts/utils/cryptography/EIP712Upgradeable.sol";
 import {Initializable} from "lib/openzeppelin-contracts-upgradeable/contracts/proxy/utils/Initializable.sol";
@@ -17,7 +16,7 @@ abstract contract DelegatesUpgradeable is
     ContextUpgradeable,
     EIP712Upgradeable,
     NoncesUpgradeable,
-    IVotes
+    IDelegates
 {
     bytes32 private constant DELEGATION_TYPEHASH =
         keccak256("Delegation(address delegatee,uint256 nonce,uint256 expiry)");
@@ -79,7 +78,7 @@ abstract contract DelegatesUpgradeable is
         virtual
     {
         if (block.timestamp > expiry) {
-            revert VotesExpiredSignature(expiry);
+            revert DelegatesExpiredSignature(expiry);
         }
         address signer = ECDSA.recover(
             _hashTypedDataV4(keccak256(abi.encode(DELEGATION_TYPEHASH, delegatee, nonce, expiry))), v, r, s

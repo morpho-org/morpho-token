@@ -35,7 +35,6 @@ contract MorphoToken is ERC20DelegatesUpgradeable, ERC20PermitUpgradeable, Ownab
         require(dao != address(0), ZeroAddress());
         require(wrapper != address(0), ZeroAddress());
 
-        ERC20DelegatesUpgradeable.__ERC20Delegates_init();
         ERC20Upgradeable.__ERC20_init(NAME, SYMBOL);
         Ownable2StepUpgradeable.__Ownable2Step_init();
         ERC20PermitUpgradeable.__ERC20Permit_init(NAME);

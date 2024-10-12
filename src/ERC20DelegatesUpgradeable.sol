@@ -21,7 +21,13 @@ import {Initializable} from "lib/openzeppelin-contracts-upgradeable/contracts/pr
  * By default, token balance does not account for voting power. This makes transfers cheaper. The downside is that it
  * requires users to delegate to themselves in order to activate their voting power.
  */
-abstract contract ERC20DelegatesUpgradeable is Initializable, ERC20Upgradeable, EIP712Upgradeable, NoncesUpgradeable, IDelegates {
+abstract contract ERC20DelegatesUpgradeable is
+    Initializable,
+    ERC20Upgradeable,
+    EIP712Upgradeable,
+    NoncesUpgradeable,
+    IDelegates
+{
     bytes32 private constant DELEGATION_TYPEHASH =
         keccak256("Delegation(address delegatee,uint256 nonce,uint256 expiry)");
 

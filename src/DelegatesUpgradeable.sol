@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import {IDelegates} from "../interfaces/IDelegates.sol";
+import {IDelegates} from "./interfaces/IDelegates.sol";
 
 import {ECDSA} from
     "lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/utils/cryptography/ECDSA.sol";

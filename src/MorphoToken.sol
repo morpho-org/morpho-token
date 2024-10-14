@@ -4,7 +4,7 @@ pragma solidity ^0.8.13;
 import {ERC20Upgradeable} from "lib/openzeppelin-contracts-upgradeable/contracts/token/ERC20/ERC20Upgradeable.sol";
 import {Ownable2StepUpgradeable} from
     "lib/openzeppelin-contracts-upgradeable/contracts/access/Ownable2StepUpgradeable.sol";
-import {ERC20DelegatesUpgradeable} from "./DelegatesContracts/ERC20DelegatesUpgradeable.sol";
+import {ERC20DelegatesUpgradeable} from "./ERC20DelegatesUpgradeable.sol";
 import {
     ERC20PermitUpgradeable,
     NoncesUpgradeable
@@ -35,7 +35,6 @@ contract MorphoToken is ERC20DelegatesUpgradeable, ERC20PermitUpgradeable, Ownab
         require(dao != address(0), ZeroAddress());
         require(wrapper != address(0), ZeroAddress());
 
-        ERC20DelegatesUpgradeable.__ERC20Delegates_init();
         ERC20Upgradeable.__ERC20_init(NAME, SYMBOL);
         Ownable2StepUpgradeable.__Ownable2Step_init();
         ERC20PermitUpgradeable.__ERC20Permit_init(NAME);

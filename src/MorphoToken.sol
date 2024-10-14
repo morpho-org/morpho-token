@@ -10,7 +10,7 @@ import {
     ERC20PermitUpgradeable,
     NoncesUpgradeable
 } from "lib/openzeppelin-contracts-upgradeable/contracts/token/ERC20/extensions/ERC20PermitUpgradeable.sol";
-import { UUPSUpgradeable } from "lib/openzeppelin-contracts-upgradeable/contracts/proxy/utils/UUPSUpgradeable.sol";
+import {UUPSUpgradeable} from "lib/openzeppelin-contracts-upgradeable/contracts/proxy/utils/UUPSUpgradeable.sol";
 
 // TODO:
 // - add natspecs
@@ -25,16 +25,16 @@ contract MorphoToken is ERC20VotesUpgradeable, ERC20PermitUpgradeable, Ownable2S
     /// @dev the symbol of the token.
     string internal constant SYMBOL = "MORPHO";
 
-	/* ERRORS */
+    /* ERRORS */
 
-	/// @notice Reverts if the address is the zero address.
-	error ZeroAddress();
+    /// @notice Thrown when a zero address is passed as input.
+    string internal constant ZERO_ADDRESS = "zero address";
 
     /* PUBLIC */
 
     function initialize(address dao, address wrapper) public initializer {
-        require(dao != address(0), ZeroAddress());
-        require(wrapper != address(0), ZeroAddress());
+        require(dao != address(0), ZERO_ADDRESS);
+        require(wrapper != address(0), ZERO_ADDRESS);
 
         ERC20VotesUpgradeable.__ERC20Votes_init();
         ERC20Upgradeable.__ERC20_init(NAME, SYMBOL);
@@ -58,6 +58,6 @@ contract MorphoToken is ERC20VotesUpgradeable, ERC20PermitUpgradeable, Ownable2S
         ERC20VotesUpgradeable._update(from, to, value);
     }
 
-	/// @inheritdoc UUPSUpgradeable
-	function _authorizeUpgrade(address) internal override onlyOwner {}
+    /// @inheritdoc UUPSUpgradeable
+    function _authorizeUpgrade(address) internal override onlyOwner {}
 }

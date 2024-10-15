@@ -4,7 +4,7 @@ out = "out"
 libs = ["lib"]
 
 [profile.default.fuzz]
-runs = 16
+runs = 32
 
 
 [profile.default.rpc_endpoints]

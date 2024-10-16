@@ -32,19 +32,19 @@ abstract contract ERC20DelegatesUpgradeable is
         keccak256("Delegation(address delegatee,uint256 nonce,uint256 expiry)");
 
     /// @custom:storage-location erc7201:morpho.storage.Delegates
-    struct DelegatesStorage {
+    struct ERC20DelegatesStorage {
         mapping(address account => address) _delegatee;
         mapping(address delegatee => uint256) _votingPower;
         uint256 _totalVotingPower;
     }
 
-    // keccak256(abi.encode(uint256(keccak256("morpho.storage.Delegates")) - 1)) & ~bytes32(uint256(0xff))
-    bytes32 private constant DelegatesStorageLocation =
+    // keccak256(abi.encode(uint256(keccak256("morpho.storage.ERC20Delegates")) - 1)) & ~bytes32(uint256(0xff))
+    bytes32 private constant ERC20DelegatesStorageLocation =
         0xe96d6a46d8feefe49b223986c94a74a56f4e1500280e36600ec085ab28160200;
 
-    function _getDelegatesStorage() private pure returns (DelegatesStorage storage $) {
+    function _getDelegatesStorage() private pure returns (ERC20DelegatesStorage storage $) {
         assembly {
-            $.slot := DelegatesStorageLocation
+            $.slot := ERC20DelegatesStorageLocation
         }
     }
 
@@ -52,7 +52,7 @@ abstract contract ERC20DelegatesUpgradeable is
      * @dev Returns the current amount of votes that `account` has.
      */
     function getVotes(address account) public view virtual returns (uint256) {
-        DelegatesStorage storage $ = _getDelegatesStorage();
+        ERC20DelegatesStorage storage $ = _getDelegatesStorage();
         return $._votingPower[account];
     }
 
@@ -60,7 +60,7 @@ abstract contract ERC20DelegatesUpgradeable is
      * @dev Returns the current total supply of votes.
      */
     function _getTotalSupply() internal view virtual returns (uint256) {
-        DelegatesStorage storage $ = _getDelegatesStorage();
+        ERC20DelegatesStorage storage $ = _getDelegatesStorage();
         return $._totalVotingPower;
     }
 
@@ -68,7 +68,7 @@ abstract contract ERC20DelegatesUpgradeable is
      * @dev Returns the delegate that `account` has chosen.
      */
     function delegates(address account) public view virtual returns (address) {
-        DelegatesStorage storage $ = _getDelegatesStorage();
+        ERC20DelegatesStorage storage $ = _getDelegatesStorage();
         return $._delegatee[account];
     }
 
@@ -103,7 +103,7 @@ abstract contract ERC20DelegatesUpgradeable is
      * Emits events {IVotes-DelegateChanged} and {IVotes-DelegateVotesChanged}.
      */
     function _delegate(address account, address delegatee) internal virtual {
-        DelegatesStorage storage $ = _getDelegatesStorage();
+        ERC20DelegatesStorage storage $ = _getDelegatesStorage();
         address oldDelegate = delegates(account);
         $._delegatee[account] = delegatee;
 
@@ -116,7 +116,7 @@ abstract contract ERC20DelegatesUpgradeable is
      * should be zero. Total supply of voting units will be adjusted with mints and burns.
      */
     function _transferVotingUnits(address from, address to, uint256 amount) internal virtual {
-        DelegatesStorage storage $ = _getDelegatesStorage();
+        ERC20DelegatesStorage storage $ = _getDelegatesStorage();
         if (from == address(0)) {
             $._totalVotingPower += amount;
         }
@@ -130,7 +130,7 @@ abstract contract ERC20DelegatesUpgradeable is
      * @dev Moves delegated votes from one delegate to another.
      */
     function _moveDelegateVotes(address from, address to, uint256 amount) private {
-        DelegatesStorage storage $ = _getDelegatesStorage();
+        ERC20DelegatesStorage storage $ = _getDelegatesStorage();
         if (from != to && amount > 0) {
             if (from != address(0)) {
                 uint256 oldValue = $._votingPower[from];

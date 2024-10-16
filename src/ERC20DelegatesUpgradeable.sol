@@ -40,7 +40,7 @@ abstract contract ERC20DelegatesUpgradeable is
 
     // keccak256(abi.encode(uint256(keccak256("morpho.storage.ERC20Delegates")) - 1)) & ~bytes32(uint256(0xff))
     bytes32 private constant ERC20DelegatesStorageLocation =
-        0xe96d6a46d8feefe49b223986c94a74a56f4e1500280e36600ec085ab28160200;
+        0x1dc92b2c6e971ab6e08dfd7dcec0e9496d223ced663ba2a06543451548549500;
 
     function _getDelegatesStorage() private pure returns (ERC20DelegatesStorage storage $) {
         assembly {

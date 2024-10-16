@@ -4,15 +4,27 @@ pragma solidity ^0.8.13;
 import {BaseTest} from "./helpers/BaseTest.sol";
 import {SigUtils} from "./helpers/SigUtils.sol";
 import {MorphoToken} from "../src/MorphoToken.sol";
+import {ERC1967Proxy} from
+    "lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 
 // TODO: Test the following:
 // - Test every paths
-// - Test migration flow
-// - Test bundler wrapping
 // - Test access control
 // - Test voting
 // - Test delegation
 contract MorphoTokenTest is BaseTest {
+    function testInitilizeZeroAddress(address randomAddress) public {
+        vm.assume(randomAddress != address(0));
+
+        address proxy = address(new ERC1967Proxy(address(tokenImplem), hex""));
+
+        vm.expectRevert();
+        MorphoToken(proxy).initialize(address(0), randomAddress);
+
+        vm.expectRevert();
+        MorphoToken(proxy).initialize(randomAddress, address(0));
+    }
+
     function testUpgradeNotOwner(address updater) public {
         vm.assume(updater != address(0));
         vm.assume(updater != MORPHO_DAO);
@@ -61,6 +73,31 @@ contract MorphoTokenTest is BaseTest {
         assertEq(newMorpho.getVotes(delegatee), amount);
     }
 
+    function testDelegateBySigExpired(SigUtils.Delegation memory delegation, uint256 privateKey, uint256 expiry)
+        public
+    {
+        expiry = bound(expiry, MAX_TEST_AMOUNT, MAX_TEST_AMOUNT);
+        privateKey = bound(privateKey, 1, type(uint32).max);
+        address delegator = vm.addr(privateKey);
+
+        address[] memory addresses = new address[](2);
+        addresses[0] = delegator;
+        addresses[1] = delegation.delegatee;
+        _validateAddresses(addresses);
+
+        delegation.expiry = expiry;
+        delegation.nonce = 0;
+
+        Signature memory sig;
+        bytes32 digest = SigUtils.getTypedDataHash(delegation, address(newMorpho));
+        (sig.v, sig.r, sig.s) = vm.sign(privateKey, digest);
+
+        vm.warp(expiry + 1);
+
+        vm.expectRevert();
+        newMorpho.delegateBySig(delegation.delegatee, delegation.nonce, delegation.expiry, sig.v, sig.r, sig.s);
+    }
+
     function testDelegateBySigWrongNonce(SigUtils.Delegation memory delegation, uint256 privateKey, uint256 nounce)
         public
     {
@@ -92,6 +129,7 @@ contract MorphoTokenTest is BaseTest {
         addresses[0] = delegator;
         addresses[1] = delegation.delegatee;
         _validateAddresses(addresses);
+        vm.assume(newMorpho.nonces(delegator) == 0);
 
         delegation.expiry = bound(delegation.expiry, block.timestamp, type(uint256).max);
         delegation.nonce = 0;
@@ -108,6 +146,7 @@ contract MorphoTokenTest is BaseTest {
         assertEq(newMorpho.delegates(delegator), delegation.delegatee);
         assertEq(newMorpho.getVotes(delegator), 0);
         assertEq(newMorpho.getVotes(delegation.delegatee), amount);
+        assertEq(newMorpho.nonces(delegator), 1);
     }
 
     function testMultipleDelegations(

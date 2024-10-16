@@ -3,6 +3,7 @@ pragma solidity ^0.8.13;
 
 import {console} from "lib/forge-std/src/Test.sol";
 import {BaseTest} from "./helpers/BaseTest.sol";
+import {Wrapper} from "../src/Wrapper.sol";
 import {IMulticall} from "lib/morpho-blue-bundlers/src/interfaces/IMulticall.sol";
 import {TransferBundler} from "lib/morpho-blue-bundlers/src/TransferBundler.sol";
 import {ERC20WrapperBundler} from "lib/morpho-blue-bundlers/src/ERC20WrapperBundler.sol";
@@ -41,6 +42,34 @@ contract MorphoTokenMigrationTest is BaseTest {
 
         forkId = vm.createSelectFork(rpcUrl, forkBlockNumber);
         vm.chainId(1);
+    }
+
+    function testDeployWrapperZeroAddress() public {
+        vm.expectRevert();
+        new Wrapper(address(0));
+    }
+
+    function testTotalSupply() public {
+        assertEq(newMorpho.totalSupply(), 1_000_000_000e18);
+    }
+
+    function testInitialWrapperBalances() public {
+        assertEq(legacyMorpho.balanceOf(address(wrapper)), 0);
+        assertEq(newMorpho.balanceOf(address(wrapper)), 1_000_000_000e18);
+    }
+
+    function testDepositForZeroAddress(uint256 amount) public {
+        vm.assume(amount != 0);
+
+        vm.expectRevert();
+        wrapper.depositFor(address(0), amount);
+    }
+
+    function testDepositForSelfAddress(uint256 amount) public {
+        vm.assume(amount != 0);
+
+        vm.expectRevert();
+        wrapper.depositFor(address(wrapper), amount);
     }
 
     function testDAOMigration() public {

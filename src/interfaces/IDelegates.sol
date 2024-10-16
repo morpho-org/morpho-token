@@ -1,6 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
+/// @title IDelegates
+/// @author Morpho Labs
+/// @custom:contact security@morpho.org
+/// @notice The Delegates interface.
 interface IDelegates {
     // @dev The signature used has expired.
     error DelegatesExpiredSignature(uint256 expiry);

@@ -61,6 +61,29 @@ contract MorphoTokenTest is BaseTest {
         assertEq(newMorpho.getVotes(delegatee), amount);
     }
 
+    function testDelegateBySigWrongNonce(SigUtils.Delegation memory delegation, uint256 privateKey, uint256 nounce)
+        public
+    {
+        vm.assume(nounce != 0);
+        privateKey = bound(privateKey, 1, type(uint32).max);
+        address delegator = vm.addr(privateKey);
+
+        address[] memory addresses = new address[](2);
+        addresses[0] = delegator;
+        addresses[1] = delegation.delegatee;
+        _validateAddresses(addresses);
+
+        delegation.expiry = bound(delegation.expiry, block.timestamp, type(uint256).max);
+        delegation.nonce = nounce;
+
+        Signature memory sig;
+        bytes32 digest = SigUtils.getTypedDataHash(delegation, address(newMorpho));
+        (sig.v, sig.r, sig.s) = vm.sign(privateKey, digest);
+
+        vm.expectRevert();
+        newMorpho.delegateBySig(delegation.delegatee, delegation.nonce, delegation.expiry, sig.v, sig.r, sig.s);
+    }
+
     function testDelegateBySig(SigUtils.Delegation memory delegation, uint256 privateKey, uint256 amount) public {
         privateKey = bound(privateKey, 1, type(uint32).max);
         address delegator = vm.addr(privateKey);
@@ -77,7 +100,7 @@ contract MorphoTokenTest is BaseTest {
         deal(address(newMorpho), delegator, amount);
 
         Signature memory sig;
-        bytes32 digest = SigUtils.getTypedDataHash(delegation);
+        bytes32 digest = SigUtils.getTypedDataHash(delegation, address(newMorpho));
         (sig.v, sig.r, sig.s) = vm.sign(privateKey, digest);
 
         newMorpho.delegateBySig(delegation.delegatee, delegation.nonce, delegation.expiry, sig.v, sig.r, sig.s);

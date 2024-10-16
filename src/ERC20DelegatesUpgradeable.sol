@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.20;
+pragma solidity 0.8.27;
 
 import {IDelegates} from "./interfaces/IDelegates.sol";
 
@@ -11,7 +11,10 @@ import {EIP712Upgradeable} from
     "lib/openzeppelin-contracts-upgradeable/contracts/utils/cryptography/EIP712Upgradeable.sol";
 import {Initializable} from "lib/openzeppelin-contracts-upgradeable/contracts/proxy/utils/Initializable.sol";
 
-/// @dev Extension of ERC20 to support token delegation.                  |
+/// @title ERC20DelegatesUpgradeable
+/// @author Morpho Labs
+/// @custom:contact security@morpho.org
+/// @dev Extension of ERC20 to support token delegation.
 ///
 /// This extension keeps track of each account's vote power. Vote power can be delegated either by calling the
 /// {delegate} function directly, or by providing a signature to be used with {delegateBySig}. Voting power can be
@@ -46,6 +49,7 @@ abstract contract ERC20DelegatesUpgradeable is
 
     /* FUNCTIONS */
 
+    /// @dev Returns the ERC20DelegatesStorage struct.
     function _getERC20DelegatesStorage() private pure returns (ERC20DelegatesStorage storage $) {
         assembly {
             $.slot := ERC20DelegatesStorageLocation
@@ -92,8 +96,7 @@ abstract contract ERC20DelegatesUpgradeable is
     }
 
     /// @dev Delegate all of `account`'s voting units to `delegatee`.
-    ///
-    /// Emits events {IDelegates-DelegateChanged} and {IDelegates-DelegateVotesChanged}.
+    /// @dev Emits events {IDelegates-DelegateChanged} and {IDelegates-DelegateVotesChanged}.
     function _delegate(address account, address delegatee) internal virtual {
         ERC20DelegatesStorage storage $ = _getERC20DelegatesStorage();
         address oldDelegate = delegates(account);
@@ -140,9 +143,8 @@ abstract contract ERC20DelegatesUpgradeable is
         return balanceOf(account);
     }
 
-    /// @dev Move voting power when tokens are transferred.
-    ///
-    /// Emits a {IDelegates-DelegateVotesChanged} event.
+    /// @dev Moves voting power when tokens are transferred.
+    /// @dev Emits a {IDelegates-DelegateVotesChanged} event.
     function _update(address from, address to, uint256 value) internal virtual override {
         super._update(from, to, value);
         // No check of supply cap here like in OZ implementation as MORPHO has a 1B total supply cap.

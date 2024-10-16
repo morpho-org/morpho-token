@@ -46,7 +46,7 @@ abstract contract ERC20DelegatesUpgradeable is
 
     /* FUNCTIONS */
 
-    function _getDelegatesStorage() private pure returns (ERC20DelegatesStorage storage $) {
+    function _getERC20DelegatesStorage() private pure returns (ERC20DelegatesStorage storage $) {
         assembly {
             $.slot := ERC20DelegatesStorageLocation
         }
@@ -54,19 +54,19 @@ abstract contract ERC20DelegatesUpgradeable is
 
     /// @dev Returns the current amount of votes that `account` has.
     function getVotes(address account) public view virtual returns (uint256) {
-        ERC20DelegatesStorage storage $ = _getDelegatesStorage();
+        ERC20DelegatesStorage storage $ = _getERC20DelegatesStorage();
         return $._votingPower[account];
     }
 
     /// @dev Returns the current total supply of votes.
     function _getTotalSupply() internal view virtual returns (uint256) {
-        ERC20DelegatesStorage storage $ = _getDelegatesStorage();
+        ERC20DelegatesStorage storage $ = _getERC20DelegatesStorage();
         return $._totalVotingPower;
     }
 
     /// @dev Returns the delegate that `account` has chosen.
     function delegates(address account) public view virtual returns (address) {
-        ERC20DelegatesStorage storage $ = _getDelegatesStorage();
+        ERC20DelegatesStorage storage $ = _getERC20DelegatesStorage();
         return $._delegatee[account];
     }
 
@@ -95,7 +95,7 @@ abstract contract ERC20DelegatesUpgradeable is
     ///
     /// Emits events {IDelegates-DelegateChanged} and {IDelegates-DelegateVotesChanged}.
     function _delegate(address account, address delegatee) internal virtual {
-        ERC20DelegatesStorage storage $ = _getDelegatesStorage();
+        ERC20DelegatesStorage storage $ = _getERC20DelegatesStorage();
         address oldDelegate = delegates(account);
         $._delegatee[account] = delegatee;
 
@@ -106,7 +106,7 @@ abstract contract ERC20DelegatesUpgradeable is
     /// @dev Transfers, mints, or burns voting units. To register a mint, `from` should be zero. To register a burn, `to`
     /// should be zero. Total supply of voting units will be adjusted with mints and burns.
     function _transferVotingUnits(address from, address to, uint256 amount) internal virtual {
-        ERC20DelegatesStorage storage $ = _getDelegatesStorage();
+        ERC20DelegatesStorage storage $ = _getERC20DelegatesStorage();
         if (from == address(0)) {
             $._totalVotingPower += amount;
         }
@@ -118,7 +118,7 @@ abstract contract ERC20DelegatesUpgradeable is
 
     /// @dev Moves delegated votes from one delegate to another.
     function _moveDelegateVotes(address from, address to, uint256 amount) private {
-        ERC20DelegatesStorage storage $ = _getDelegatesStorage();
+        ERC20DelegatesStorage storage $ = _getERC20DelegatesStorage();
         if (from != to && amount > 0) {
             if (from != address(0)) {
                 uint256 oldValue = $._votingPower[from];

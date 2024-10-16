@@ -44,19 +44,19 @@ contract MorphoTokenMigrationTest is BaseTest {
     }
 
     function testDAOMigration() public {
-        uint256 DAOTokenAmount = legacyMorpho.balanceOf(MORPHO_DAO);
+        uint256 daoTokenAmount = legacyMorpho.balanceOf(MORPHO_DAO);
 
-        bundle.push(_erc20TransferFrom(LEGACY_MORPHO, DAOTokenAmount));
-        bundle.push(_erc20WrapperDepositFor(address(wrapper), DAOTokenAmount));
+        bundle.push(_erc20TransferFrom(LEGACY_MORPHO, daoTokenAmount));
+        bundle.push(_erc20WrapperDepositFor(address(wrapper), daoTokenAmount));
 
         vm.startPrank(MORPHO_DAO);
-        legacyMorpho.approve(address(bundler), DAOTokenAmount);
+        legacyMorpho.approve(address(bundler), daoTokenAmount);
         bundler.multicall(bundle);
         vm.stopPrank();
 
         assertEq(legacyMorpho.balanceOf(MORPHO_DAO), 0, "legacyMorpho.balanceOf(MORPHO_DAO)");
-        assertEq(legacyMorpho.balanceOf(address(wrapper)), DAOTokenAmount, "legacyMorpho.balanceOf(wrapper)");
-        assertEq(newMorpho.balanceOf(MORPHO_DAO), DAOTokenAmount, "newMorpho.balanceOf(MORPHO_DAO)");
+        assertEq(legacyMorpho.balanceOf(address(wrapper)), daoTokenAmount, "legacyMorpho.balanceOf(wrapper)");
+        assertEq(newMorpho.balanceOf(MORPHO_DAO), daoTokenAmount, "newMorpho.balanceOf(MORPHO_DAO)");
     }
 
     function testMigration(address migrater, uint256 amount) public {

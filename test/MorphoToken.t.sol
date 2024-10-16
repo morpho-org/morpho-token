@@ -110,7 +110,7 @@ contract MorphoTokenTest is BaseTest {
         assertEq(newMorpho.getVotes(delegation.delegatee), amount);
     }
 
-    function testMultipleDelegation(
+    function testMultipleDelegations(
         address delegator1,
         address delegator2,
         address delegatee,

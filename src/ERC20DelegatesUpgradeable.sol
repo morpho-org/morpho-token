@@ -145,7 +145,7 @@ abstract contract ERC20DelegatesUpgradeable is
     /// Emits a {IDelegates-DelegateVotesChanged} event.
     function _update(address from, address to, uint256 value) internal virtual override {
         super._update(from, to, value);
-        // No check of supply cap here like in OZ implementation has MORPHO has a 1B total supply cap.
+        // No check of supply cap here like in OZ implementation as MORPHO has a 1B total supply cap.
         _transferVotingUnits(from, to, value);
     }
 }

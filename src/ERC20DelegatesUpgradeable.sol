@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.20;
+pragma solidity 0.8.27;
 
 import {IDelegates} from "./interfaces/IDelegates.sol";
 
@@ -11,7 +11,10 @@ import {EIP712Upgradeable} from
     "lib/openzeppelin-contracts-upgradeable/contracts/utils/cryptography/EIP712Upgradeable.sol";
 import {Initializable} from "lib/openzeppelin-contracts-upgradeable/contracts/proxy/utils/Initializable.sol";
 
-/// @dev Extension of ERC20 to support token delegation.                  |
+/// @title ERC20DelegatesUpgradeable
+/// @author Morpho Labs
+/// @custom:contact security@morpho.org
+/// @dev Extension of ERC20 to support token delegation.
 ///
 /// This extension keeps track of each account's vote power. Vote power can be delegated either by calling the
 /// {delegate} function directly, or by providing a signature to be used with {delegateBySig}. Voting power can be
@@ -44,43 +47,28 @@ abstract contract ERC20DelegatesUpgradeable is
         uint256 _totalVotingPower;
     }
 
-    /* FUNCTIONS */
-
-    function _getERC20DelegatesStorage() private pure returns (ERC20DelegatesStorage storage $) {
-        assembly {
-            $.slot := ERC20DelegatesStorageLocation
-        }
-    }
+    /* PUBLIC */
 
     /// @dev Returns the current amount of votes that `account` has.
-    function getVotes(address account) public view virtual returns (uint256) {
+    function getVotes(address account) public view returns (uint256) {
         ERC20DelegatesStorage storage $ = _getERC20DelegatesStorage();
         return $._votingPower[account];
     }
 
-    /// @dev Returns the current total supply of votes.
-    function _getTotalSupply() internal view virtual returns (uint256) {
-        ERC20DelegatesStorage storage $ = _getERC20DelegatesStorage();
-        return $._totalVotingPower;
-    }
-
     /// @dev Returns the delegate that `account` has chosen.
-    function delegates(address account) public view virtual returns (address) {
+    function delegates(address account) public view returns (address) {
         ERC20DelegatesStorage storage $ = _getERC20DelegatesStorage();
         return $._delegatee[account];
     }
 
     /// @dev Delegates votes from the sender to `delegatee`.
-    function delegate(address delegatee) public virtual {
+    function delegate(address delegatee) public {
         address account = _msgSender();
         _delegate(account, delegatee);
     }
 
     /// @dev Delegates votes from signer to `delegatee`.
-    function delegateBySig(address delegatee, uint256 nonce, uint256 expiry, uint8 v, bytes32 r, bytes32 s)
-        public
-        virtual
-    {
+    function delegateBySig(address delegatee, uint256 nonce, uint256 expiry, uint8 v, bytes32 r, bytes32 s) public {
         if (block.timestamp > expiry) {
             revert DelegatesExpiredSignature(expiry);
         }
@@ -91,10 +79,11 @@ abstract contract ERC20DelegatesUpgradeable is
         _delegate(signer, delegatee);
     }
 
-    /// @dev Delegate all of `account`'s voting units to `delegatee`.
-    ///
-    /// Emits events {IDelegates-DelegateChanged} and {IDelegates-DelegateVotesChanged}.
-    function _delegate(address account, address delegatee) internal virtual {
+    /* INTERNAL */
+
+    /// @dev Delegates all of `account`'s voting units to `delegatee`.
+    /// @dev Emits events {IDelegates-DelegateChanged} and {IDelegates-DelegateVotesChanged}.
+    function _delegate(address account, address delegatee) internal {
         ERC20DelegatesStorage storage $ = _getERC20DelegatesStorage();
         address oldDelegate = delegates(account);
         $._delegatee[account] = delegatee;
@@ -105,7 +94,7 @@ abstract contract ERC20DelegatesUpgradeable is
 
     /// @dev Transfers, mints, or burns voting units. To register a mint, `from` should be zero. To register a burn, `to`
     /// should be zero. Total supply of voting units will be adjusted with mints and burns.
-    function _transferVotingUnits(address from, address to, uint256 amount) internal virtual {
+    function _transferVotingUnits(address from, address to, uint256 amount) internal {
         ERC20DelegatesStorage storage $ = _getERC20DelegatesStorage();
         if (from == address(0)) {
             $._totalVotingPower += amount;
@@ -115,6 +104,27 @@ abstract contract ERC20DelegatesUpgradeable is
         }
         _moveDelegateVotes(delegates(from), delegates(to), amount);
     }
+
+    /// @dev Returns the current total supply of votes.
+    function _getTotalSupply() internal view returns (uint256) {
+        ERC20DelegatesStorage storage $ = _getERC20DelegatesStorage();
+        return $._totalVotingPower;
+    }
+
+    /// @dev Must return the voting units held by an account.
+    function _getVotingUnits(address account) internal view returns (uint256) {
+        return balanceOf(account);
+    }
+
+    /// @dev Moves voting power when tokens are transferred.
+    /// @dev Emits a {IDelegates-DelegateVotesChanged} event.
+    function _update(address from, address to, uint256 value) internal virtual override {
+        super._update(from, to, value);
+        // No check of supply cap here like in OZ implementation as MORPHO has a 1B total supply cap.
+        _transferVotingUnits(from, to, value);
+    }
+
+    /* PRIVATE */
 
     /// @dev Moves delegated votes from one delegate to another.
     function _moveDelegateVotes(address from, address to, uint256 amount) private {
@@ -135,17 +145,10 @@ abstract contract ERC20DelegatesUpgradeable is
         }
     }
 
-    /// @dev Must return the voting units held by an account.
-    function _getVotingUnits(address account) internal view returns (uint256) {
-        return balanceOf(account);
-    }
-
-    /// @dev Move voting power when tokens are transferred.
-    ///
-    /// Emits a {IDelegates-DelegateVotesChanged} event.
-    function _update(address from, address to, uint256 value) internal virtual override {
-        super._update(from, to, value);
-        // No check of supply cap here like in OZ implementation as MORPHO has a 1B total supply cap.
-        _transferVotingUnits(from, to, value);
+    /// @dev Returns the ERC20DelegatesStorage struct.
+    function _getERC20DelegatesStorage() private pure returns (ERC20DelegatesStorage storage $) {
+        assembly {
+            $.slot := ERC20DelegatesStorageLocation
+        }
     }
 }

@@ -143,7 +143,7 @@ contract MorphoTokenTest is BaseTest {
         address delegatee1,
         address delegatee2,
         uint256 initialAmount,
-        uint256 transferedAmount
+        uint256 transferredAmount
     ) public {
         address[] memory addresses = new address[](4);
         addresses[0] = delegator1;
@@ -152,7 +152,7 @@ contract MorphoTokenTest is BaseTest {
         addresses[3] = delegatee2;
         _validateAddresses(addresses);
         initialAmount = bound(initialAmount, MIN_TEST_AMOUNT, MAX_TEST_AMOUNT);
-        transferedAmount = bound(transferedAmount, MIN_TEST_AMOUNT, initialAmount);
+        transferredAmount = bound(transferredAmount, MIN_TEST_AMOUNT, initialAmount);
 
         deal(address(newMorpho), delegator1, initialAmount);
 
@@ -161,10 +161,10 @@ contract MorphoTokenTest is BaseTest {
 
         vm.startPrank(delegator1);
         newMorpho.delegate(delegatee1);
-        newMorpho.transfer(delegator2, transferedAmount);
+        newMorpho.transfer(delegator2, transferredAmount);
         vm.stopPrank();
 
-        assertEq(newMorpho.getVotes(delegatee1), initialAmount - transferedAmount);
-        assertEq(newMorpho.getVotes(delegatee2), transferedAmount);
+        assertEq(newMorpho.getVotes(delegatee1), initialAmount - transferredAmount);
+        assertEq(newMorpho.getVotes(delegatee2), transferredAmount);
     }
 }

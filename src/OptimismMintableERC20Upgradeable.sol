@@ -4,6 +4,7 @@ pragma solidity 0.8.27;
 import {ERC20Upgradeable} from "lib/openzeppelin-contracts-upgradeable/contracts/token/ERC20/ERC20Upgradeable.sol";
 import {IERC165} from "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 import {ILegacyMintableERC20, IOptimismMintableERC20} from "./interfaces/IOptimismMintableERC20.sol";
+import {Initializable} from "lib/openzeppelin-contracts-upgradeable/contracts/proxy/utils/Initializable.sol";
 
 /**
  * @title OptimismMintableERC20
@@ -13,7 +14,12 @@ import {ILegacyMintableERC20, IOptimismMintableERC20} from "./interfaces/IOptimi
  *         Designed to be backwards compatible with the older StandardL2ERC20 token which was only
  *         meant for use on L2.
  */
-contract OptimismMintableERC20Upgradeable is IOptimismMintableERC20, ILegacyMintableERC20, ERC20Upgradeable {
+contract OptimismMintableERC20Upgradeable is
+    Initializable,
+    IOptimismMintableERC20,
+    ILegacyMintableERC20,
+    ERC20Upgradeable
+{
     // keccak256(abi.encode(uint256(keccak256("morpho.storage.OptimismMintableERC20")) - 1)) & ~bytes32(uint256(0xff))
     bytes32 private constant OptimismMintableERC20StorageLocation =
         0x1dc92b2c6e971ab6e08dfd7dcec0e9496d223ced663ba2a06543451548549500; // TO UPDATE
@@ -46,23 +52,25 @@ contract OptimismMintableERC20Upgradeable is IOptimismMintableERC20, ILegacyMint
      * @notice A modifier that only allows the bridge to call
      */
     modifier onlyBridge() {
-        require(msg.sender == BRIDGE, "OptimismMintableERC20: only bridge can mint and burn");
+        OptimismMintableERC20Storage storage $ = _getOptimismMintableERC20Storage();
+        require(_msgSender() == $._BRIDGE, "OptimismMintableERC20: only bridge can mint and burn");
         _;
     }
 
     /**
-     * @custom:semver 1.0.0
+     * @dev Sets the values for {name} and {symbol}.
      *
-     * @param _bridge      Address of the L2 standard bridge.
-     * @param _remoteToken Address of the corresponding L1 token.
-     * @param _name        ERC20 name.
-     * @param _symbol      ERC20 symbol.
+     * All two of these values are immutable: they can only be set once during
+     * initialization.
      */
-    constructor(address _bridge, address _remoteToken, string memory _name, string memory _symbol)
-        ERC20(_name, _symbol)
-    {
-        REMOTE_TOKEN = _remoteToken;
-        BRIDGE = _bridge;
+    function __OptimismMintableERC20_init(address remoteToken_, address bridge_) internal onlyInitializing {
+        __OptimismMintableERC20_init_unchained(remoteToken_, bridge_);
+    }
+
+    function __OptimismMintableERC20_init_unchained(address remoteToken_, address bridge_) internal onlyInitializing {
+        OptimismMintableERC20Storage storage $ = _getOptimismMintableERC20Storage();
+        $._REMOTE_TOKEN = remoteToken_;
+        $._BRIDGE = bridge_;
     }
 
     /**
@@ -118,7 +126,8 @@ contract OptimismMintableERC20Upgradeable is IOptimismMintableERC20, ILegacyMint
      * @notice Legacy getter for the remote token. Use REMOTE_TOKEN going forward.
      */
     function l1Token() public view returns (address) {
-        return REMOTE_TOKEN;
+        OptimismMintableERC20Storage storage $ = _getOptimismMintableERC20Storage();
+        return $._BRIDGE;
     }
 
     /**
@@ -126,7 +135,8 @@ contract OptimismMintableERC20Upgradeable is IOptimismMintableERC20, ILegacyMint
      * @notice Legacy getter for the bridge. Use BRIDGE going forward.
      */
     function l2Bridge() public view returns (address) {
-        return BRIDGE;
+        OptimismMintableERC20Storage storage $ = _getOptimismMintableERC20Storage();
+        return $._BRIDGE;
     }
 
     /**
@@ -134,7 +144,8 @@ contract OptimismMintableERC20Upgradeable is IOptimismMintableERC20, ILegacyMint
      * @notice Legacy getter for REMOTE_TOKEN.
      */
     function remoteToken() public view returns (address) {
-        return REMOTE_TOKEN;
+        OptimismMintableERC20Storage storage $ = _getOptimismMintableERC20Storage();
+        return $._REMOTE_TOKEN;
     }
 
     /**
@@ -142,11 +153,12 @@ contract OptimismMintableERC20Upgradeable is IOptimismMintableERC20, ILegacyMint
      * @notice Legacy getter for BRIDGE.
      */
     function bridge() public view returns (address) {
-        return BRIDGE;
+        OptimismMintableERC20Storage storage $ = _getOptimismMintableERC20Storage();
+        return $._BRIDGE;
     }
 
     /// @dev Returns the OptimismMintableERC20Storage struct.
-    function _getOptimismMintableERC20Storage() private pure returns (ERC20DelegatesStorage storage $) {
+    function _getOptimismMintableERC20Storage() private pure returns (OptimismMintableERC20Storage storage $) {
         assembly {
             $.slot := OptimismMintableERC20StorageLocation
         }

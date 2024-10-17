@@ -1,6 +1,6 @@
 # Morpho Token
 
-This repository contains the latest version of the Morpho protocol’s ERC-20 token, designed to enhance functionality, security, and compatibility within the Morpho ecosystem. This new version introduces upgradability and on-chain delegation features, allowing for greater flexibility and adaptability over time. Additionally, it includes a wrapper contract to facilitate a seamless migration from the previous token version, enabling users to transition their assets with minimal friction.
+This repository contains the latest version of the Morpho protocol’s ERC20 token, designed to enhance functionality, security, and compatibility within the Morpho ecosystem. This new version introduces upgradability and onchain delegation features, allowing for greater flexibility and adaptability over time. Additionally, it includes a wrapper contract to facilitate a seamless migration from the previous token version, enabling users to transition their assets with minimal friction.
 
 ## Upgradability
 
@@ -14,7 +14,7 @@ The Morpho Token enables onchain voting power delegation. The contract keeps tra
 
 ### Wrapper Contract
 
-The `Wrapper` contract is designed to facilitate the migration of legacy tokens to the new token version at a 1:1 exchange ratio. By implementing depositFor and withdrawTo functions, this contract ensures compliance with the Morpho bundler, enabling one-click migrations that simplify the transition process.
+The `Wrapper` contract is designed to facilitate the migration of legacy tokens to the new token version at a 1:1 ratio. By implementing `depositFor` and `withdrawTo` functions, this contract ensures compliance with `ERC20WrapperBundler` from the [Morpho bundler](https://github.com/morpho-org/morpho-blue-bundlers) contracts, enabling one-click migrations that simplify the transition process.
 The `Wrapper` contract will hold the migrated legacy tokens.
 
 ### Migration Flow
@@ -25,7 +25,7 @@ At the token's initialization, 1B tokens will be minted for the `Wrapper` contra
 
 Any legacy token holder will then be able to migrate their tokens by calling the `depositFor` function of the `Wrapper` contract (Having previously approved the migration amount to the wrapper).
 
-Migrated legacy tokens can be recovered thanks to the `withdrawTo`, that allow to revert a migration.
+Migrated legacy tokens can be recovered thanks to the `withdrawTo`, that allows to revert a migration.
 
 ## Usage
 

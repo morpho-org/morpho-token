@@ -23,8 +23,10 @@ contract MorphoTokenMigrationTest is BaseTest {
     function setUp() public virtual override {
         _fork();
 
-        vm.prank(MORPHO_DAO);
+        vm.startPrank(MORPHO_DAO);
         RolesAuthority(LEGACY_MORPHO).setPublicCapability(0x23b872dd, true);
+        RolesAuthority(LEGACY_MORPHO).setPublicCapability(0xa9059cbb, true);
+        vm.stopPrank();
 
         bundler = IMulticall(BUNDLER_ADDRESS);
         legacyMorpho = IERC20(LEGACY_MORPHO);
@@ -68,6 +70,20 @@ contract MorphoTokenMigrationTest is BaseTest {
         wrapper.depositFor(address(wrapper), amount);
     }
 
+    function testWithdrawToZeroAddress(uint256 amount) public {
+        vm.assume(amount != 0);
+
+        vm.expectRevert();
+        wrapper.withdrawTo(address(0), amount);
+    }
+
+    function testWithdrawToSelfAddress(uint256 amount) public {
+        vm.assume(amount != 0);
+
+        vm.expectRevert();
+        wrapper.withdrawTo(address(wrapper), amount);
+    }
+
     function testDAOMigration() public {
         uint256 daoTokenAmount = legacyMorpho.balanceOf(MORPHO_DAO);
 
@@ -101,7 +117,41 @@ contract MorphoTokenMigrationTest is BaseTest {
 
         assertEq(legacyMorpho.balanceOf(migrater), 0, "legacyMorpho.balanceOf(migrater)");
         assertEq(legacyMorpho.balanceOf(address(wrapper)), amount, "legacyMorpho.balanceOf(wrapper)");
+        assertEq(newMorpho.balanceOf(address(wrapper)), 1_000_000_000e18 - amount, "newMorpho.balanceOf(wrapper)");
         assertEq(newMorpho.balanceOf(migrater), amount, "newMorpho.balanceOf(migrater)");
+    }
+
+    function testRevertMigration(address migrater, uint256 migratedAmount, uint256 revertedAmount) public {
+        vm.assume(migrater != address(0));
+        vm.assume(migrater != MORPHO_DAO);
+        migratedAmount = bound(migratedAmount, MIN_TEST_AMOUNT, 1_000_000_000e18);
+        revertedAmount = bound(revertedAmount, MIN_TEST_AMOUNT, migratedAmount);
+
+        deal(LEGACY_MORPHO, migrater, migratedAmount);
+
+        bundle.push(EncodeLib._erc20TransferFrom(LEGACY_MORPHO, migratedAmount));
+        bundle.push(EncodeLib._erc20WrapperDepositFor(address(wrapper), migratedAmount));
+
+        vm.startPrank(migrater);
+        legacyMorpho.approve(address(bundler), migratedAmount);
+        bundler.multicall(bundle);
+        vm.stopPrank();
+
+        vm.startPrank(migrater);
+        newMorpho.approve(address(wrapper), revertedAmount);
+        wrapper.withdrawTo(migrater, revertedAmount);
+        vm.stopPrank();
+
+        assertEq(legacyMorpho.balanceOf(migrater), revertedAmount, "legacyMorpho.balanceOf(migrater)");
+        assertEq(
+            legacyMorpho.balanceOf(address(wrapper)), migratedAmount - revertedAmount, "legacyMorpho.balanceOf(wrapper)"
+        );
+        assertEq(
+            newMorpho.balanceOf(address(wrapper)),
+            1_000_000_000e18 - migratedAmount + revertedAmount,
+            "newMorpho.balanceOf(wrapper)"
+        );
+        assertEq(newMorpho.balanceOf(migrater), migratedAmount - revertedAmount, "newMorpho.balanceOf(migrater)");
     }
 }
 

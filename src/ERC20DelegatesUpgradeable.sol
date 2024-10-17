@@ -105,12 +105,6 @@ abstract contract ERC20DelegatesUpgradeable is
         _moveDelegateVotes(delegates(from), delegates(to), amount);
     }
 
-    /// @dev Returns the current total supply of votes.
-    function _getTotalSupply() internal view returns (uint256) {
-        ERC20DelegatesStorage storage $ = _getERC20DelegatesStorage();
-        return $._totalVotingPower;
-    }
-
     /// @dev Must return the voting units held by an account.
     function _getVotingUnits(address account) internal view returns (uint256) {
         return balanceOf(account);

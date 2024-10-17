@@ -7,11 +7,6 @@ import {MorphoToken} from "../src/MorphoToken.sol";
 import {ERC1967Proxy} from
     "lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 
-// TODO: Test the following:
-// - Test every paths
-// - Test access control
-// - Test voting
-// - Test delegation
 contract MorphoTokenTest is BaseTest {
     function testInitilizeZeroAddress(address randomAddress) public {
         vm.assume(randomAddress != address(0));

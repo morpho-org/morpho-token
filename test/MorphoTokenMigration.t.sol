@@ -4,15 +4,11 @@ pragma solidity ^0.8.13;
 import {console} from "lib/forge-std/src/Test.sol";
 import {BaseTest} from "./helpers/BaseTest.sol";
 import {Wrapper} from "../src/Wrapper.sol";
-import {IMulticall} from "lib/morpho-blue-bundlers/src/interfaces/IMulticall.sol";
-import {TransferBundler} from "lib/morpho-blue-bundlers/src/TransferBundler.sol";
-import {ERC20WrapperBundler} from "lib/morpho-blue-bundlers/src/ERC20WrapperBundler.sol";
+import {IMulticall} from "./helpers/interfaces/IMulticall.sol";
+import {EncodeLib} from "./helpers/libraries/EncodeLib.sol";
 import {IERC20} from
     "lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 
-// TODO: Test the following:
-// - Test migration flow
-// - Test bundler wrapping
 contract MorphoTokenMigrationTest is BaseTest {
     address internal constant BUNDLER_ADDRESS = 0x4095F064B8d3c3548A3bebfd0Bbfd04750E30077;
     address internal constant LEGACY_MORPHO = 0x9994E35Db50125E0DF82e4c2dde62496CE330999;
@@ -75,8 +71,8 @@ contract MorphoTokenMigrationTest is BaseTest {
     function testDAOMigration() public {
         uint256 daoTokenAmount = legacyMorpho.balanceOf(MORPHO_DAO);
 
-        bundle.push(_erc20TransferFrom(LEGACY_MORPHO, daoTokenAmount));
-        bundle.push(_erc20WrapperDepositFor(address(wrapper), daoTokenAmount));
+        bundle.push(EncodeLib._erc20TransferFrom(LEGACY_MORPHO, daoTokenAmount));
+        bundle.push(EncodeLib._erc20WrapperDepositFor(address(wrapper), daoTokenAmount));
 
         vm.startPrank(MORPHO_DAO);
         legacyMorpho.approve(address(bundler), daoTokenAmount);
@@ -95,8 +91,8 @@ contract MorphoTokenMigrationTest is BaseTest {
 
         deal(LEGACY_MORPHO, migrater, amount);
 
-        bundle.push(_erc20TransferFrom(LEGACY_MORPHO, amount));
-        bundle.push(_erc20WrapperDepositFor(address(wrapper), amount));
+        bundle.push(EncodeLib._erc20TransferFrom(LEGACY_MORPHO, amount));
+        bundle.push(EncodeLib._erc20WrapperDepositFor(address(wrapper), amount));
 
         vm.startPrank(migrater);
         legacyMorpho.approve(address(bundler), amount);
@@ -106,14 +102,6 @@ contract MorphoTokenMigrationTest is BaseTest {
         assertEq(legacyMorpho.balanceOf(migrater), 0, "legacyMorpho.balanceOf(migrater)");
         assertEq(legacyMorpho.balanceOf(address(wrapper)), amount, "legacyMorpho.balanceOf(wrapper)");
         assertEq(newMorpho.balanceOf(migrater), amount, "newMorpho.balanceOf(migrater)");
-    }
-
-    function _erc20WrapperDepositFor(address asset, uint256 amount) internal pure returns (bytes memory) {
-        return abi.encodeCall(ERC20WrapperBundler.erc20WrapperDepositFor, (asset, amount));
-    }
-
-    function _erc20TransferFrom(address asset, uint256 amount) internal pure returns (bytes memory) {
-        return abi.encodeCall(TransferBundler.erc20TransferFrom, (asset, amount));
     }
 }
 

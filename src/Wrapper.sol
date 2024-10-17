@@ -1,21 +1,21 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.27;
+pragma solidity 0.8.27;
 
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
-// TODO:
-// - add natspecs
-// - add events?
-// - add error messages
+/// @title MorphoToken
+/// @author Morpho Labs
+/// @custom:contact security@morpho.org
+/// @notice The MORPHO Token contract.
 contract Wrapper {
     /* CONSTANTS */
 
-    /// @dev The address of the legacy morpho token.
+    /// @dev The address of the legacy MORPHO token.
     address public constant LEGACY_MORPHO = address(0x9994E35Db50125E0DF82e4c2dde62496CE330999);
 
     /* IMMUTABLES */
 
-    /// @dev The address of the new morpho token.
+    /// @dev The address of the new MORPHO token.
     address public immutable NEW_MORPHO;
 
     /* ERRORS */
@@ -38,12 +38,22 @@ contract Wrapper {
     /* PUBLIC */
 
     /// @dev Compliant to `ERC20Wrapper` contract from OZ for convenience.
-    function depositFor(address account, uint256 amount) public returns (bool) {
+    function depositFor(address account, uint256 value) public returns (bool) {
         require(account != address(0), ZeroAddress());
         require(account != address(this), SelfAddress());
 
-        IERC20(LEGACY_MORPHO).transferFrom(msg.sender, address(this), amount);
-        IERC20(NEW_MORPHO).transfer(account, amount);
+        IERC20(LEGACY_MORPHO).transferFrom(msg.sender, address(this), value);
+        IERC20(NEW_MORPHO).transfer(account, value);
+        return true;
+    }
+
+    /// @dev Compliant to `ERC20Wrapper` contract from OZ for convenience.
+    function withdrawTo(address account, uint256 value) public returns (bool) {
+        require(account != address(0), ZeroAddress());
+        require(account != address(this), SelfAddress());
+
+        IERC20(NEW_MORPHO).transferFrom(msg.sender, address(this), value);
+        IERC20(LEGACY_MORPHO).transfer(account, value);
         return true;
     }
 

@@ -38,12 +38,22 @@ contract Wrapper {
     /* PUBLIC */
 
     /// @dev Compliant to `ERC20Wrapper` contract from OZ for convenience.
-    function depositFor(address account, uint256 amount) public returns (bool) {
+    function depositFor(address account, uint256 value) public returns (bool) {
         require(account != address(0), ZeroAddress());
         require(account != address(this), SelfAddress());
 
-        IERC20(LEGACY_MORPHO).transferFrom(msg.sender, address(this), amount);
-        IERC20(NEW_MORPHO).transfer(account, amount);
+        IERC20(LEGACY_MORPHO).transferFrom(msg.sender, address(this), value);
+        IERC20(NEW_MORPHO).transfer(account, value);
+        return true;
+    }
+
+    /// @dev Compliant to `ERC20Wrapper` contract from OZ for convenience.
+    function withdrawTo(address account, uint256 value) public returns (bool) {
+        require(account != address(0), ZeroAddress());
+        require(account != address(this), SelfAddress());
+
+        IERC20(NEW_MORPHO).transferFrom(msg.sender, address(this), value);
+        IERC20(LEGACY_MORPHO).transfer(account, value);
         return true;
     }
 

@@ -23,8 +23,8 @@ contract OptimismMintableERC20Upgradeable is Initializable, IOptimismMintableERC
 
     /// @custom:storage-location erc7201:morpho.storage.OptimismMintableERC20
     struct OptimismMintableERC20Storage {
-        address _REMOTE_TOKEN;
-        address _BRIDGE;
+        address _remoteToken;
+        address _bridge;
     }
 
     /* EVENTS */
@@ -48,7 +48,7 @@ contract OptimismMintableERC20Upgradeable is Initializable, IOptimismMintableERC
     /// @dev A modifier that only allows the bridge to call.
     modifier onlyBridge() {
         OptimismMintableERC20Storage storage $ = _getOptimismMintableERC20Storage();
-        require(_msgSender() == $._BRIDGE, NotBridge(_msgSender()));
+        require(_msgSender() == $._bridge, NotBridge(_msgSender()));
         _;
     }
 
@@ -65,22 +65,22 @@ contract OptimismMintableERC20Upgradeable is Initializable, IOptimismMintableERC
         require(bridge_ != address(0), ZeroAddress());
 
         OptimismMintableERC20Storage storage $ = _getOptimismMintableERC20Storage();
-        $._REMOTE_TOKEN = remoteToken_;
-        $._BRIDGE = bridge_;
+        $._remoteToken = remoteToken_;
+        $._bridge = bridge_;
     }
 
     /* EXTERNAL */
 
     /// @dev Allows the StandardBridge on this network to mint tokens.
-    function mint(address _to, uint256 _amount) external virtual override onlyBridge {
-        _mint(_to, _amount);
-        emit Mint(_to, _amount);
+    function mint(address to, uint256 amount) external virtual override onlyBridge {
+        _mint(to, amount);
+        emit Mint(to, amount);
     }
 
     /// @dev Allows the StandardBridge on this network to burn tokens.
-    function burn(address _from, uint256 _amount) external virtual override onlyBridge {
-        _burn(_from, _amount);
-        emit Burn(_from, _amount);
+    function burn(address from, uint256 amount) external virtual override onlyBridge {
+        _burn(from, amount);
+        emit Burn(from, amount);
     }
 
     /// @notice ERC165 interface check function.
@@ -99,14 +99,14 @@ contract OptimismMintableERC20Upgradeable is Initializable, IOptimismMintableERC
     /// @dev Legacy getter for REMOTE_TOKEN.
     function remoteToken() public view returns (address) {
         OptimismMintableERC20Storage storage $ = _getOptimismMintableERC20Storage();
-        return $._REMOTE_TOKEN;
+        return $._remoteToken;
     }
 
     /// @custom:legacy
     /// @dev Legacy getter for BRIDGE.
     function bridge() public view returns (address) {
         OptimismMintableERC20Storage storage $ = _getOptimismMintableERC20Storage();
-        return $._BRIDGE;
+        return $._bridge;
     }
 
     /* PRIVATE */

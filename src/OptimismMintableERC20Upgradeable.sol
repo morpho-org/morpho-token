@@ -21,7 +21,7 @@ contract OptimismMintableERC20Upgradeable is Initializable, IOptimismMintableERC
 
     /* STRUCTS */
 
-    /// @custom:storage-location erc7201:morpho.storage.ERC20Delegates
+    /// @custom:storage-location erc7201:morpho.storage.OptimismMintableERC20
     struct OptimismMintableERC20Storage {
         address _REMOTE_TOKEN;
         address _BRIDGE;
@@ -44,6 +44,8 @@ contract OptimismMintableERC20Upgradeable is Initializable, IOptimismMintableERC
         _;
     }
 
+    /* INITIALIZER */
+
     /// @dev Sets the values for {remoteToken} and {bridge}.
     /// @dev All two of these values are immutable: they can only be set once during initialization.
     function __OptimismMintableERC20_init(address remoteToken_, address bridge_) internal onlyInitializing {
@@ -55,6 +57,8 @@ contract OptimismMintableERC20Upgradeable is Initializable, IOptimismMintableERC
         $._REMOTE_TOKEN = remoteToken_;
         $._BRIDGE = bridge_;
     }
+
+    /* EXTERNAL */
 
     /// @dev Allows the StandardBridge on this network to mint tokens.
     function mint(address _to, uint256 _amount) external virtual override onlyBridge {
@@ -78,6 +82,8 @@ contract OptimismMintableERC20Upgradeable is Initializable, IOptimismMintableERC
         return _interfaceId == iface1 || _interfaceId == iface3;
     }
 
+    /* PUBLIC */
+
     /// @custom:legacy
     /// @dev Legacy getter for REMOTE_TOKEN.
     function remoteToken() public view returns (address) {
@@ -91,6 +97,8 @@ contract OptimismMintableERC20Upgradeable is Initializable, IOptimismMintableERC
         OptimismMintableERC20Storage storage $ = _getOptimismMintableERC20Storage();
         return $._BRIDGE;
     }
+
+    /* PRIVATE */
 
     /// @dev Returns the OptimismMintableERC20Storage struct.
     function _getOptimismMintableERC20Storage() private pure returns (OptimismMintableERC20Storage storage $) {

@@ -98,7 +98,7 @@ contract OptimismMintableERC20Upgradeable is
     /// @dev Legacy getter for the remote token. Use REMOTE_TOKEN going forward.
     function l1Token() public view returns (address) {
         OptimismMintableERC20Storage storage $ = _getOptimismMintableERC20Storage();
-        return $._BRIDGE;
+        return $._REMOTE_TOKEN;
     }
 
     ///@dev Legacy getter for the bridge. Use BRIDGE going forward.

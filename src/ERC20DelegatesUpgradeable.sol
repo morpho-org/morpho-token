@@ -12,7 +12,7 @@ import {EIP712Upgradeable} from
 import {Initializable} from "lib/openzeppelin-contracts-upgradeable/contracts/proxy/utils/Initializable.sol";
 
 /// @title ERC20DelegatesUpgradeable
-/// @author Morpho Labs
+/// @author Morpho Association
 /// @custom:contact security@morpho.org
 /// @dev Extension of ERC20 to support token delegation.
 ///

@@ -10,7 +10,7 @@ import {ERC20PermitUpgradeable} from
 import {UUPSUpgradeable} from "lib/openzeppelin-contracts-upgradeable/contracts/proxy/utils/UUPSUpgradeable.sol";
 
 /// @title MorphoToken
-/// @author Morpho Labs
+/// @author Morpho Association
 /// @custom:contact security@morpho.org
 /// @notice The MORPHO Token contract for Optimism networks.
 contract MorphoTokenOptimism is
@@ -26,11 +26,6 @@ contract MorphoTokenOptimism is
 
     /// @dev The symbol of the token.
     string internal constant SYMBOL = "MORPHO";
-
-    /* ERRORS */
-
-    /// @notice Reverts if the address is the zero address.
-    error ZeroAddress();
 
     /* PUBLIC */
 

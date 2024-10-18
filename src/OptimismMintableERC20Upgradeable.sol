@@ -74,13 +74,13 @@ contract OptimismMintableERC20Upgradeable is Initializable, IOptimismMintableERC
     /* EXTERNAL */
 
     /// @dev Allows the StandardBridge on this network to mint tokens.
-    function mint(address to, uint256 amount) external virtual override onlyBridge {
+    function mint(address to, uint256 amount) external override onlyBridge {
         _mint(to, amount);
         emit Mint(to, amount);
     }
 
     /// @dev Allows the StandardBridge on this network to burn tokens.
-    function burn(address from, uint256 amount) external virtual override onlyBridge {
+    function burn(address from, uint256 amount) external override onlyBridge {
         _burn(from, amount);
         emit Burn(from, amount);
     }
@@ -95,18 +95,16 @@ contract OptimismMintableERC20Upgradeable is Initializable, IOptimismMintableERC
         return _interfaceId == iface1 || _interfaceId == iface3;
     }
 
-    /* PUBLIC */
-
     /// @custom:legacy
     /// @dev Legacy getter for REMOTE_TOKEN.
-    function remoteToken() public view returns (address) {
+    function remoteToken() external view returns (address) {
         OptimismMintableERC20Storage storage $ = _getOptimismMintableERC20Storage();
         return $._remoteToken;
     }
 
     /// @custom:legacy
     /// @dev Legacy getter for BRIDGE.
-    function bridge() public view returns (address) {
+    function bridge() external view returns (address) {
         OptimismMintableERC20Storage storage $ = _getOptimismMintableERC20Storage();
         return $._bridge;
     }

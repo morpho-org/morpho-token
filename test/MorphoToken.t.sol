@@ -58,6 +58,8 @@ contract MorphoTokenTest is BaseTest {
         _validateAddresses(addresses);
         amount = bound(amount, MIN_TEST_AMOUNT, MAX_TEST_AMOUNT);
 
+        assertEq(newMorpho.getTotalVotes(), 0);
+
         deal(address(newMorpho), delegator, amount);
 
         vm.prank(delegator);
@@ -66,6 +68,14 @@ contract MorphoTokenTest is BaseTest {
         assertEq(newMorpho.delegates(delegator), delegatee);
         assertEq(newMorpho.getVotes(delegator), 0);
         assertEq(newMorpho.getVotes(delegatee), amount);
+        assertEq(newMorpho.getTotalVotes(), amount);
+
+        vm.prank(delegator);
+        newMorpho.delegate(address(0));
+
+        assertEq(newMorpho.delegates(delegator), address(0));
+        assertEq(newMorpho.getVotes(delegator), 0);
+        assertEq(newMorpho.getTotalVotes(), 0);
     }
 
     function testDelegateBySigExpired(SigUtils.Delegation memory delegation, uint256 privateKey, uint256 expiry)
@@ -142,6 +152,7 @@ contract MorphoTokenTest is BaseTest {
         assertEq(newMorpho.getVotes(delegator), 0);
         assertEq(newMorpho.getVotes(delegation.delegatee), amount);
         assertEq(newMorpho.nonces(delegator), 1);
+        assertEq(newMorpho.getTotalVotes(), amount);
     }
 
     function testMultipleDelegations(

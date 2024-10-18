@@ -63,6 +63,12 @@ abstract contract ERC20DelegatesUpgradeable is
         return $._votingPower[account];
     }
 
+    /// @dev Returns the current total voting power.
+    function getTotalVotes() external view returns (uint256) {
+        ERC20DelegatesStorage storage $ = _getERC20DelegatesStorage();
+        return $._totalVotingPower;
+    }
+
     /// @dev Delegates votes from the sender to `delegatee`.
     function delegate(address delegatee) external {
         address account = _msgSender();
@@ -94,19 +100,6 @@ abstract contract ERC20DelegatesUpgradeable is
         _moveDelegateVotes(oldDelegate, delegatee, _getVotingUnits(account));
     }
 
-    /// @dev Transfers, mints, or burns voting units. To register a mint, `from` should be zero. To register a burn, `to`
-    /// should be zero. Total supply of voting units will be adjusted with mints and burns.
-    function _transferVotingUnits(address from, address to, uint256 amount) internal {
-        ERC20DelegatesStorage storage $ = _getERC20DelegatesStorage();
-        if (from == address(0)) {
-            $._totalVotingPower += amount;
-        }
-        if (to == address(0)) {
-            $._totalVotingPower -= amount;
-        }
-        _moveDelegateVotes(delegates(from), delegates(to), amount);
-    }
-
     /// @dev Must return the voting units held by an account.
     function _getVotingUnits(address account) internal view returns (uint256) {
         return balanceOf(account);
@@ -117,7 +110,7 @@ abstract contract ERC20DelegatesUpgradeable is
     function _update(address from, address to, uint256 value) internal virtual override {
         super._update(from, to, value);
         // No check of supply cap here like in OZ implementation as MORPHO has a 1B total supply cap.
-        _transferVotingUnits(from, to, value);
+        _moveDelegateVotes(delegates(from), delegates(to), value);
     }
 
     /* PRIVATE */
@@ -131,12 +124,16 @@ abstract contract ERC20DelegatesUpgradeable is
                 uint256 newValue = oldValue - amount;
                 $._votingPower[from] = newValue;
                 emit DelegateVotesChanged(from, oldValue, newValue);
+            } else {
+                $._totalVotingPower += amount;
             }
             if (to != address(0)) {
                 uint256 oldValue = $._votingPower[to];
                 uint256 newValue = oldValue + amount;
                 $._votingPower[to] = newValue;
                 emit DelegateVotesChanged(to, oldValue, newValue);
+            } else {
+                $._totalVotingPower -= amount;
             }
         }
     }

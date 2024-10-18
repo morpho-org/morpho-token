@@ -31,7 +31,7 @@ contract MorphoTokenOptimismTest is Test {
         morphoOptimism.initialize(MORPHO_DAO, REMOTE_TOKEN, BRIDGE);
     }
 
-    function testInitilizeZeroAddress(address randomAddress) public {
+    function testInitializeZeroAddress(address randomAddress) public {
         vm.assume(randomAddress != address(0));
 
         address proxy = address(new ERC1967Proxy(address(tokenImplem), hex""));
@@ -66,6 +66,7 @@ contract MorphoTokenOptimismTest is Test {
     function testGetters() public view {
         assertEq(morphoOptimism.remoteToken(), REMOTE_TOKEN, "remoteToken");
         assertEq(morphoOptimism.bridge(), BRIDGE, "bridge");
+        assertEq(morphoOptimism.owner(), MORPHO_DAO, "owner");
     }
 
     function testMintNoBridge(address account, address to, uint256 amount) public {

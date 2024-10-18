@@ -35,12 +35,20 @@ contract OptimismMintableERC20Upgradeable is Initializable, IOptimismMintableERC
     /// @dev Emitted whenever tokens are burned from an account.
     event Burn(address indexed account, uint256 amount);
 
+    /* ERRORS */
+
+    /// @notice Reverts if the address is the zero address.
+    error ZeroAddress();
+
+    /// @notice Reverts if the caller is not the bridge.
+    error NotBridge(address caller);
+
     /* MODIFIERS */
 
     /// @dev A modifier that only allows the bridge to call.
     modifier onlyBridge() {
         OptimismMintableERC20Storage storage $ = _getOptimismMintableERC20Storage();
-        require(_msgSender() == $._BRIDGE, "OptimismMintableERC20: only bridge can mint and burn");
+        require(_msgSender() == $._BRIDGE, NotBridge(_msgSender()));
         _;
     }
 
@@ -53,6 +61,9 @@ contract OptimismMintableERC20Upgradeable is Initializable, IOptimismMintableERC
     }
 
     function __OptimismMintableERC20_init_unchained(address remoteToken_, address bridge_) internal onlyInitializing {
+        require(remoteToken_ != address(0), ZeroAddress());
+        require(bridge_ != address(0), ZeroAddress());
+
         OptimismMintableERC20Storage storage $ = _getOptimismMintableERC20Storage();
         $._REMOTE_TOKEN = remoteToken_;
         $._BRIDGE = bridge_;

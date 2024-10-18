@@ -27,11 +27,6 @@ contract MorphoTokenOptimism is
     /// @dev The symbol of the token.
     string internal constant SYMBOL = "MORPHO";
 
-    /* ERRORS */
-
-    /// @notice Reverts if the address is the zero address.
-    error ZeroAddress();
-
     /* PUBLIC */
 
     /// @notice Initializes the contract.

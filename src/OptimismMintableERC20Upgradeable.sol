@@ -15,6 +15,8 @@ import {ERC20Upgradeable} from "lib/openzeppelin-contracts-upgradeable/contracts
 /// OptimismMintablERC20 as the L2 representation of an L1 token, or vice-versa. Designed to be backwards compatible
 /// with the older StandardL2ERC20 token which was only meant for use on L2.
 contract OptimismMintableERC20Upgradeable is Initializable, IOptimismMintableERC20, ERC20Upgradeable {
+    /* CONSTANTS */
+
     // keccak256(abi.encode(uint256(keccak256("morpho.storage.OptimismMintableERC20")) - 1)) & ~bytes32(uint256(0xff))
     bytes32 private constant OptimismMintableERC20StorageLocation =
         0x6fd4c0a11d0843c68c809f0a5f29b102d54bc08a251c384d9ad17600bfa05d00;

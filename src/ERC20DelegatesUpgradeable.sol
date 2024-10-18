@@ -81,7 +81,6 @@ abstract contract ERC20DelegatesUpgradeable is
         _delegate(signer, delegatee);
     }
 
-
     /* INTERNAL */
 
     /// @dev Delegates all of `account`'s voting units to `delegatee`.

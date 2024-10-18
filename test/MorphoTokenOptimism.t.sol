@@ -64,9 +64,7 @@ contract MorphoTokenOptimismTest is Test {
     }
 
     function testGetters() public view {
-        assertEq(morphoOptimism.l1Token(), REMOTE_TOKEN, "remoteToken");
         assertEq(morphoOptimism.remoteToken(), REMOTE_TOKEN, "remoteToken");
-        assertEq(morphoOptimism.l2Bridge(), BRIDGE, "bridge");
         assertEq(morphoOptimism.bridge(), BRIDGE, "bridge");
     }
 

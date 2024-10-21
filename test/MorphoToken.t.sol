@@ -124,7 +124,7 @@ contract MorphoTokenTest is BaseTest {
         addresses[0] = delegator;
         addresses[1] = delegation.delegatee;
         _validateAddresses(addresses);
-        vm.assume(newMorpho.nonces(delegator) == 0);
+        vm.assume(newMorpho.delegationNonces(delegator) == 0);
 
         delegation.expiry = bound(delegation.expiry, block.timestamp, type(uint256).max);
         delegation.nonce = 0;
@@ -141,7 +141,8 @@ contract MorphoTokenTest is BaseTest {
         assertEq(newMorpho.delegates(delegator), delegation.delegatee);
         assertEq(newMorpho.getVotes(delegator), 0);
         assertEq(newMorpho.getVotes(delegation.delegatee), amount);
-        assertEq(newMorpho.nonces(delegator), 1);
+        assertEq(newMorpho.delegationNonces(delegator), 1);
+        assertEq(newMorpho.nonces(delegator), 0);
     }
 
     function testMultipleDelegations(

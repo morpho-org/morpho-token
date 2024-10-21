@@ -29,6 +29,12 @@ contract MorphoToken is ERC20DelegatesUpgradeable, ERC20PermitUpgradeable, Ownab
     /// @notice Reverts if the address is the zero address.
     error ZeroAddress();
 
+    /* CONSTRUCTOR */
+
+    constructor() {
+        _disableInitializers();
+    }
+
     /* PUBLIC */
 
     /// @notice Initializes the contract.

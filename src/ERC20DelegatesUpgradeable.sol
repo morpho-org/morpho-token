@@ -50,7 +50,7 @@ abstract contract ERC20DelegatesUpgradeable is
     /// @dev Returns the delegate that `account` has chosen.
     function delegates(address account) public view returns (address) {
         ERC20DelegatesStorage storage $ = _getERC20DelegatesStorage();
-        return $._delegatee[account];
+        return $._delegatee[account] == address(0) ? account : $._delegatee[account];
     }
 
     /* EXTERNAL */
@@ -58,7 +58,7 @@ abstract contract ERC20DelegatesUpgradeable is
     /// @dev Returns the current amount of votes that `account` has.
     function getVotes(address account) external view returns (uint256) {
         ERC20DelegatesStorage storage $ = _getERC20DelegatesStorage();
-        return delegates(account) == address(0) ? $._votingPower[account] + balanceOf(account) : $._votingPower[account];
+        return $._votingPower[account];
     }
 
     /// @dev Delegates votes from the sender to `delegatee`.
@@ -89,7 +89,7 @@ abstract contract ERC20DelegatesUpgradeable is
         $._delegatee[account] = delegatee;
 
         emit DelegateChanged(account, oldDelegate, delegatee);
-        _moveDelegateVotes(oldDelegate, delegatee, _getVotingUnits(account));
+        _moveDelegateVotes(oldDelegate, delegatee == address(0) ? account : delegatee, _getVotingUnits(account));
     }
 
     /// @dev Must return the voting units held by an account.

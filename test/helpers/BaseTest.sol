@@ -40,6 +40,7 @@ contract BaseTest is Test {
         for (uint256 i = 0; i < addresses.length; i++) {
             vm.assume(addresses[i] != address(0));
             vm.assume(addresses[i] != MORPHO_DAO);
+            assumeNotPrecompile(addresses[i]);
             for (uint256 j = i + 1; j < addresses.length; j++) {
                 vm.assume(addresses[i] != addresses[j]);
             }

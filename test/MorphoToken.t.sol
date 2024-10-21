@@ -1,13 +1,19 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.13;
 
+import {console} from "lib/forge-std/src/Test.sol";
 import {BaseTest} from "./helpers/BaseTest.sol";
 import {SigUtils} from "./helpers/SigUtils.sol";
 import {MorphoToken} from "../src/MorphoToken.sol";
 import {ERC1967Proxy} from
     "lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/proxy/ERC1967/ERC1967Proxy.sol";
+import {IERC20} from
+    "lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 
 contract MorphoTokenTest is BaseTest {
+    bytes32 private constant ERC20DelegatesStorageLocation =
+        0x1dc92b2c6e971ab6e08dfd7dcec0e9496d223ced663ba2a06543451548549500;
+
     function testInitilizeZeroAddress(address randomAddress) public {
         vm.assume(randomAddress != address(0));
 
@@ -37,7 +43,7 @@ contract MorphoTokenTest is BaseTest {
         newMorpho.upgradeToAndCall(newImplem, hex"");
     }
 
-    function testOwnDelegation(address delegator, uint256 amount) public {
+    function testSelfDelegate(address delegator, uint256 amount) public {
         vm.assume(delegator != address(0));
         vm.assume(delegator != MORPHO_DAO);
         amount = bound(amount, MIN_TEST_AMOUNT, MAX_TEST_AMOUNT);
@@ -251,5 +257,20 @@ contract MorphoTokenTest is BaseTest {
         bytes32 expected =
             keccak256(abi.encode(uint256(keccak256("morpho.storage.ERC20Delegates")) - 1)) & ~bytes32(uint256(0xff));
         assertEq(expected, 0x1dc92b2c6e971ab6e08dfd7dcec0e9496d223ced663ba2a06543451548549500);
+    }
+
+    function _getVotingPowerSlot(address account) internal pure returns (bytes32) {
+        return keccak256(abi.encode(account, uint256(ERC20DelegatesStorageLocation) + 1));
+    }
+
+    function deal(address token, address to, uint256 give) internal virtual override {
+        uint256 previousBalance = IERC20(address(newMorpho)).balanceOf(to);
+        if (address(newMorpho) == token) {
+            bytes32 votingPowerSlot = _getVotingPowerSlot(to);
+            uint256 previousVotingPower = uint256(vm.load(to, votingPowerSlot));
+            uint256 delegatedVotingPower = previousVotingPower - previousBalance;
+            vm.store(address(newMorpho), votingPowerSlot, bytes32(delegatedVotingPower + give));
+        }
+        super.deal(token, to, give);
     }
 }

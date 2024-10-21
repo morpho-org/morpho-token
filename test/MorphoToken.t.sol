@@ -124,7 +124,7 @@ contract MorphoTokenTest is BaseTest {
         addresses[0] = delegator;
         addresses[1] = delegation.delegatee;
         _validateAddresses(addresses);
-        vm.assume(newMorpho.delegationNonces(delegator) == 0);
+        vm.assume(newMorpho.delegationNonce(delegator) == 0);
 
         delegation.expiry = bound(delegation.expiry, block.timestamp, type(uint256).max);
         delegation.nonce = 0;
@@ -141,7 +141,7 @@ contract MorphoTokenTest is BaseTest {
         assertEq(newMorpho.delegates(delegator), delegation.delegatee);
         assertEq(newMorpho.getVotes(delegator), 0);
         assertEq(newMorpho.getVotes(delegation.delegatee), amount);
-        assertEq(newMorpho.delegationNonces(delegator), 1);
+        assertEq(newMorpho.delegationNonce(delegator), 1);
         assertEq(newMorpho.nonces(delegator), 0);
     }
 
@@ -153,7 +153,7 @@ contract MorphoTokenTest is BaseTest {
         addresses[0] = permit.owner;
         addresses[1] = permit.spender;
         _validateAddresses(addresses);
-        vm.assume(newMorpho.delegationNonces(permit.owner) == 0);
+        vm.assume(newMorpho.delegationNonce(permit.owner) == 0);
         vm.assume(newMorpho.nonces(permit.owner) == 0);
 
         permit.deadline = bound(permit.deadline, block.timestamp, type(uint256).max);
@@ -167,7 +167,7 @@ contract MorphoTokenTest is BaseTest {
 
         newMorpho.permit(permit.owner, permit.spender, permit.value, permit.deadline, sig.v, sig.r, sig.s);
 
-        assertEq(newMorpho.delegationNonces(permit.owner), 0);
+        assertEq(newMorpho.delegationNonce(permit.owner), 0);
         assertEq(newMorpho.nonces(permit.owner), 1);
     }
 

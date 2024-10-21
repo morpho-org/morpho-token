@@ -38,7 +38,7 @@ abstract contract ERC20DelegatesUpgradeable is Initializable, ERC20Upgradeable, 
         mapping(address account => address) _delegatee;
         mapping(address delegatee => uint256) _votingPower;
         uint256 _totalVotingPower;
-        mapping(address account => uint256) _nonces;
+        mapping(address account => uint256) _delegationNonce;
     }
 
     /* PUBLIC */
@@ -57,9 +57,9 @@ abstract contract ERC20DelegatesUpgradeable is Initializable, ERC20Upgradeable, 
         return $._votingPower[account];
     }
 
-    function delegationNonces(address account) external view returns (uint256) {
+    function delegationNonce(address account) external view returns (uint256) {
         ERC20DelegatesStorage storage $ = _getERC20DelegatesStorage();
-        return $._nonces[account];
+        return $._delegationNonce[account];
     }
 
     /// @dev Delegates votes from the sender to `delegatee`.
@@ -77,9 +77,9 @@ abstract contract ERC20DelegatesUpgradeable is Initializable, ERC20Upgradeable, 
         );
 
         ERC20DelegatesStorage storage $ = _getERC20DelegatesStorage();
-        uint256 current = $._nonces[signer];
+        uint256 current = $._delegationNonce[signer];
         require(nonce == current, InvalidDelegationNonce(signer, current));
-        $._nonces[signer]++;
+        $._delegationNonce[signer]++;
 
         _delegate(signer, delegatee);
     }

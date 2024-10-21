@@ -48,7 +48,7 @@ contract MorphoTokenTest is BaseTest {
         newMorpho.delegate(delegator);
 
         assertEq(newMorpho.delegates(delegator), delegator);
-        assertEq(newMorpho.getVotes(delegator), amount);
+        assertEq(newMorpho.getDelegatedVotes(delegator), amount);
     }
 
     function testDelegate(address delegator, address delegatee, uint256 amount) public {
@@ -64,8 +64,8 @@ contract MorphoTokenTest is BaseTest {
         newMorpho.delegate(delegatee);
 
         assertEq(newMorpho.delegates(delegator), delegatee);
-        assertEq(newMorpho.getVotes(delegator), 0);
-        assertEq(newMorpho.getVotes(delegatee), amount);
+        assertEq(newMorpho.getDelegatedVotes(delegator), 0);
+        assertEq(newMorpho.getDelegatedVotes(delegatee), amount);
     }
 
     function testDelegateBySigExpired(SigUtils.Delegation memory delegation, uint256 privateKey, uint256 expiry)
@@ -139,8 +139,8 @@ contract MorphoTokenTest is BaseTest {
         newMorpho.delegateBySig(delegation.delegatee, delegation.nonce, delegation.expiry, sig.v, sig.r, sig.s);
 
         assertEq(newMorpho.delegates(delegator), delegation.delegatee);
-        assertEq(newMorpho.getVotes(delegator), 0);
-        assertEq(newMorpho.getVotes(delegation.delegatee), amount);
+        assertEq(newMorpho.getDelegatedVotes(delegator), 0);
+        assertEq(newMorpho.getDelegatedVotes(delegation.delegatee), amount);
         assertEq(newMorpho.nonces(delegator), 1);
     }
 
@@ -168,7 +168,7 @@ contract MorphoTokenTest is BaseTest {
         vm.prank(delegator2);
         newMorpho.delegate(delegatee);
 
-        assertEq(newMorpho.getVotes(delegatee), amount1 + amount2);
+        assertEq(newMorpho.getDelegatedVotes(delegatee), amount1 + amount2);
     }
 
     function testTransferVotingPower(
@@ -198,7 +198,7 @@ contract MorphoTokenTest is BaseTest {
         newMorpho.transfer(delegator2, transferredAmount);
         vm.stopPrank();
 
-        assertEq(newMorpho.getVotes(delegatee1), initialAmount - transferredAmount);
-        assertEq(newMorpho.getVotes(delegatee2), transferredAmount);
+        assertEq(newMorpho.getDelegatedVotes(delegatee1), initialAmount - transferredAmount);
+        assertEq(newMorpho.getDelegatedVotes(delegatee2), transferredAmount);
     }
 }

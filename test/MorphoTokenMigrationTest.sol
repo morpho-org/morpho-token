@@ -24,7 +24,9 @@ contract MorphoTokenMigrationTest is BaseTest {
         _fork();
 
         vm.startPrank(MORPHO_DAO);
+        // Enable `transferFrom` on the legacy MORPHO token.
         RolesAuthority(LEGACY_MORPHO).setPublicCapability(0x23b872dd, true);
+        // Enable `transfer` on the legacy MORPHO token.
         RolesAuthority(LEGACY_MORPHO).setPublicCapability(0xa9059cbb, true);
         vm.stopPrank();
 

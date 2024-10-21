@@ -48,7 +48,7 @@ abstract contract ERC20DelegatesUpgradeable is
 
     /* PUBLIC */
 
-    /// @dev Returns the current amount of delegated votes that `account` has.
+    /// @dev Returns the current amount of votes delegated to `account`.
     function getDelegatedVotes(address account) public view returns (uint256) {
         ERC20DelegatesStorage storage $ = _getERC20DelegatesStorage();
         return $._delegatedVotes[account];

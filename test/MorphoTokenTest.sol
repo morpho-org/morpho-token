@@ -5,7 +5,7 @@ import {BaseTest} from "./helpers/BaseTest.sol";
 import {SigUtils} from "./helpers/SigUtils.sol";
 import {MorphoToken} from "../src/MorphoToken.sol";
 import {ERC1967Proxy} from
-    "lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/proxy/ERC1967/ERC1967Proxy.sol";
+    "../lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 
 contract MorphoTokenTest is BaseTest {
     function testInitilizeZeroAddress(address randomAddress) public {

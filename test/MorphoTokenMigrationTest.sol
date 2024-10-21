@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import {console} from "lib/forge-std/src/Test.sol";
+import {console} from "../lib/forge-std/src/Test.sol";
 import {BaseTest} from "./helpers/BaseTest.sol";
 import {Wrapper} from "../src/Wrapper.sol";
 import {IMulticall} from "./helpers/interfaces/IMulticall.sol";
 import {EncodeLib} from "./helpers/libraries/EncodeLib.sol";
 import {IERC20} from
-    "lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
+    "../lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 
 contract MorphoTokenMigrationTest is BaseTest {
     address internal constant BUNDLER_ADDRESS = 0x4095F064B8d3c3548A3bebfd0Bbfd04750E30077;

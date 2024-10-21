@@ -2,7 +2,7 @@
 pragma solidity ^0.8.0;
 
 import {IERC5267} from
-    "lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/interfaces/IERC5267.sol";
+    "../../lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/interfaces/IERC5267.sol";
 
 library SigUtils {
     struct Delegation {

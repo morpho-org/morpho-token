@@ -38,9 +38,8 @@ contract MorphoTokenMigrationTest is BaseTest {
 
     function _fork() internal virtual {
         string memory rpcUrl = vm.rpcUrl("ethereum");
-        uint256 forkBlockNumber = 20969715;
 
-        forkId = vm.createSelectFork(rpcUrl, forkBlockNumber);
+        forkId = vm.createSelectFork(rpcUrl);
         vm.chainId(1);
     }
 

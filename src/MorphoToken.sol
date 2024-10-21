@@ -37,9 +37,8 @@ contract MorphoToken is ERC20DelegatesUpgradeable, ERC20PermitUpgradeable, Ownab
     function initialize(address dao, address wrapper) public initializer {
         require(dao != address(0), ZeroAddress());
 
-        ERC20Upgradeable.__ERC20_init(NAME, SYMBOL);
-        Ownable2StepUpgradeable.__Ownable2Step_init();
-        ERC20PermitUpgradeable.__ERC20Permit_init(NAME);
+        __ERC20_init(NAME, SYMBOL);
+        __ERC20Permit_init(NAME);
 
         _transferOwnership(dao); // Transfer ownership to the DAO.
         _mint(wrapper, 1_000_000_000e18); // Mint 1B to the wrapper contract.

@@ -70,13 +70,17 @@ abstract contract ERC20DelegatesUpgradeable is Initializable, ERC20Upgradeable, 
 
     /// @dev Delegates votes from signer to `delegatee`.
     function delegateBySig(address delegatee, uint256 nonce, uint256 expiry, uint8 v, bytes32 r, bytes32 s) external {
-        if (block.timestamp > expiry) {
-            revert DelegatesExpiredSignature(expiry);
-        }
+        require(block.timestamp <= expiry, DelegatesExpiredSignature(expiry));
+
         address signer = ECDSA.recover(
             _hashTypedDataV4(keccak256(abi.encode(DELEGATION_TYPEHASH, delegatee, nonce, expiry))), v, r, s
         );
-        _useCheckedDelegationNonce(signer, nonce);
+
+        ERC20DelegatesStorage storage $ = _getERC20DelegatesStorage();
+        uint256 current = $._nonces[signer];
+        require(nonce == current, InvalidDelegationNonce(signer, current));
+        $._nonces[signer]++;
+
         _delegate(signer, delegatee);
     }
 
@@ -97,12 +101,8 @@ abstract contract ERC20DelegatesUpgradeable is Initializable, ERC20Upgradeable, 
     /// should be zero. Total supply of voting units will be adjusted with mints and burns.
     function _transferVotingUnits(address from, address to, uint256 amount) internal {
         ERC20DelegatesStorage storage $ = _getERC20DelegatesStorage();
-        if (from == address(0)) {
-            $._totalVotingPower += amount;
-        }
-        if (to == address(0)) {
-            $._totalVotingPower -= amount;
-        }
+        if (from == address(0)) $._totalVotingPower += amount;
+        if (to == address(0)) $._totalVotingPower -= amount;
         _moveDelegateVotes(delegates(from), delegates(to), amount);
     }
 
@@ -138,15 +138,6 @@ abstract contract ERC20DelegatesUpgradeable is Initializable, ERC20Upgradeable, 
                 emit DelegateVotesChanged(to, oldValue, newValue);
             }
         }
-    }
-
-    function _useCheckedDelegationNonce(address owner, uint256 nonce) private {
-        ERC20DelegatesStorage storage $ = _getERC20DelegatesStorage();
-        uint256 current = $._nonces[owner];
-        if (nonce != current) {
-            revert InvalidDelegationNonce(owner, current);
-        }
-        $._nonces[owner]++;
     }
 
     /// @dev Returns the ERC20DelegatesStorage struct.

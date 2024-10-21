@@ -49,17 +49,17 @@ abstract contract ERC20DelegatesUpgradeable is Initializable, ERC20Upgradeable, 
         return $._delegatee[account];
     }
 
-    function delegationNonces(address account) public view returns (uint256) {
-        ERC20DelegatesStorage storage $ = _getERC20DelegatesStorage();
-        return $._nonces[account];
-    }
-
     /* EXTERNAL */
 
     /// @dev Returns the current amount of votes that `account` has.
     function getVotes(address account) external view returns (uint256) {
         ERC20DelegatesStorage storage $ = _getERC20DelegatesStorage();
         return $._votingPower[account];
+    }
+
+    function delegationNonces(address account) external view returns (uint256) {
+        ERC20DelegatesStorage storage $ = _getERC20DelegatesStorage();
+        return $._nonces[account];
     }
 
     /// @dev Delegates votes from the sender to `delegatee`.

@@ -45,11 +45,6 @@ contract MorphoToken is ERC20DelegatesUpgradeable, ERC20PermitUpgradeable, Ownab
         _mint(wrapper, 1_000_000_000e18); // Mint 1B to the wrapper contract.
     }
 
-    /// @inheritdoc ERC20PermitUpgradeable
-    function nonces(address owner) public view override(ERC20PermitUpgradeable, NoncesUpgradeable) returns (uint256) {
-        return ERC20PermitUpgradeable.nonces(owner);
-    }
-
     /* INTERNAL */
 
     /// @inheritdoc ERC20DelegatesUpgradeable

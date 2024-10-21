@@ -17,9 +17,8 @@ import {Initializable} from "lib/openzeppelin-contracts-upgradeable/contracts/pr
 /// @dev Extension of ERC20 to support token delegation.
 ///
 /// This extension keeps track of each account's vote power. Vote power can be delegated either by calling the
-/// {delegate} function directly, or by providing a signature to be used with {delegateBySig}. Voting power can be
-/// queried through the external accessor {getVotes}.
-///
+/// `delegate` function directly, or by providing a signature to be used with `delegateBySig`. Voting power can be
+/// queried through the external accessor `getVotes`.
 /// By default, token balance does not account for voting power. This makes transfers cheaper. The downside is that it
 /// requires users to delegate to themselves in order to activate their voting power.
 abstract contract ERC20DelegatesUpgradeable is

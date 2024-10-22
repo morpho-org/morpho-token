@@ -25,7 +25,7 @@ The `Wrapper` contract will hold the migrated legacy tokens.
 Note: the `Wrapper` contract must be deployed before the new token's initialization.
 
 During contract intialization, 1 billion tokens will be minted for the `Wrapper` contract, which will initially hold the entire supply.
-Any legacy token holder will then be able to migrate their tokens provided that,the migration amount is the approved for the wrapper.
+Any legacy token holder will then be able to migrate their tokens provided that the migration amount is the approved for the wrapper.
 Migrated legacy tokens may be recovered in order to revert a migration.
 
 ### Install dependencies

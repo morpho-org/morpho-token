@@ -54,10 +54,10 @@ abstract contract ERC20DelegatesUpgradeable is
         return $._delegatee[delegator];
     }
 
-    /// @dev Returns the current amount of votes delegated to `delegator`.
-    function delegatedVotingPower(address delegator) external view returns (uint256) {
+    /// @dev Returns the current voting power delegated to `delegatee`.
+    function delegatedVotingPower(address delegatee) external view returns (uint256) {
         ERC20DelegatesStorage storage $ = _getERC20DelegatesStorage();
-        return $._delegatedVotingPower[delegator];
+        return $._delegatedVotingPower[delegatee];
     }
 
     /// @dev Returns the current delegation nonce of `delegator`.

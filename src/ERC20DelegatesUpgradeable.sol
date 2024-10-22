@@ -56,11 +56,11 @@ abstract contract ERC20DelegatesUpgradeable is
 
     /* EVENTS */
 
-    // @dev Emitted when an delegator changes their delegate.
+    // @dev Emitted when an delegator changes their delegatee.
     event DelegateeChanged(address indexed delegator, address indexed oldDelegatee, address indexed newDelegatee);
 
-    // @dev Emitted when a token transfer or delegate change results in changes to a delegate's number of voting units.
-    event DelegateVotesChanged(address indexed delegate, uint256 oldVotes, uint256 newVotes);
+    // @dev Emitted when a delegatee's delegated voting power changes.
+    event DelegatedVotingPowerChanged(address indexed delegatee, uint256 oldVotes, uint256 newVotes);
 
     /* GETTERS */
 
@@ -133,13 +133,13 @@ abstract contract ERC20DelegatesUpgradeable is
                 uint256 oldValue = $._delegatedVotingPower[from];
                 uint256 newValue = oldValue - amount;
                 $._delegatedVotingPower[from] = newValue;
-                emit DelegateVotesChanged(from, oldValue, newValue);
+                emit DelegatedVotingPowerChanged(from, oldValue, newValue);
             }
             if (to != address(0)) {
                 uint256 oldValue = $._delegatedVotingPower[to];
                 uint256 newValue = oldValue + amount;
                 $._delegatedVotingPower[to] = newValue;
-                emit DelegateVotesChanged(to, oldValue, newValue);
+                emit DelegatedVotingPowerChanged(to, oldValue, newValue);
             }
         }
     }

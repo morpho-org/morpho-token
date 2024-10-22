@@ -36,10 +36,11 @@ contract BaseTest is Test {
         newMorpho.initialize(MORPHO_DAO, address(wrapper));
     }
 
-    function _validateAddresses(address[] memory addresses) internal pure {
+    function _validateAddresses(address[] memory addresses) internal view {
         for (uint256 i = 0; i < addresses.length; i++) {
             vm.assume(addresses[i] != address(0));
             vm.assume(addresses[i] != MORPHO_DAO);
+            vm.assume(addresses[i] != address(wrapper));
             for (uint256 j = i + 1; j < addresses.length; j++) {
                 vm.assume(addresses[i] != addresses[j]);
             }

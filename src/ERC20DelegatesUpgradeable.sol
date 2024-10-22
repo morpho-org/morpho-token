@@ -97,11 +97,11 @@ abstract contract ERC20DelegatesUpgradeable is
     /// @dev Delegates the balance of the `delegator` to `newDelegatee`.
     function _delegate(address delegator, address newDelegatee) internal {
         ERC20DelegatesStorage storage $ = _getERC20DelegatesStorage();
-        address newDelegatee = delegatee(delegator);
+        address oldDelegatee = delegatee(delegator);
         $._delegatee[delegator] = newDelegatee;
 
-        emit DelegateChanged(delegator, newDelegatee, newDelegatee);
-        _moveDelegateVotes(newDelegatee, newDelegatee, _getVotingUnits(delegator));
+        emit DelegateChanged(delegator, oldDelegatee, newDelegatee);
+        _moveDelegateVotes(oldDelegatee, newDelegatee, _getVotingUnits(delegator));
     }
 
     /// @dev Returns the voting units held by a delegator.

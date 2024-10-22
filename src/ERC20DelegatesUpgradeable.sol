@@ -78,16 +78,16 @@ abstract contract ERC20DelegatesUpgradeable is
     function delegateBySig(address delegatee, uint256 nonce, uint256 expiry, uint8 v, bytes32 r, bytes32 s) external {
         require(block.timestamp <= expiry, DelegatesExpiredSignature(expiry));
 
-        address signer = ECDSA.recover(
+        address delegator = ECDSA.recover(
             _hashTypedDataV4(keccak256(abi.encode(DELEGATION_TYPEHASH, delegatee, nonce, expiry))), v, r, s
         );
 
         ERC20DelegatesStorage storage $ = _getERC20DelegatesStorage();
-        uint256 current = $._delegationNonce[signer];
-        require(nonce == current, InvalidDelegationNonce(signer, current));
-        $._delegationNonce[signer]++;
+        uint256 current = $._delegationNonce[delegator];
+        require(nonce == current, InvalidDelegationNonce(delegator, current));
+        $._delegationNonce[delegator]++;
 
-        _delegate(signer, delegatee);
+        _delegate(delegator, delegatee);
     }
 
     /* INTERNAL */

@@ -61,7 +61,7 @@ contract MorphoTokenOptimism is Token {
 
     /// @notice Initializes the contract.
     /// @param dao The DAO address.
-    /// @param remoteToken_ The address of the Morpho Token on Ethereum.
+    /// @param remoteToken_ The address of the Morpho token on Ethereum.
     /// @param bridge_ The address of the StandardBridge contract.
     function initialize(address dao, address remoteToken_, address bridge_) public initializer {
         require(dao != address(0), ZeroAddress());

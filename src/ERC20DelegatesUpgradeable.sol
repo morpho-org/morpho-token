@@ -37,7 +37,7 @@ abstract contract ERC20DelegatesUpgradeable is
     bytes32 private constant ERC20DelegatesStorageLocation =
         0x1dc92b2c6e971ab6e08dfd7dcec0e9496d223ced663ba2a06543451548549500;
 
-    /* STRUCTS */
+    /* STORAGE LAYOUT */
 
     /// @custom:storage-location erc7201:morpho.storage.ERC20Delegates
     struct ERC20DelegatesStorage {
@@ -45,6 +45,22 @@ abstract contract ERC20DelegatesUpgradeable is
         mapping(address => uint256) _delegatedVotingPower;
         mapping(address => uint256) _delegationNonce;
     }
+
+    /* ERRORS */
+
+    // @dev The signature used has expired.
+    error DelegatesExpiredSignature(uint256 expiry);
+
+    // @dev The delegation nonce used by the signer is not its current delegation nonce.
+    error InvalidDelegationNonce();
+
+    /* EVENTS */
+
+    // @dev Emitted when an delegator changes their delegate.
+    event DelegateChanged(address indexed delegator, address indexed fromDelegate, address indexed toDelegate);
+
+    // @dev Emitted when a token transfer or delegate change results in changes to a delegate's number of voting units.
+    event DelegateVotesChanged(address indexed delegate, uint256 previousVotes, uint256 newVotes);
 
     /* GETTERS */
 

@@ -22,7 +22,7 @@ interface IERC20DelegatesUpgradeable {
     function delegatedVotingPower(address delegator) external view returns (uint256);
 
     // @dev Returns the delegate that `delegator` has chosen.
-    function delegates(address delegator) external view returns (address);
+    function delegatee(address delegator) external view returns (address);
 
     // @dev Delegates votes from the sender to `delegatee`.
     function delegate(address delegatee) external;

@@ -49,7 +49,7 @@ abstract contract ERC20DelegatesUpgradeable is
     /* GETTERS */
 
     /// @dev Returns the delegate that `delegator` has chosen.
-    function delegates(address delegator) public view returns (address) {
+    function delegatee(address delegator) public view returns (address) {
         ERC20DelegatesStorage storage $ = _getERC20DelegatesStorage();
         return $._delegatee[delegator];
     }
@@ -68,18 +68,18 @@ abstract contract ERC20DelegatesUpgradeable is
 
     /* DELEGATE */
 
-    /// @dev Delegates the balance of the sender to `delegatee`.
-    function delegate(address delegatee) external {
+    /// @dev Delegates the balance of the sender to `newDelegatee`.
+    function delegate(address newDelegatee) external {
         address delegator = _msgSender();
-        _delegate(delegator, delegatee);
+        _delegate(delegator, newDelegatee);
     }
 
-    /// @dev Delegates the balance of the signer to `delegatee`.
-    function delegateBySig(address delegatee, uint256 nonce, uint256 expiry, uint8 v, bytes32 r, bytes32 s) external {
+    /// @dev Delegates the balance of the signer to `newDelegatee`.
+    function delegateBySig(address newDelegatee, uint256 nonce, uint256 expiry, uint8 v, bytes32 r, bytes32 s) external {
         require(block.timestamp <= expiry, DelegatesExpiredSignature(expiry));
 
         address signer = ECDSA.recover(
-            _hashTypedDataV4(keccak256(abi.encode(DELEGATION_TYPEHASH, delegatee, nonce, expiry))), v, r, s
+            _hashTypedDataV4(keccak256(abi.encode(DELEGATION_TYPEHASH, newDelegatee, nonce, expiry))), v, r, s
         );
 
         ERC20DelegatesStorage storage $ = _getERC20DelegatesStorage();
@@ -87,19 +87,19 @@ abstract contract ERC20DelegatesUpgradeable is
         require(nonce == current, InvalidDelegationNonce(signer, current));
         $._delegationNonce[signer]++;
 
-        _delegate(signer, delegatee);
+        _delegate(signer, newDelegatee);
     }
 
     /* INTERNAL */
 
-    /// @dev Delegates the balance of the `delegator` to `delegatee`.
-    function _delegate(address delegator, address delegatee) internal {
+    /// @dev Delegates the balance of the `delegator` to `newDelegatee`.
+    function _delegate(address delegator, address newDelegatee) internal {
         ERC20DelegatesStorage storage $ = _getERC20DelegatesStorage();
-        address oldDelegate = delegates(delegator);
-        $._delegatee[delegator] = delegatee;
+        address newDelegatee = delegatee(delegator);
+        $._delegatee[delegator] = newDelegatee;
 
-        emit DelegateChanged(delegator, oldDelegate, delegatee);
-        _moveDelegateVotes(oldDelegate, delegatee, _getVotingUnits(delegator));
+        emit DelegateChanged(delegator, newDelegatee, newDelegatee);
+        _moveDelegateVotes(newDelegatee, newDelegatee, _getVotingUnits(delegator));
     }
 
     /// @dev Must return the voting units held by an delegator.
@@ -111,7 +111,7 @@ abstract contract ERC20DelegatesUpgradeable is
     /// @dev Emits a {IDelegates-DelegateVotesChanged} event.
     function _update(address from, address to, uint256 value) internal virtual override {
         super._update(from, to, value);
-        _moveDelegateVotes(delegates(from), delegates(to), value);
+        _moveDelegateVotes(delegatee(from), delegatee(to), value);
     }
 
     /* PRIVATE */

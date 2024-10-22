@@ -47,7 +47,7 @@ contract MorphoTokenTest is BaseTest {
         vm.prank(delegator);
         newMorpho.delegate(delegator);
 
-        assertEq(newMorpho.delegates(delegator), delegator);
+        assertEq(newMorpho.delegatee(delegator), delegator);
         assertEq(newMorpho.delegatedVotingPower(delegator), amount);
     }
 
@@ -63,7 +63,7 @@ contract MorphoTokenTest is BaseTest {
         vm.prank(delegator);
         newMorpho.delegate(delegatee);
 
-        assertEq(newMorpho.delegates(delegator), delegatee);
+        assertEq(newMorpho.delegatee(delegator), delegatee);
         assertEq(newMorpho.delegatedVotingPower(delegator), 0);
         assertEq(newMorpho.delegatedVotingPower(delegatee), amount);
     }
@@ -138,7 +138,7 @@ contract MorphoTokenTest is BaseTest {
 
         newMorpho.delegateBySig(delegation.delegatee, delegation.nonce, delegation.expiry, sig.v, sig.r, sig.s);
 
-        assertEq(newMorpho.delegates(delegator), delegation.delegatee);
+        assertEq(newMorpho.delegatee(delegator), delegation.delegatee);
         assertEq(newMorpho.delegatedVotingPower(delegator), 0);
         assertEq(newMorpho.delegatedVotingPower(delegation.delegatee), amount);
         assertEq(newMorpho.delegationNonce(delegator), 1);

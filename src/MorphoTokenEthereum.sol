@@ -16,6 +16,14 @@ contract MorphoTokenEthereum is Token {
     /// @dev The symbol of the token.
     string internal constant SYMBOL = "MORPHO";
 
+    /* EVENTS */
+
+    /// @dev Emitted whenever tokens are minted for an account.
+    event Mint(address indexed account, uint256 amount);
+
+    /// @dev Emitted whenever tokens are burned from an account.
+    event Burn(address indexed account, uint256 amount);
+
     /* ERRORS */
 
     /// @notice Reverts if the address is the zero address.
@@ -34,5 +42,17 @@ contract MorphoTokenEthereum is Token {
 
         _transferOwnership(owner);
         _mint(wrapper, 1_000_000_000e18); // Mint 1B to the wrapper contract.
+    }
+
+    /// @dev Mints tokens.
+    function mint(address to, uint256 amount) external onlyOwner {
+        _mint(to, amount);
+        emit Mint(to, amount);
+    }
+
+    /// @dev Burns sender's tokens.
+    function burn(uint256 amount) external {
+        _burn(_msgSender(), amount);
+        emit Burn(_msgSender(), amount);
     }
 }

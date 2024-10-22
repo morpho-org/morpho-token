@@ -21,7 +21,7 @@ interface IERC20DelegatesUpgradeable {
     // @dev Returns the current amount of votes that `delegator` has.
     function delegatedVotingPower(address delegator) external view returns (uint256);
 
-    // @dev Returns the delegate that `delegator` has chosen.
+    // @dev Returns the delegatee that `delegator` has chosen.
     function delegates(address delegator) external view returns (address);
 
     // @dev Delegates votes from the sender to `delegatee`.

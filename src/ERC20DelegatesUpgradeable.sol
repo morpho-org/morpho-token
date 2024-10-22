@@ -102,7 +102,7 @@ abstract contract ERC20DelegatesUpgradeable is
         _moveDelegateVotes(oldDelegate, delegatee, _getVotingUnits(delegator));
     }
 
-    /// @dev Must return the voting units held by an delegator.
+    /// @dev Returns the voting units held by a delegator.
     function _getVotingUnits(address delegator) internal view returns (uint256) {
         return balanceOf(delegator);
     }

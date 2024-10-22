@@ -1,10 +1,10 @@
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: GPL-2.0-or-later
 pragma solidity 0.8.27;
 
 import {Ownable2StepUpgradeable} from
-    "lib/openzeppelin-contracts-upgradeable/contracts/access/Ownable2StepUpgradeable.sol";
+    "../lib/openzeppelin-contracts-upgradeable/contracts/access/Ownable2StepUpgradeable.sol";
 import {ERC20DelegatesUpgradeable} from "./ERC20DelegatesUpgradeable.sol";
-import {UUPSUpgradeable} from "lib/openzeppelin-contracts-upgradeable/contracts/proxy/utils/UUPSUpgradeable.sol";
+import {UUPSUpgradeable} from "../lib/openzeppelin-contracts-upgradeable/contracts/proxy/utils/UUPSUpgradeable.sol";
 
 /// @title MorphoToken
 /// @author Morpho Labs
@@ -24,6 +24,13 @@ contract MorphoToken is ERC20DelegatesUpgradeable, Ownable2StepUpgradeable, UUPS
     /// @notice Reverts if the address is the zero address.
     error ZeroAddress();
 
+    /* CONSTRUCTOR */
+
+    // @dev Disables initializers for the implementation contract.
+    constructor() {
+        _disableInitializers();
+    }
+
     /* PUBLIC */
 
     /// @notice Initializes the contract.
@@ -33,7 +40,6 @@ contract MorphoToken is ERC20DelegatesUpgradeable, Ownable2StepUpgradeable, UUPS
         require(dao != address(0), ZeroAddress());
 
         __ERC20_init(NAME, SYMBOL);
-        __Ownable2Step_init();
         __ERC20Permit_init(NAME);
 
         _transferOwnership(dao); // Transfer ownership to the DAO.

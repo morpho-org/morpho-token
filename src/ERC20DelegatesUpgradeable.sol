@@ -1,12 +1,12 @@
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: GPL-2.0-or-later
 pragma solidity 0.8.27;
 
 import {IDelegates} from "./interfaces/IDelegates.sol";
 
 import {ERC20PermitUpgradeable} from
-    "lib/openzeppelin-contracts-upgradeable/contracts/token/ERC20/extensions/ERC20PermitUpgradeable.sol";
+    "../lib/openzeppelin-contracts-upgradeable/contracts/token/ERC20/extensions/ERC20PermitUpgradeable.sol";
 import {ECDSA} from
-    "lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/utils/cryptography/ECDSA.sol";
+    "../lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/utils/cryptography/ECDSA.sol";
 
 /// @title ERC20DelegatesUpgradeable
 /// @author Morpho Labs
@@ -14,7 +14,7 @@ import {ECDSA} from
 /// @dev Extension of ERC20 to support token delegation.
 ///
 /// This extension keeps track of the current voting power delegated to each account. Voting power can be delegated
-/// either by calling the {delegate} function directly, or by providing a signature to be used with {delegateBySig}.
+/// either by calling the `delegate` function directly, or by providing a signature to be used with `delegateBySig`.
 ///
 /// By default, token balance does not account for voting power. This makes transfers cheaper. Whether an account
 /// has to self-delegate to vote depends on the voting contract implementation.

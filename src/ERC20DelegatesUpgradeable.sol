@@ -43,7 +43,7 @@ abstract contract ERC20DelegatesUpgradeable is
     /// @custom:storage-location erc7201:morpho.storage.ERC20Delegates
     struct ERC20DelegatesStorage {
         mapping(address account => address) _delegatee;
-        mapping(address delegatee => uint256) _delegatedVotes;
+        mapping(address delegatee => uint256) _delegatedVotingPower;
     }
 
     /* PUBLIC */
@@ -51,7 +51,7 @@ abstract contract ERC20DelegatesUpgradeable is
     /// @dev Returns the current amount of votes delegated to `account`.
     function getDelegatedVotes(address account) public view returns (uint256) {
         ERC20DelegatesStorage storage $ = _getERC20DelegatesStorage();
-        return $._delegatedVotes[account];
+        return $._delegatedVotingPower[account];
     }
 
     /// @dev Returns the delegate that `account` has chosen.
@@ -111,15 +111,15 @@ abstract contract ERC20DelegatesUpgradeable is
         ERC20DelegatesStorage storage $ = _getERC20DelegatesStorage();
         if (from != to && amount > 0) {
             if (from != address(0)) {
-                uint256 oldValue = $._delegatedVotes[from];
+                uint256 oldValue = $._delegatedVotingPower[from];
                 uint256 newValue = oldValue - amount;
-                $._delegatedVotes[from] = newValue;
+                $._delegatedVotingPower[from] = newValue;
                 emit DelegateVotesChanged(from, oldValue, newValue);
             }
             if (to != address(0)) {
-                uint256 oldValue = $._delegatedVotes[to];
+                uint256 oldValue = $._delegatedVotingPower[to];
                 uint256 newValue = oldValue + amount;
-                $._delegatedVotes[to] = newValue;
+                $._delegatedVotingPower[to] = newValue;
                 emit DelegateVotesChanged(to, oldValue, newValue);
             }
         }

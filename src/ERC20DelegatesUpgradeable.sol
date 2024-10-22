@@ -41,9 +41,9 @@ abstract contract ERC20DelegatesUpgradeable is
 
     /// @custom:storage-location erc7201:morpho.storage.ERC20Delegates
     struct ERC20DelegatesStorage {
-        mapping(address delegator => address) _delegatee;
-        mapping(address delegatee => uint256) _delegatedVotingPower;
-        mapping(address delegator => uint256) _delegationNonce;
+        mapping(address => address) _delegatee;
+        mapping(address => uint256) _delegatedVotingPower;
+        mapping(address => uint256) _delegationNonce;
     }
 
     /* GETTERS */

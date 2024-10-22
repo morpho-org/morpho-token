@@ -20,32 +20,40 @@ contract MorphoTokenOptimism is Token, IOptimismMintableERC20 {
     /// @dev The symbol of the token.
     string internal constant SYMBOL = "MORPHO";
 
-    // keccak256(abi.encode(uint256(keccak256("morpho.storage.OptimismMintableERC20")) - 1)) & ~bytes32(uint256(0xff))
-    bytes32 internal constant OptimismMintableERC20StorageLocation =
-        0x6fd4c0a11d0843c68c809f0a5f29b102d54bc08a251c384d9ad17600bfa05d00;
+    /// @notice The Morpho token on Ethereum.
+    /// @dev Does not follow our classic naming convention to suits Optimism' standard.
+    address public immutable remoteToken;
 
-    /* STORAGE LAYOUT */
-
-    /// @custom:storage-location erc7201:morpho.storage.OptimismMintableERC20
-    struct OptimismMintableERC20Storage {
-        address _remoteToken;
-        address _bridge;
-    }
+    /// @notice The StandardBridge.
+    /// @dev Does not follow our classic naming convention to suits Optimism' standard.
+    address public immutable bridge;
 
     /* ERRORS */
 
-    /// @notice Reverts if the address is the zero address.
+    /// @notice Thrown if the address is the zero address.
     error ZeroAddress();
 
-    /// @notice Reverts if the caller is not the bridge.
-    error NotBridge(address caller);
+    /// @notice Thrown if the caller is not the bridge.
+    error NotBridge();
+
+    /* CONSTRUCTOR */
+
+    /// @notice Construct the contract.
+    /// @param newRemoteToken The remote token address.
+    /// @param newBridge The bridge address.
+    constructor(address newRemoteToken, address newBridge) {
+        require(newRemoteToken != address(0), ZeroAddress());
+        require(newBridge != address(0), ZeroAddress());
+
+        remoteToken = newRemoteToken;
+        bridge = newBridge;
+    }
 
     /* MODIFIERS */
 
     /// @dev A modifier that only allows the bridge to call.
     modifier onlyBridge() {
-        OptimismMintableERC20Storage storage $ = _getOptimismMintableERC20Storage();
-        require(_msgSender() == $._bridge, NotBridge(_msgSender()));
+        require(_msgSender() == bridge, NotBridge());
         _;
     }
 
@@ -53,19 +61,11 @@ contract MorphoTokenOptimism is Token, IOptimismMintableERC20 {
 
     /// @notice Initializes the contract.
     /// @param owner The new owner.
-    /// @param remoteToken_ The address of the Morpho token on Ethereum.
-    /// @param bridge_ The address of the StandardBridge contract.
-    function initialize(address owner, address remoteToken_, address bridge_) external initializer {
+    function initialize(address owner) external initializer {
         require(owner != address(0), ZeroAddress());
-        require(remoteToken_ != address(0), ZeroAddress());
-        require(bridge_ != address(0), ZeroAddress());
 
         __ERC20_init(NAME, SYMBOL);
         __ERC20Permit_init(NAME);
-
-        OptimismMintableERC20Storage storage $ = _getOptimismMintableERC20Storage();
-        $._remoteToken = remoteToken_;
-        $._bridge = bridge_;
 
         _transferOwnership(owner);
     }
@@ -89,26 +89,5 @@ contract MorphoTokenOptimism is Token, IOptimismMintableERC20 {
         bytes4 interfaceERC165 = type(IERC165).interfaceId;
         bytes4 interfaceOptimismMintableERC20 = type(IOptimismMintableERC20).interfaceId;
         return _interfaceId == interfaceERC165 || _interfaceId == interfaceOptimismMintableERC20;
-    }
-
-    /// @dev Returns the address of the Morpho token on Ethereum.
-    function remoteToken() external view returns (address) {
-        OptimismMintableERC20Storage storage $ = _getOptimismMintableERC20Storage();
-        return $._remoteToken;
-    }
-
-    /// @dev Returns the address of the StandardBridge contract.
-    function bridge() external view returns (address) {
-        OptimismMintableERC20Storage storage $ = _getOptimismMintableERC20Storage();
-        return $._bridge;
-    }
-
-    /* INTERNAL */
-
-    /// @dev Returns the OptimismMintableERC20Storage struct.
-    function _getOptimismMintableERC20Storage() internal pure returns (OptimismMintableERC20Storage storage $) {
-        assembly {
-            $.slot := OptimismMintableERC20StorageLocation
-        }
     }
 }

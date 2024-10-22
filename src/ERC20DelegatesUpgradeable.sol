@@ -83,9 +83,7 @@ abstract contract ERC20DelegatesUpgradeable is
         );
 
         ERC20DelegatesStorage storage $ = _getERC20DelegatesStorage();
-        uint256 current = $._delegationNonce[delegator];
-        require(nonce == current, InvalidDelegationNonce(delegator, current));
-        $._delegationNonce[delegator]++;
+        require(nonce == $._delegationNonce[delegator]++, InvalidDelegationNonce());
 
         _delegate(delegator, delegatee);
     }

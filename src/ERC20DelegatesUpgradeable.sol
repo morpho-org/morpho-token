@@ -56,16 +56,16 @@ abstract contract ERC20DelegatesUpgradeable is
 
     /* EVENTS */
 
-    // @dev Emitted when an delegator changes their delegate.
-    event DelegateChanged(address indexed delegator, address indexed fromDelegate, address indexed toDelegate);
+    // @dev Emitted when an delegator changes their delegatee.
+    event DelegateeChanged(address indexed delegator, address indexed oldDelegatee, address indexed newDelegatee);
 
-    // @dev Emitted when a token transfer or delegate change results in changes to a delegate's number of voting units.
-    event DelegateVotesChanged(address indexed delegate, uint256 previousVotes, uint256 newVotes);
+    // @dev Emitted when a delegatee's delegated voting power changes.
+    event DelegatedVotingPowerChanged(address indexed delegatee, uint256 oldVotes, uint256 newVotes);
 
     /* GETTERS */
 
-    /// @dev Returns the delegate that `account` has chosen.
-    function delegates(address account) public view returns (address) {
+    /// @dev Returns the delegatee that `account` has chosen.
+    function delegatee(address account) public view returns (address) {
         ERC20DelegatesStorage storage $ = _getERC20DelegatesStorage();
         return $._delegatee[account];
     }
@@ -84,43 +84,45 @@ abstract contract ERC20DelegatesUpgradeable is
 
     /* DELEGATE */
 
-    /// @dev Delegates the balance of the sender to `delegatee`.
-    function delegate(address delegatee) external {
+    /// @dev Delegates the balance of the sender to `newDelegatee`.
+    function delegate(address newDelegatee) external {
         address delegator = _msgSender();
-        _delegate(delegator, delegatee);
+        _delegate(delegator, newDelegatee);
     }
 
-    /// @dev Delegates the balance of the signer to `delegatee`.
-    function delegateBySig(address delegatee, uint256 nonce, uint256 expiry, uint8 v, bytes32 r, bytes32 s) external {
+    /// @dev Delegates the balance of the signer to `newDelegatee`.
+    function delegateWithSig(address newDelegatee, uint256 nonce, uint256 expiry, uint8 v, bytes32 r, bytes32 s)
+        external
+    {
         require(block.timestamp <= expiry, DelegatesExpiredSignature(expiry));
 
         address delegator = ECDSA.recover(
-            _hashTypedDataV4(keccak256(abi.encode(DELEGATION_TYPEHASH, delegatee, nonce, expiry))), v, r, s
+            _hashTypedDataV4(keccak256(abi.encode(DELEGATION_TYPEHASH, newDelegatee, nonce, expiry))), v, r, s
         );
 
         ERC20DelegatesStorage storage $ = _getERC20DelegatesStorage();
         require(nonce == $._delegationNonce[delegator]++, InvalidDelegationNonce());
 
-        _delegate(delegator, delegatee);
+        _delegate(delegator, newDelegatee);
     }
 
     /* INTERNAL */
 
-    /// @dev Delegates the balance of the `delegator` to `delegatee`.
-    function _delegate(address delegator, address delegatee) internal {
+    /// @dev Delegates the balance of the `delegator` to `newDelegatee`.
+    function _delegate(address delegator, address newDelegatee) internal {
         ERC20DelegatesStorage storage $ = _getERC20DelegatesStorage();
-        address oldDelegate = delegates(delegator);
-        $._delegatee[delegator] = delegatee;
+        address oldDelegatee = delegatee(delegator);
+        $._delegatee[delegator] = newDelegatee;
 
-        emit DelegateChanged(delegator, oldDelegate, delegatee);
-        _moveDelegateVotes(oldDelegate, delegatee, balanceOf(delegator));
+        emit DelegateeChanged(delegator, oldDelegatee, newDelegatee);
+        _moveDelegateVotes(oldDelegatee, newDelegatee, balanceOf(delegator));
     }
 
     /// @dev Moves voting power when tokens are transferred.
     /// @dev Emits a {IDelegates-DelegateVotesChanged} event.
     function _update(address from, address to, uint256 value) internal virtual override {
         super._update(from, to, value);
-        _moveDelegateVotes(delegates(from), delegates(to), value);
+        _moveDelegateVotes(delegatee(from), delegatee(to), value);
     }
 
     /// @dev Moves delegated votes from one delegate to another.
@@ -131,13 +133,13 @@ abstract contract ERC20DelegatesUpgradeable is
                 uint256 oldValue = $._delegatedVotingPower[from];
                 uint256 newValue = oldValue - amount;
                 $._delegatedVotingPower[from] = newValue;
-                emit DelegateVotesChanged(from, oldValue, newValue);
+                emit DelegatedVotingPowerChanged(from, oldValue, newValue);
             }
             if (to != address(0)) {
                 uint256 oldValue = $._delegatedVotingPower[to];
                 uint256 newValue = oldValue + amount;
                 $._delegatedVotingPower[to] = newValue;
-                emit DelegateVotesChanged(to, oldValue, newValue);
+                emit DelegatedVotingPowerChanged(to, oldValue, newValue);
             }
         }
     }

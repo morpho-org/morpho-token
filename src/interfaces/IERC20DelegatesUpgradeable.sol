@@ -7,11 +7,12 @@ pragma solidity >=0.5.0;
 interface IERC20DelegatesUpgradeable {
     function delegatedVotingPower(address account) external view returns (uint256);
 
-    function delegates(address account) external view returns (address);
+    function delegatee(address account) external view returns (address);
 
     function delegationNonce(address account) external view returns (uint256);
 
     function delegate(address delegatee) external;
 
-    function delegateBySig(address delegatee, uint256 nonce, uint256 expiry, uint8 v, bytes32 r, bytes32 s) external;
+    function delegateWithSig(address delegatee, uint256 nonce, uint256 expiry, uint8 v, bytes32 r, bytes32 s)
+        external;
 }

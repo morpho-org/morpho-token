@@ -57,10 +57,10 @@ abstract contract ERC20DelegatesUpgradeable is
     /* EVENTS */
 
     // @dev Emitted when an delegator changes their delegate.
-    event DelegateChanged(address indexed delegator, address indexed oldDelegatee, address indexed newDelegatee);
+    event DelegateeChanged(address indexed delegator, address indexed oldDelegatee, address indexed newDelegatee);
 
     // @dev Emitted when a token transfer or delegate change results in changes to a delegate's number of voting units.
-    event DelegateVotesChanged(address indexed delegate, uint256 previousVotes, uint256 newVotes);
+    event DelegateVotesChanged(address indexed delegate, uint256 oldVotes, uint256 newVotes);
 
     /* GETTERS */
 
@@ -91,7 +91,7 @@ abstract contract ERC20DelegatesUpgradeable is
     }
 
     /// @dev Delegates the balance of the signer to `newDelegatee`.
-    function delegateBySig(address newDelegatee, uint256 nonce, uint256 expiry, uint8 v, bytes32 r, bytes32 s)
+    function delegateWithSig(address newDelegatee, uint256 nonce, uint256 expiry, uint8 v, bytes32 r, bytes32 s)
         external
     {
         require(block.timestamp <= expiry, DelegatesExpiredSignature(expiry));
@@ -114,7 +114,7 @@ abstract contract ERC20DelegatesUpgradeable is
         address oldDelegatee = delegatee(delegator);
         $._delegatee[delegator] = newDelegatee;
 
-        emit DelegateChanged(delegator, oldDelegatee, newDelegatee);
+        emit DelegateeChanged(delegator, oldDelegatee, newDelegatee);
         _moveDelegateVotes(oldDelegatee, newDelegatee, balanceOf(delegator));
     }
 

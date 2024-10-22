@@ -11,7 +11,7 @@ import {Token} from "./Token.sol";
 /// @author Morpho Association
 /// @custom:contact security@morpho.org
 /// @notice The Morpho token contract for Optimism networks.
-contract MorphoTokenOptimism is Token {
+contract MorphoTokenOptimism is Token, IOptimismMintableERC20 {
     /* CONSTANTS */
 
     /// @dev The name of the token.

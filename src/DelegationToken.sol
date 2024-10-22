@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 pragma solidity ^0.8.27;
 
-import {IDelegationToken} from "./interfaces/IDelegationToken.sol";
+import {IDelegation} from "./interfaces/IDelegation.sol";
 
 import {ERC20PermitUpgradeable} from
     "../lib/openzeppelin-contracts-upgradeable/contracts/token/ERC20/extensions/ERC20PermitUpgradeable.sol";
@@ -23,12 +23,7 @@ import {UUPSUpgradeable} from "../lib/openzeppelin-contracts-upgradeable/contrac
 ///
 /// By default, token balance does not account for voting power. This makes transfers cheaper. Whether an account
 /// has to self-delegate to vote depends on the voting contract implementation.
-abstract contract DelegationToken is
-    IDelegationToken,
-    ERC20PermitUpgradeable,
-    Ownable2StepUpgradeable,
-    UUPSUpgradeable
-{
+abstract contract DelegationToken is IDelegation, ERC20PermitUpgradeable, Ownable2StepUpgradeable, UUPSUpgradeable {
     /* CONSTANTS */
 
     bytes32 internal constant DELEGATION_TYPEHASH =

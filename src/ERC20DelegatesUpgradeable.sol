@@ -4,8 +4,6 @@ pragma solidity 0.8.27;
 import {IDelegates} from "./interfaces/IDelegates.sol";
 
 import {ERC20Upgradeable} from "lib/openzeppelin-contracts-upgradeable/contracts/token/ERC20/ERC20Upgradeable.sol";
-import {ECDSA} from
-    "lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/utils/cryptography/ECDSA.sol";
 import {EIP712Upgradeable} from
     "lib/openzeppelin-contracts-upgradeable/contracts/utils/cryptography/EIP712Upgradeable.sol";
 import {Initializable} from "lib/openzeppelin-contracts-upgradeable/contracts/proxy/utils/Initializable.sol";
@@ -71,9 +69,9 @@ abstract contract ERC20DelegatesUpgradeable is Initializable, ERC20Upgradeable, 
     function delegateBySig(address delegatee, uint256 nonce, uint256 expiry, uint8 v, bytes32 r, bytes32 s) external {
         require(block.timestamp <= expiry, DelegatesExpiredSignature(expiry));
 
-        address signer = ECDSA.recover(
-            _hashTypedDataV4(keccak256(abi.encode(DELEGATION_TYPEHASH, delegatee, nonce, expiry))), v, r, s
-        );
+        address signer =
+            ecrecover(_hashTypedDataV4(keccak256(abi.encode(DELEGATION_TYPEHASH, delegatee, nonce, expiry))), v, r, s);
+        require(signer != address(0), InvalidDelegationSignature());
 
         ERC20DelegatesStorage storage $ = _getERC20DelegatesStorage();
         uint256 current = $._delegationNonce[signer];

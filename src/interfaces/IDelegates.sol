@@ -12,6 +12,9 @@ interface IDelegates {
     // @dev The delegation nonce used by `account` is not its current delegation nonce.
     error InvalidDelegationNonce(address account, uint256 currentNonce);
 
+    // @dev The signature used is invalid.
+    error InvalidDelegationSignature();
+
     // @dev Emitted when an account changes their delegate.
     event DelegateChanged(address indexed delegator, address indexed fromDelegate, address indexed toDelegate);
 

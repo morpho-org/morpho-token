@@ -75,7 +75,9 @@ abstract contract ERC20DelegatesUpgradeable is
     }
 
     /// @dev Delegates the balance of the signer to `newDelegatee`.
-    function delegateBySig(address newDelegatee, uint256 nonce, uint256 expiry, uint8 v, bytes32 r, bytes32 s) external {
+    function delegateBySig(address newDelegatee, uint256 nonce, uint256 expiry, uint8 v, bytes32 r, bytes32 s)
+        external
+    {
         require(block.timestamp <= expiry, DelegatesExpiredSignature(expiry));
 
         address signer = ECDSA.recover(

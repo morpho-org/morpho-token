@@ -7,10 +7,10 @@ import {IERC165} from
 
 import {Token} from "./Token.sol";
 
-/// @title MorphoToken
+/// @title MorphoTokenOptimism
 /// @author Morpho Association
 /// @custom:contact security@morpho.org
-/// @notice The MORPHO Token contract for Optimism networks.
+/// @notice The Morpho token contract for Optimism networks.
 contract MorphoTokenOptimism is Token {
     /* CONSTANTS */
 

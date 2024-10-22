@@ -12,7 +12,7 @@ import {Ownable2StepUpgradeable} from
 import {UUPSUpgradeable} from "../lib/openzeppelin-contracts-upgradeable/contracts/proxy/utils/UUPSUpgradeable.sol";
 
 /// @title Token
-/// @author Morpho Labs
+/// @author Morpho Association
 /// @custom:contact security@morpho.org
 /// @dev Extension of ERC20 to support token delegation.
 ///

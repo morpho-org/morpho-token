@@ -3,10 +3,10 @@ pragma solidity 0.8.27;
 
 import {Token} from "./Token.sol";
 
-/// @title MorphoToken
+/// @title MorphoTokenEthereum
 /// @author Morpho Association
 /// @custom:contact security@morpho.org
-/// @notice The MORPHO Token contract.
+/// @notice The Morpho Token contract for Ethereum.
 contract MorphoTokenEthereum is Token {
     /* CONSTANTS */
 

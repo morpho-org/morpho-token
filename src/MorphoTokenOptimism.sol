@@ -24,7 +24,7 @@ contract MorphoTokenOptimism is Token, IOptimismMintableERC20 {
     /// @dev Does not follow our classic naming convention to suits Optimism' standard.
     address public immutable remoteToken;
 
-    /// @dev The StandardBridge.
+    /// @notice The StandardBridge.
     /// @dev Does not follow our classic naming convention to suits Optimism' standard.
     address public immutable bridge;
 

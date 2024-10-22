@@ -9,20 +9,20 @@ interface IDelegates {
     // @dev The signature used has expired.
     error DelegatesExpiredSignature(uint256 expiry);
 
-    // @dev The delegation nonce used by `account` is not its current delegation nonce.
-    error InvalidDelegationNonce(address account, uint256 currentNonce);
+    // @dev The delegation nonce used by `delegator` is not its current delegation nonce.
+    error InvalidDelegationNonce(address delegator, uint256 currentNonce);
 
-    // @dev Emitted when an account changes their delegate.
+    // @dev Emitted when an delegator changes their delegate.
     event DelegateChanged(address indexed delegator, address indexed fromDelegate, address indexed toDelegate);
 
     // @dev Emitted when a token transfer or delegate change results in changes to a delegate's number of voting units.
     event DelegateVotesChanged(address indexed delegate, uint256 previousVotes, uint256 newVotes);
 
-    // @dev Returns the current amount of votes that `account` has.
-    function delegatedVotingPower(address account) external view returns (uint256);
+    // @dev Returns the current amount of votes that `delegator` has.
+    function delegatedVotingPower(address delegator) external view returns (uint256);
 
-    // @dev Returns the delegate that `account` has chosen.
-    function delegates(address account) external view returns (address);
+    // @dev Returns the delegate that `delegator` has chosen.
+    function delegatee(address delegator) external view returns (address);
 
     // @dev Delegates votes from the sender to `delegatee`.
     function delegate(address delegatee) external;

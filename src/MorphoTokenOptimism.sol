@@ -86,8 +86,6 @@ contract MorphoTokenOptimism is Token, IOptimismMintableERC20 {
     /// @param _interfaceId Interface ID to check.
     /// @return Whether or not the interface is supported by this contract.
     function supportsInterface(bytes4 _interfaceId) external pure returns (bool) {
-        bytes4 interfaceERC165 = type(IERC165).interfaceId;
-        bytes4 interfaceOptimismMintableERC20 = type(IOptimismMintableERC20).interfaceId;
-        return _interfaceId == interfaceERC165 || _interfaceId == interfaceOptimismMintableERC20;
+        return _interfaceId == type(IERC165).interfaceId || _interfaceId == type(IOptimismMintableERC20).interfaceId;
     }
 }

@@ -6,7 +6,7 @@ Additionally, it ships a wrapper contract to simplify the migration of assets fr
 
 ## Upgradability
 
-The Morpho token complies with the EIP-1967 to support upgradability.
+The Morpho token complies with the EIP-1967 to support upgradeability.
 
 ## Delegation
 

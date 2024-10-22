@@ -37,33 +37,49 @@ abstract contract ERC20DelegatesUpgradeable is
     bytes32 private constant ERC20DelegatesStorageLocation =
         0x1dc92b2c6e971ab6e08dfd7dcec0e9496d223ced663ba2a06543451548549500;
 
-    /* STRUCTS */
+    /* STORAGE LAYOUT */
 
     /// @custom:storage-location erc7201:morpho.storage.ERC20Delegates
     struct ERC20DelegatesStorage {
-        mapping(address delegator => address) _delegatee;
-        mapping(address delegatee => uint256) _delegatedVotingPower;
-        mapping(address delegator => uint256) _delegationNonce;
+        mapping(address => address) _delegatee;
+        mapping(address => uint256) _delegatedVotingPower;
+        mapping(address => uint256) _delegationNonce;
     }
+
+    /* ERRORS */
+
+    // @dev The signature used has expired.
+    error DelegatesExpiredSignature(uint256 expiry);
+
+    // @dev The delegation nonce used by the signer is not its current delegation nonce.
+    error InvalidDelegationNonce();
+
+    /* EVENTS */
+
+    // @dev Emitted when an delegator changes their delegate.
+    event DelegateChanged(address indexed delegator, address indexed oldDelegatee, address indexed newDelegatee);
+
+    // @dev Emitted when a token transfer or delegate change results in changes to a delegate's number of voting units.
+    event DelegateVotesChanged(address indexed delegate, uint256 previousVotes, uint256 newVotes);
 
     /* GETTERS */
 
-    /// @dev Returns the delegate that `delegator` has chosen.
-    function delegatee(address delegator) public view returns (address) {
+    /// @dev Returns the delegate that `account` has chosen.
+    function delegatee(address account) public view returns (address) {
         ERC20DelegatesStorage storage $ = _getERC20DelegatesStorage();
-        return $._delegatee[delegator];
+        return $._delegatee[account];
     }
 
-    /// @dev Returns the current voting power delegated to `delegatee`.
-    function delegatedVotingPower(address delegatee) external view returns (uint256) {
+    /// @dev Returns the current voting power delegated to `account`.
+    function delegatedVotingPower(address account) external view returns (uint256) {
         ERC20DelegatesStorage storage $ = _getERC20DelegatesStorage();
-        return $._delegatedVotingPower[delegatee];
+        return $._delegatedVotingPower[account];
     }
 
-    /// @dev Returns the current delegation nonce of `delegator`.
-    function delegationNonce(address delegator) external view returns (uint256) {
+    /// @dev Returns the current delegation nonce of `account`.
+    function delegationNonce(address account) external view returns (uint256) {
         ERC20DelegatesStorage storage $ = _getERC20DelegatesStorage();
-        return $._delegationNonce[delegator];
+        return $._delegationNonce[account];
     }
 
     /* DELEGATE */
@@ -109,10 +125,8 @@ abstract contract ERC20DelegatesUpgradeable is
         _moveDelegateVotes(delegatee(from), delegatee(to), value);
     }
 
-    /* PRIVATE */
-
     /// @dev Moves delegated votes from one delegate to another.
-    function _moveDelegateVotes(address from, address to, uint256 amount) private {
+    function _moveDelegateVotes(address from, address to, uint256 amount) internal {
         ERC20DelegatesStorage storage $ = _getERC20DelegatesStorage();
         if (from != to && amount > 0) {
             if (from != address(0)) {
@@ -131,7 +145,7 @@ abstract contract ERC20DelegatesUpgradeable is
     }
 
     /// @dev Returns the ERC20DelegatesStorage struct.
-    function _getERC20DelegatesStorage() private pure returns (ERC20DelegatesStorage storage $) {
+    function _getERC20DelegatesStorage() internal pure returns (ERC20DelegatesStorage storage $) {
         assembly {
             $.slot := ERC20DelegatesStorageLocation
         }

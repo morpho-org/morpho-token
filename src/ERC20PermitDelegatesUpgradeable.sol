@@ -8,7 +8,7 @@ import {ERC20PermitUpgradeable} from
 import {ECDSA} from
     "../lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/utils/cryptography/ECDSA.sol";
 
-/// @title ERC20DelegatesUpgradeable
+/// @title ERC20PermitDelegatesUpgradeable
 /// @author Morpho Labs
 /// @custom:contact security@morpho.org
 /// @dev Extension of ERC20 to support token delegation.
@@ -18,7 +18,7 @@ import {ECDSA} from
 ///
 /// By default, token balance does not account for voting power. This makes transfers cheaper. Whether an account
 /// has to self-delegate to vote depends on the voting contract implementation.
-abstract contract ERC20DelegatesUpgradeable is ERC20PermitUpgradeable, IDelegates {
+abstract contract ERC20PermitDelegatesUpgradeable is ERC20PermitUpgradeable, IDelegates {
     /* CONSTANTS */
 
     bytes32 private constant DELEGATION_TYPEHASH =

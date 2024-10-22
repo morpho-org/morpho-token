@@ -3,14 +3,14 @@ pragma solidity 0.8.27;
 
 import {Ownable2StepUpgradeable} from
     "../lib/openzeppelin-contracts-upgradeable/contracts/access/Ownable2StepUpgradeable.sol";
-import {ERC20DelegatesUpgradeable} from "./ERC20DelegatesUpgradeable.sol";
+import {ERC20PermitDelegatesUpgradeable} from "./ERC20PermitDelegatesUpgradeable.sol";
 import {UUPSUpgradeable} from "../lib/openzeppelin-contracts-upgradeable/contracts/proxy/utils/UUPSUpgradeable.sol";
 
 /// @title MorphoToken
 /// @author Morpho Labs
 /// @custom:contact security@morpho.org
 /// @notice The MORPHO Token contract.
-contract MorphoToken is ERC20DelegatesUpgradeable, Ownable2StepUpgradeable, UUPSUpgradeable {
+contract MorphoToken is ERC20PermitDelegatesUpgradeable, Ownable2StepUpgradeable, UUPSUpgradeable {
     /* CONSTANTS */
 
     /// @dev The name of the token.

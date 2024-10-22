@@ -5,7 +5,7 @@ pragma solidity ^0.8.20;
 /// @author Morpho Labs
 /// @custom:contact security@morpho.org
 /// @notice The Delegates interface.
-interface IDelegates {
+interface IERC20DelegatesUpgradeable {
     // @dev The signature used has expired.
     error DelegatesExpiredSignature(uint256 expiry);
 
@@ -22,7 +22,7 @@ interface IDelegates {
     function delegatedVotingPower(address delegator) external view returns (uint256);
 
     // @dev Returns the delegate that `delegator` has chosen.
-    function delegatee(address delegator) external view returns (address);
+    function delegates(address delegator) external view returns (address);
 
     // @dev Delegates votes from the sender to `delegatee`.
     function delegate(address delegatee) external;

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.27;
 
-import {IDelegates} from "./interfaces/IDelegates.sol";
+import {IERC20DelegatesUpgradeable} from "./interfaces/IERC20DelegatesUpgradeable.sol";
 
 import {ERC20Upgradeable} from "lib/openzeppelin-contracts-upgradeable/contracts/token/ERC20/ERC20Upgradeable.sol";
 import {ECDSA} from
@@ -22,7 +22,12 @@ import {Initializable} from "lib/openzeppelin-contracts-upgradeable/contracts/pr
 ///
 /// By default, token balance does not account for voting power. This makes transfers cheaper. Whether an account
 /// has to self-delegate to vote depends on the voting contract implementation.
-abstract contract ERC20DelegatesUpgradeable is Initializable, ERC20Upgradeable, EIP712Upgradeable, IDelegates {
+abstract contract ERC20DelegatesUpgradeable is
+    Initializable,
+    ERC20Upgradeable,
+    EIP712Upgradeable,
+    IERC20DelegatesUpgradeable
+{
     /* CONSTANTS */
 
     bytes32 private constant DELEGATION_TYPEHASH =
@@ -48,7 +53,7 @@ abstract contract ERC20DelegatesUpgradeable is Initializable, ERC20Upgradeable, 
         ERC20DelegatesStorage storage $ = _getERC20DelegatesStorage();
         return $._delegatee[delegator];
     }
-    
+
     /// @dev Returns the current amount of votes delegated to `delegator`.
     function delegatedVotingPower(address delegator) external view returns (uint256) {
         ERC20DelegatesStorage storage $ = _getERC20DelegatesStorage();

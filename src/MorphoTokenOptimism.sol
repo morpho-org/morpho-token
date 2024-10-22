@@ -60,11 +60,11 @@ contract MorphoTokenOptimism is Token {
     /* PUBLIC */
 
     /// @notice Initializes the contract.
-    /// @param dao The DAO address.
+    /// @param owner The new owner.
     /// @param remoteToken_ The address of the Morpho token on Ethereum.
     /// @param bridge_ The address of the StandardBridge contract.
-    function initialize(address dao, address remoteToken_, address bridge_) public initializer {
-        require(dao != address(0), ZeroAddress());
+    function initialize(address owner, address remoteToken_, address bridge_) public initializer {
+        require(owner != address(0), ZeroAddress());
         require(remoteToken_ != address(0), ZeroAddress());
         require(bridge_ != address(0), ZeroAddress());
 
@@ -74,7 +74,7 @@ contract MorphoTokenOptimism is Token {
         $._remoteToken = remoteToken_;
         $._bridge = bridge_;
 
-        _transferOwnership(dao); // Transfer ownership to the DAO.
+        _transferOwnership(owner);
     }
 
     /* EXTERNAL */

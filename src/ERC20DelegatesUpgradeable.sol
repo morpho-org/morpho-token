@@ -15,12 +15,13 @@ import {Initializable} from "lib/openzeppelin-contracts-upgradeable/contracts/pr
 /// @custom:contact security@morpho.org
 /// @dev Extension of ERC20 to support token delegation.
 ///
-/// This extension keeps track of each account's vote power. Vote power can be delegated either by calling the
-/// {delegate} function directly, or by providing a signature to be used with {delegateBySig}. Voting power can be
-/// queried through the external accessor {getVotes}.
+/// This extension keeps track of the current voting power delegated to each account. Voting power can be delegated
+/// either by calling the {delegate} function directly, or by providing a signature to be used with {delegateBySig}.
 ///
-/// By default, token balance does not account for voting power. This makes transfers cheaper. The downside is that it
-/// requires users to delegate to themselves in order to activate their voting power.
+/// This enables onchain votes on external voting smart contracts leveraging storage proofs.
+///
+/// By default, token balance does not account for voting power. This makes transfers cheaper. Whether an account
+/// has to self-delegate to vote depends on the voting contract implementation.
 abstract contract ERC20DelegatesUpgradeable is Initializable, ERC20Upgradeable, EIP712Upgradeable, IDelegates {
     /* CONSTANTS */
 
@@ -36,7 +37,7 @@ abstract contract ERC20DelegatesUpgradeable is Initializable, ERC20Upgradeable, 
     /// @custom:storage-location erc7201:morpho.storage.ERC20Delegates
     struct ERC20DelegatesStorage {
         mapping(address account => address) _delegatee;
-        mapping(address delegatee => uint256) _votingPower;
+        mapping(address delegatee => uint256) _delegatedVotingPower;
         mapping(address account => uint256) _delegationNonce;
     }
 
@@ -50,10 +51,10 @@ abstract contract ERC20DelegatesUpgradeable is Initializable, ERC20Upgradeable, 
 
     /* EXTERNAL */
 
-    /// @dev Returns the current amount of votes that `account` has.
-    function getVotes(address account) external view returns (uint256) {
+    /// @dev Returns the current amount of votes delegated to `account`.
+    function delegatedVotingPower(address account) external view returns (uint256) {
         ERC20DelegatesStorage storage $ = _getERC20DelegatesStorage();
-        return $._votingPower[account];
+        return $._delegatedVotingPower[account];
     }
 
     function delegationNonce(address account) external view returns (uint256) {
@@ -116,15 +117,15 @@ abstract contract ERC20DelegatesUpgradeable is Initializable, ERC20Upgradeable, 
         ERC20DelegatesStorage storage $ = _getERC20DelegatesStorage();
         if (from != to && amount > 0) {
             if (from != address(0)) {
-                uint256 oldValue = $._votingPower[from];
+                uint256 oldValue = $._delegatedVotingPower[from];
                 uint256 newValue = oldValue - amount;
-                $._votingPower[from] = newValue;
+                $._delegatedVotingPower[from] = newValue;
                 emit DelegateVotesChanged(from, oldValue, newValue);
             }
             if (to != address(0)) {
-                uint256 oldValue = $._votingPower[to];
+                uint256 oldValue = $._delegatedVotingPower[to];
                 uint256 newValue = oldValue + amount;
-                $._votingPower[to] = newValue;
+                $._delegatedVotingPower[to] = newValue;
                 emit DelegateVotesChanged(to, oldValue, newValue);
             }
         }

@@ -17,7 +17,6 @@ import {Initializable} from "lib/openzeppelin-contracts-upgradeable/contracts/pr
 ///
 /// This extension keeps track of the current voting power delegated to each account. Voting power can be delegated
 /// either by calling the {delegate} function directly, or by providing a signature to be used with {delegateBySig}.
-/// Voting power can be queried through the external accessor {getVotes}.
 ///
 /// This enables onchain votes on external voting smart contracts leveraging storage proofs.
 ///

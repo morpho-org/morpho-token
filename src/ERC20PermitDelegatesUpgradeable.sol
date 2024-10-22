@@ -90,12 +90,7 @@ abstract contract ERC20PermitDelegatesUpgradeable is ERC20PermitUpgradeable, IDe
         $._delegatee[account] = delegatee;
 
         emit DelegateChanged(account, oldDelegate, delegatee);
-        _moveDelegateVotes(oldDelegate, delegatee, _getVotingUnits(account));
-    }
-
-    /// @dev Must return the voting units held by an account.
-    function _getVotingUnits(address account) internal view returns (uint256) {
-        return balanceOf(account);
+        _moveDelegateVotes(oldDelegate, delegatee, balanceOf(account));
     }
 
     /// @dev Moves voting power when tokens are transferred.

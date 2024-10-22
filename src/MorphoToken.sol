@@ -1,14 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.27;
 
-import {ERC20Upgradeable} from "lib/openzeppelin-contracts-upgradeable/contracts/token/ERC20/ERC20Upgradeable.sol";
 import {Ownable2StepUpgradeable} from
     "lib/openzeppelin-contracts-upgradeable/contracts/access/Ownable2StepUpgradeable.sol";
 import {ERC20DelegatesUpgradeable} from "./ERC20DelegatesUpgradeable.sol";
-import {
-    ERC20PermitUpgradeable,
-    NoncesUpgradeable
-} from "lib/openzeppelin-contracts-upgradeable/contracts/token/ERC20/extensions/ERC20PermitUpgradeable.sol";
 import {UUPSUpgradeable} from "lib/openzeppelin-contracts-upgradeable/contracts/proxy/utils/UUPSUpgradeable.sol";
 
 /// @title MorphoToken
@@ -37,9 +32,9 @@ contract MorphoToken is ERC20DelegatesUpgradeable, Ownable2StepUpgradeable, UUPS
     function initialize(address dao, address wrapper) public initializer {
         require(dao != address(0), ZeroAddress());
 
-        ERC20Upgradeable.__ERC20_init(NAME, SYMBOL);
-        Ownable2StepUpgradeable.__Ownable2Step_init();
-        ERC20PermitUpgradeable.__ERC20Permit_init(NAME);
+        __ERC20_init(NAME, SYMBOL);
+        __Ownable2Step_init();
+        __ERC20Permit_init(NAME);
 
         _transferOwnership(dao); // Transfer ownership to the DAO.
         _mint(wrapper, 1_000_000_000e18); // Mint 1B to the wrapper contract.

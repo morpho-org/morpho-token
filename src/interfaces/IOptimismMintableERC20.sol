@@ -1,8 +1,8 @@
-// SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+// SPDX-License-Identifier: GPL-2.0-or-later
+pragma solidity >=0.5.0;
 
 import {IERC165} from
-    "lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/utils/introspection/IERC165.sol";
+    "../../lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/utils/introspection/IERC165.sol";
 
 /// @title IOptimismMintableERC20
 /// @notice This interface is available on the OptimismMintableERC20 contract.

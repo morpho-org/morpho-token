@@ -36,10 +36,10 @@ contract Wrapper {
         NEW_MORPHO = morphoToken;
     }
 
-    /* PUBLIC */
+    /* EXTERNAL */
 
     /// @dev Compliant to `ERC20Wrapper` contract from OZ for convenience.
-    function depositFor(address account, uint256 value) public returns (bool) {
+    function depositFor(address account, uint256 value) external returns (bool) {
         require(account != address(0), ZeroAddress());
         require(account != address(this), SelfAddress());
 
@@ -49,7 +49,7 @@ contract Wrapper {
     }
 
     /// @dev Compliant to `ERC20Wrapper` contract from OZ for convenience.
-    function withdrawTo(address account, uint256 value) public returns (bool) {
+    function withdrawTo(address account, uint256 value) external returns (bool) {
         require(account != address(0), ZeroAddress());
         require(account != address(this), SelfAddress());
 
@@ -58,8 +58,9 @@ contract Wrapper {
         return true;
     }
 
-    /// @dev To ease wrapping via the bundler contract: https://github.com/morpho-org/morpho-blue-bundlers/blob/main/src/ERC20WrapperBundler.sol
-    function underlying() public pure returns (address) {
+    /// @dev To ease wrapping via the bundler contract:
+    /// https://github.com/morpho-org/morpho-blue-bundlers/blob/main/src/ERC20WrapperBundler.sol
+    function underlying() external pure returns (address) {
         return LEGACY_MORPHO;
     }
 }

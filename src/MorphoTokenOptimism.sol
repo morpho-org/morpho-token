@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: GPL-2.0-or-later
 pragma solidity 0.8.27;
 
 import {IOptimismMintableERC20} from "./interfaces/IOptimismMintableERC20.sol";
@@ -11,7 +11,7 @@ import {Token} from "./Token.sol";
 /// @author Morpho Association
 /// @custom:contact security@morpho.org
 /// @notice The Morpho token contract for Optimism networks.
-contract MorphoTokenOptimism is Token {
+contract MorphoTokenOptimism is Token, IOptimismMintableERC20 {
     /* CONSTANTS */
 
     /// @dev The name of the token.
@@ -21,24 +21,16 @@ contract MorphoTokenOptimism is Token {
     string internal constant SYMBOL = "MORPHO";
 
     // keccak256(abi.encode(uint256(keccak256("morpho.storage.OptimismMintableERC20")) - 1)) & ~bytes32(uint256(0xff))
-    bytes32 private constant OptimismMintableERC20StorageLocation =
+    bytes32 internal constant OptimismMintableERC20StorageLocation =
         0x6fd4c0a11d0843c68c809f0a5f29b102d54bc08a251c384d9ad17600bfa05d00;
 
-    /* STRUCTS */
+    /* STORAGE LAYOUT */
 
     /// @custom:storage-location erc7201:morpho.storage.OptimismMintableERC20
     struct OptimismMintableERC20Storage {
         address _remoteToken;
         address _bridge;
     }
-
-    /* EVENTS */
-
-    /// @dev Emitted whenever tokens are minted for an account.
-    event Mint(address indexed account, uint256 amount);
-
-    /// @dev Emitted whenever tokens are burned from an account.
-    event Burn(address indexed account, uint256 amount);
 
     /* ERRORS */
 
@@ -57,27 +49,26 @@ contract MorphoTokenOptimism is Token {
         _;
     }
 
-    /* PUBLIC */
+    /* EXTERNAL */
 
     /// @notice Initializes the contract.
-    /// @param dao The DAO address.
-    /// @param remoteToken_ The address of the Morpho Token on Ethereum.
+    /// @param owner The new owner.
+    /// @param remoteToken_ The address of the Morpho token on Ethereum.
     /// @param bridge_ The address of the StandardBridge contract.
-    function initialize(address dao, address remoteToken_, address bridge_) public initializer {
-        require(dao != address(0), ZeroAddress());
+    function initialize(address owner, address remoteToken_, address bridge_) external initializer {
+        require(owner != address(0), ZeroAddress());
         require(remoteToken_ != address(0), ZeroAddress());
         require(bridge_ != address(0), ZeroAddress());
 
         __ERC20_init(NAME, SYMBOL);
+        __ERC20Permit_init(NAME);
 
         OptimismMintableERC20Storage storage $ = _getOptimismMintableERC20Storage();
         $._remoteToken = remoteToken_;
         $._bridge = bridge_;
 
-        _transferOwnership(dao); // Transfer ownership to the DAO.
+        _transferOwnership(owner);
     }
-
-    /* EXTERNAL */
 
     /// @dev Allows the StandardBridge on this network to mint tokens.
     function mint(address to, uint256 amount) external onlyBridge {
@@ -100,24 +91,22 @@ contract MorphoTokenOptimism is Token {
         return _interfaceId == interfaceERC165 || _interfaceId == interfaceOptimismMintableERC20;
     }
 
-    /// @custom:legacy
-    /// @dev Legacy getter for REMOTE_TOKEN.
+    /// @dev Returns the address of the Morpho token on Ethereum.
     function remoteToken() external view returns (address) {
         OptimismMintableERC20Storage storage $ = _getOptimismMintableERC20Storage();
         return $._remoteToken;
     }
 
-    /// @custom:legacy
-    /// @dev Legacy getter for BRIDGE.
+    /// @dev Returns the address of the StandardBridge contract.
     function bridge() external view returns (address) {
         OptimismMintableERC20Storage storage $ = _getOptimismMintableERC20Storage();
         return $._bridge;
     }
 
-    /* PRIVATE */
+    /* INTERNAL */
 
     /// @dev Returns the OptimismMintableERC20Storage struct.
-    function _getOptimismMintableERC20Storage() private pure returns (OptimismMintableERC20Storage storage $) {
+    function _getOptimismMintableERC20Storage() internal pure returns (OptimismMintableERC20Storage storage $) {
         assembly {
             $.slot := OptimismMintableERC20StorageLocation
         }

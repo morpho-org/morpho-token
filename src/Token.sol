@@ -3,8 +3,6 @@ pragma solidity 0.8.27;
 
 import {IERC20DelegatesUpgradeable} from "./interfaces/IERC20DelegatesUpgradeable.sol";
 
-import {Ownable2StepUpgradeable} from
-    "lib/openzeppelin-contracts-upgradeable/contracts/access/Ownable2StepUpgradeable.sol";
 import {ERC20PermitUpgradeable} from
     "../lib/openzeppelin-contracts-upgradeable/contracts/token/ERC20/extensions/ERC20PermitUpgradeable.sol";
 import {ECDSA} from

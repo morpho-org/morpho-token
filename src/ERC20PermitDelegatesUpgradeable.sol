@@ -3,14 +3,12 @@ pragma solidity 0.8.27;
 
 import {IERC20DelegatesUpgradeable} from "./interfaces/IERC20DelegatesUpgradeable.sol";
 
-import {ERC20Upgradeable} from "../lib/openzeppelin-contracts-upgradeable/contracts/token/ERC20/ERC20Upgradeable.sol";
+import {ERC20PermitUpgradeable} from
+    "../lib/openzeppelin-contracts-upgradeable/contracts/token/ERC20/extensions/ERC20PermitUpgradeable.sol";
 import {ECDSA} from
     "../lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/utils/cryptography/ECDSA.sol";
-import {EIP712Upgradeable} from
-    "../lib/openzeppelin-contracts-upgradeable/contracts/utils/cryptography/EIP712Upgradeable.sol";
-import {Initializable} from "../lib/openzeppelin-contracts-upgradeable/contracts/proxy/utils/Initializable.sol";
 
-/// @title ERC20DelegatesUpgradeable
+/// @title ERC20PermitDelegatesUpgradeable
 /// @author Morpho Labs
 /// @custom:contact security@morpho.org
 /// @dev Extension of ERC20 to support token delegation.
@@ -22,12 +20,7 @@ import {Initializable} from "../lib/openzeppelin-contracts-upgradeable/contracts
 ///
 /// By default, token balance does not account for voting power. This makes transfers cheaper. Whether an account
 /// has to self-delegate to vote depends on the voting contract implementation.
-abstract contract ERC20DelegatesUpgradeable is
-    Initializable,
-    ERC20Upgradeable,
-    EIP712Upgradeable,
-    IERC20DelegatesUpgradeable
-{
+abstract contract ERC20PermitDelegatesUpgradeable is ERC20PermitUpgradeable, IERC20DelegatesUpgradeable {
     /* CONSTANTS */
 
     bytes32 private constant DELEGATION_TYPEHASH =

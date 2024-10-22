@@ -1,21 +1,16 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 pragma solidity 0.8.27;
 
-import {ERC20Upgradeable} from "../lib/openzeppelin-contracts-upgradeable/contracts/token/ERC20/ERC20Upgradeable.sol";
 import {Ownable2StepUpgradeable} from
     "../lib/openzeppelin-contracts-upgradeable/contracts/access/Ownable2StepUpgradeable.sol";
-import {ERC20DelegatesUpgradeable} from "./ERC20DelegatesUpgradeable.sol";
-import {
-    ERC20PermitUpgradeable,
-    NoncesUpgradeable
-} from "../lib/openzeppelin-contracts-upgradeable/contracts/token/ERC20/extensions/ERC20PermitUpgradeable.sol";
+import {ERC20PermitDelegatesUpgradeable} from "./ERC20PermitDelegatesUpgradeable.sol";
 import {UUPSUpgradeable} from "../lib/openzeppelin-contracts-upgradeable/contracts/proxy/utils/UUPSUpgradeable.sol";
 
 /// @title MorphoToken
 /// @author Morpho Labs
 /// @custom:contact security@morpho.org
 /// @notice The MORPHO Token contract.
-contract MorphoToken is ERC20DelegatesUpgradeable, ERC20PermitUpgradeable, Ownable2StepUpgradeable, UUPSUpgradeable {
+contract MorphoToken is ERC20PermitDelegatesUpgradeable, Ownable2StepUpgradeable, UUPSUpgradeable {
     /* CONSTANTS */
 
     /// @dev The name of the token.
@@ -52,14 +47,6 @@ contract MorphoToken is ERC20DelegatesUpgradeable, ERC20PermitUpgradeable, Ownab
     }
 
     /* INTERNAL */
-
-    /// @inheritdoc ERC20DelegatesUpgradeable
-    function _update(address from, address to, uint256 value)
-        internal
-        override(ERC20Upgradeable, ERC20DelegatesUpgradeable)
-    {
-        ERC20DelegatesUpgradeable._update(from, to, value);
-    }
 
     /// @inheritdoc UUPSUpgradeable
     function _authorizeUpgrade(address) internal override onlyOwner {}

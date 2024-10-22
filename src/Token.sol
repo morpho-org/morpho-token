@@ -119,7 +119,7 @@ abstract contract Token is
     /// @dev Delegates the balance of the `delegator` to `newDelegatee`.
     function _delegate(address delegator, address newDelegatee) internal {
         ERC20DelegatesStorage storage $ = _getERC20DelegatesStorage();
-        address oldDelegatee = delegatee(delegator);
+        address oldDelegatee = $._delegatee[delegator];
         $._delegatee[delegator] = newDelegatee;
 
         emit DelegateeChanged(delegator, oldDelegatee, newDelegatee);

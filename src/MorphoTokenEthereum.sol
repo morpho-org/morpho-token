@@ -21,12 +21,12 @@ contract MorphoTokenEthereum is Token {
     /// @notice Reverts if the address is the zero address.
     error ZeroAddress();
 
-    /* PUBLIC */
+    /* EXTERNAL */
 
     /// @notice Initializes the contract.
     /// @param owner The new owner.
     /// @param wrapper The wrapper contract address to migrate legacy MORPHO tokens to the new one.
-    function initialize(address owner, address wrapper) public initializer {
+    function initialize(address owner, address wrapper) external initializer {
         require(owner != address(0), ZeroAddress());
 
         __ERC20_init(NAME, SYMBOL);

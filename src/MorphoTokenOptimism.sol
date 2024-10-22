@@ -57,13 +57,13 @@ contract MorphoTokenOptimism is Token {
         _;
     }
 
-    /* PUBLIC */
+    /* EXTERNAL */
 
     /// @notice Initializes the contract.
     /// @param owner The new owner.
     /// @param remoteToken_ The address of the Morpho token on Ethereum.
     /// @param bridge_ The address of the StandardBridge contract.
-    function initialize(address owner, address remoteToken_, address bridge_) public initializer {
+    function initialize(address owner, address remoteToken_, address bridge_) external initializer {
         require(owner != address(0), ZeroAddress());
         require(remoteToken_ != address(0), ZeroAddress());
         require(bridge_ != address(0), ZeroAddress());
@@ -77,8 +77,6 @@ contract MorphoTokenOptimism is Token {
 
         _transferOwnership(owner);
     }
-
-    /* EXTERNAL */
 
     /// @dev Allows the StandardBridge on this network to mint tokens.
     function mint(address to, uint256 amount) external onlyBridge {

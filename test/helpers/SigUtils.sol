@@ -32,7 +32,7 @@ library SigUtils {
 
     /// @dev Computes the hash of the EIP-712 encoded data.
     function getDelegationTypedDataHash(Delegation memory delegation, address contractAddress)
-        public
+        internal
         view
         returns (bytes32)
     {
@@ -42,7 +42,7 @@ library SigUtils {
         );
     }
 
-    function getPermitTypedDataHash(Permit memory permit, address contractAddress) public view returns (bytes32) {
+    function getPermitTypedDataHash(Permit memory permit, address contractAddress) internal view returns (bytes32) {
         (, string memory name, string memory version,,,,) = IERC5267(contractAddress).eip712Domain();
         return keccak256(
             bytes.concat("\x19\x01", domainSeparator(contractAddress, name, version), permitHashStruct(permit))
@@ -60,7 +60,7 @@ library SigUtils {
     }
 
     function domainSeparator(address contractAddress, string memory name, string memory version)
-        public
+        internal
         view
         returns (bytes32)
     {

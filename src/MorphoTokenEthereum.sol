@@ -21,13 +21,6 @@ contract MorphoTokenEthereum is ERC20PermitDelegatesUpgradeable {
     /// @notice Reverts if the address is the zero address.
     error ZeroAddress();
 
-    /* CONSTRUCTOR */
-
-    // @dev Disables initializers for the implementation contract.
-    constructor() {
-        _disableInitializers();
-    }
-
     /* PUBLIC */
 
     /// @notice Initializes the contract.

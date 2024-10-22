@@ -63,6 +63,13 @@ abstract contract ERC20PermitDelegatesUpgradeable is
     // @dev Emitted when a delegatee's delegated voting power changes.
     event DelegatedVotingPowerChanged(address indexed delegatee, uint256 oldVotes, uint256 newVotes);
 
+    /* CONSTRUCTOR */
+
+    // @dev Disables initializers for the implementation contract.
+    constructor() {
+        _disableInitializers();
+    }
+
     /* GETTERS */
 
     /// @dev Returns the delegatee that `account` has chosen.

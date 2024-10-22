@@ -24,7 +24,7 @@ contract MorphoTokenOptimism is Token {
     bytes32 private constant OptimismMintableERC20StorageLocation =
         0x6fd4c0a11d0843c68c809f0a5f29b102d54bc08a251c384d9ad17600bfa05d00;
 
-    /* STRUCTS */
+    /* STORAGE LAYOUT */
 
     /// @custom:storage-location erc7201:morpho.storage.OptimismMintableERC20
     struct OptimismMintableERC20Storage {

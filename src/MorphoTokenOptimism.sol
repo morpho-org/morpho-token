@@ -32,14 +32,6 @@ contract MorphoTokenOptimism is Token, IOptimismMintableERC20 {
         address _bridge;
     }
 
-    /* EVENTS */
-
-    /// @dev Emitted whenever tokens are minted for an account.
-    event Mint(address indexed account, uint256 amount);
-
-    /// @dev Emitted whenever tokens are burned from an account.
-    event Burn(address indexed account, uint256 amount);
-
     /* ERRORS */
 
     /// @notice Reverts if the address is the zero address.

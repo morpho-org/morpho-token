@@ -99,15 +99,13 @@ contract MorphoTokenOptimism is Token {
         return _interfaceId == interfaceERC165 || _interfaceId == interfaceOptimismMintableERC20;
     }
 
-    /// @custom:legacy
-    /// @dev Legacy getter for REMOTE_TOKEN.
+    /// @dev Returns the address of the Morpho token on Ethereum.
     function remoteToken() external view returns (address) {
         OptimismMintableERC20Storage storage $ = _getOptimismMintableERC20Storage();
         return $._remoteToken;
     }
 
-    /// @custom:legacy
-    /// @dev Legacy getter for BRIDGE.
+    /// @dev Returns the address of the StandardBridge contract.
     function bridge() external view returns (address) {
         OptimismMintableERC20Storage storage $ = _getOptimismMintableERC20Storage();
         return $._bridge;

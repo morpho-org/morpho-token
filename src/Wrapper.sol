@@ -58,7 +58,8 @@ contract Wrapper {
         return true;
     }
 
-    /// @dev To ease wrapping via the bundler contract: https://github.com/morpho-org/morpho-blue-bundlers/blob/main/src/ERC20WrapperBundler.sol
+    /// @dev To ease wrapping via the bundler contract:
+    /// https://github.com/morpho-org/morpho-blue-bundlers/blob/main/src/ERC20WrapperBundler.sol
     function underlying() external pure returns (address) {
         return LEGACY_MORPHO;
     }

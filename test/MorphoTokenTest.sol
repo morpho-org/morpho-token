@@ -248,6 +248,25 @@ contract MorphoTokenEthereumTest is BaseTest {
         assertEq(newMorpho.balanceOf(to), amount);
     }
 
+    function testMintOverflow(address to, uint256 amount) public {
+        vm.assume(to != address(0));
+        amount = bound(amount, type(uint256).max - newMorpho.totalSupply() + 1, type(uint256).max);
+
+        vm.prank(MORPHO_DAO);
+        vm.expectRevert();
+        newMorpho.mint(to, amount);
+    }
+
+    function testMintAccess(address account, address to, uint256 amount) public {
+        vm.assume(to != address(0));
+        vm.assume(account != MORPHO_DAO);
+        amount = bound(amount, MIN_TEST_AMOUNT, MAX_TEST_AMOUNT);
+
+        vm.expectRevert();
+        vm.prank(account);
+        newMorpho.mint(to, amount);
+    }
+
     function testBurn(address from, uint256 amountMinted, uint256 amountBurned) public {
         vm.assume(from != address(0));
         amountMinted = bound(amountMinted, MIN_TEST_AMOUNT, MAX_TEST_AMOUNT);

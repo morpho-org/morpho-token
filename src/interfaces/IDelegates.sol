@@ -9,6 +9,9 @@ interface IDelegates {
     // @dev The signature used has expired.
     error DelegatesExpiredSignature(uint256 expiry);
 
+    // @dev The delegation nonce used by `account` is not its current delegation nonce.
+    error InvalidDelegationNonce(address account, uint256 currentNonce);
+
     // @dev Emitted when an account changes their delegate.
     event DelegateChanged(address indexed delegator, address indexed fromDelegate, address indexed toDelegate);
 

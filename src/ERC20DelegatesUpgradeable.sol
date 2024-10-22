@@ -5,8 +5,7 @@ import {IDelegates} from "./interfaces/IDelegates.sol";
 
 import {ERC20Upgradeable} from "../lib/openzeppelin-contracts-upgradeable/contracts/token/ERC20/ERC20Upgradeable.sol";
 import {ECDSA} from
-    "../lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/utils/cryptography/ECDSA.sol";
-import {NoncesUpgradeable} from "../lib/openzeppelin-contracts-upgradeable/contracts/utils/NoncesUpgradeable.sol";
+    "..lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/utils/cryptography/ECDSA.sol";
 import {EIP712Upgradeable} from
     "../lib/openzeppelin-contracts-upgradeable/contracts/utils/cryptography/EIP712Upgradeable.sol";
 import {Initializable} from "../lib/openzeppelin-contracts-upgradeable/contracts/proxy/utils/Initializable.sol";
@@ -21,13 +20,7 @@ import {Initializable} from "../lib/openzeppelin-contracts-upgradeable/contracts
 /// queried through the external accessor `getVotes`.
 /// By default, token balance does not account for voting power. This makes transfers cheaper. The downside is that it
 /// requires users to delegate to themselves in order to activate their voting power.
-abstract contract ERC20DelegatesUpgradeable is
-    Initializable,
-    ERC20Upgradeable,
-    EIP712Upgradeable,
-    NoncesUpgradeable,
-    IDelegates
-{
+abstract contract ERC20DelegatesUpgradeable is Initializable, ERC20Upgradeable, EIP712Upgradeable, IDelegates {
     /* CONSTANTS */
 
     bytes32 private constant DELEGATION_TYPEHASH =
@@ -43,7 +36,7 @@ abstract contract ERC20DelegatesUpgradeable is
     struct ERC20DelegatesStorage {
         mapping(address account => address) _delegatee;
         mapping(address delegatee => uint256) _votingPower;
-        uint256 _totalVotingPower;
+        mapping(address account => uint256) _delegationNonce;
     }
 
     /* PUBLIC */
@@ -62,6 +55,11 @@ abstract contract ERC20DelegatesUpgradeable is
         return $._votingPower[account];
     }
 
+    function delegationNonce(address account) external view returns (uint256) {
+        ERC20DelegatesStorage storage $ = _getERC20DelegatesStorage();
+        return $._delegationNonce[account];
+    }
+
     /// @dev Delegates votes from the sender to `delegatee`.
     function delegate(address delegatee) external {
         address account = _msgSender();
@@ -70,13 +68,17 @@ abstract contract ERC20DelegatesUpgradeable is
 
     /// @dev Delegates votes from signer to `delegatee`.
     function delegateBySig(address delegatee, uint256 nonce, uint256 expiry, uint8 v, bytes32 r, bytes32 s) external {
-        if (block.timestamp > expiry) {
-            revert DelegatesExpiredSignature(expiry);
-        }
+        require(block.timestamp <= expiry, DelegatesExpiredSignature(expiry));
+
         address signer = ECDSA.recover(
             _hashTypedDataV4(keccak256(abi.encode(DELEGATION_TYPEHASH, delegatee, nonce, expiry))), v, r, s
         );
-        _useCheckedNonce(signer, nonce);
+
+        ERC20DelegatesStorage storage $ = _getERC20DelegatesStorage();
+        uint256 current = $._delegationNonce[signer];
+        require(nonce == current, InvalidDelegationNonce(signer, current));
+        $._delegationNonce[signer]++;
+
         _delegate(signer, delegatee);
     }
 
@@ -93,19 +95,6 @@ abstract contract ERC20DelegatesUpgradeable is
         _moveDelegateVotes(oldDelegate, delegatee, _getVotingUnits(account));
     }
 
-    /// @dev Transfers, mints, or burns voting units. To register a mint, `from` should be zero. To register a burn, `to`
-    /// should be zero. Total supply of voting units will be adjusted with mints and burns.
-    function _transferVotingUnits(address from, address to, uint256 amount) internal {
-        ERC20DelegatesStorage storage $ = _getERC20DelegatesStorage();
-        if (from == address(0)) {
-            $._totalVotingPower += amount;
-        }
-        if (to == address(0)) {
-            $._totalVotingPower -= amount;
-        }
-        _moveDelegateVotes(delegates(from), delegates(to), amount);
-    }
-
     /// @dev Must return the voting units held by an account.
     function _getVotingUnits(address account) internal view returns (uint256) {
         return balanceOf(account);
@@ -116,7 +105,7 @@ abstract contract ERC20DelegatesUpgradeable is
     function _update(address from, address to, uint256 value) internal virtual override {
         super._update(from, to, value);
         // No check of supply cap here like in OZ implementation as MORPHO has a 1B total supply cap.
-        _transferVotingUnits(from, to, value);
+        _moveDelegateVotes(delegates(from), delegates(to), value);
     }
 
     /* PRIVATE */

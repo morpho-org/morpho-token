@@ -19,16 +19,14 @@ library SigUtils {
         uint256 deadline;
     }
 
-    bytes32 private constant DELEGATION_TYPEHASH =
+    bytes32 internal constant DELEGATION_TYPEHASH =
         keccak256("Delegation(address delegatee,uint256 nonce,uint256 expiry)");
 
-    bytes32 private constant PERMIT_TYPEHASH =
+    bytes32 internal constant PERMIT_TYPEHASH =
         keccak256("Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)");
 
-    bytes32 private constant TYPE_HASH =
+    bytes32 internal constant TYPE_HASH =
         keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)");
-
-    // bytes32 private constant DOMAIN_SEPARATOR = 0xebe7cdc854ed987c1fb2e9e58acbe8b1afdc4375c51e160b9a8de75014baa36b;
 
     /// @dev Computes the hash of the EIP-712 encoded data.
     function getDelegationTypedDataHash(Delegation memory delegation, address contractAddress)

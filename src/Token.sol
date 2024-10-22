@@ -31,11 +31,11 @@ abstract contract Token is
 {
     /* CONSTANTS */
 
-    bytes32 private constant DELEGATION_TYPEHASH =
+    bytes32 internal constant DELEGATION_TYPEHASH =
         keccak256("Delegation(address delegatee,uint256 nonce,uint256 expiry)");
 
     // keccak256(abi.encode(uint256(keccak256("morpho.storage.ERC20Delegates")) - 1)) & ~bytes32(uint256(0xff))
-    bytes32 private constant ERC20DelegatesStorageLocation =
+    bytes32 internal constant ERC20DelegatesStorageLocation =
         0x1dc92b2c6e971ab6e08dfd7dcec0e9496d223ced663ba2a06543451548549500;
 
     /* STORAGE LAYOUT */

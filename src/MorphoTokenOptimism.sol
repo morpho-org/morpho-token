@@ -21,7 +21,7 @@ contract MorphoTokenOptimism is Token {
     string internal constant SYMBOL = "MORPHO";
 
     // keccak256(abi.encode(uint256(keccak256("morpho.storage.OptimismMintableERC20")) - 1)) & ~bytes32(uint256(0xff))
-    bytes32 private constant OptimismMintableERC20StorageLocation =
+    bytes32 internal constant OptimismMintableERC20StorageLocation =
         0x6fd4c0a11d0843c68c809f0a5f29b102d54bc08a251c384d9ad17600bfa05d00;
 
     /* STORAGE LAYOUT */
@@ -111,10 +111,10 @@ contract MorphoTokenOptimism is Token {
         return $._bridge;
     }
 
-    /* PRIVATE */
+    /* INTERNAL */
 
     /// @dev Returns the OptimismMintableERC20Storage struct.
-    function _getOptimismMintableERC20Storage() private pure returns (OptimismMintableERC20Storage storage $) {
+    function _getOptimismMintableERC20Storage() internal pure returns (OptimismMintableERC20Storage storage $) {
         assembly {
             $.slot := OptimismMintableERC20StorageLocation
         }

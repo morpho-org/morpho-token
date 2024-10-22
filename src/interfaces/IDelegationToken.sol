@@ -1,10 +1,13 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 pragma solidity >=0.5.0;
 
-/// @title IDelegates
+import {IERC20} from
+    "../../lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
+
+/// @title IDelegationToken
 /// @author Morpho Association
 /// @custom:contact security@morpho.org
-interface IERC20DelegatesUpgradeable {
+interface IDelegationToken is IERC20 {
     function delegatedVotingPower(address account) external view returns (uint256);
 
     function delegatee(address account) external view returns (address);

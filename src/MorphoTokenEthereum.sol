@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 pragma solidity 0.8.27;
 
-import {Token} from "./Token.sol";
+import {DelegationToken} from "./DelegationToken.sol";
 
 /// @title MorphoTokenEthereum
 /// @author Morpho Association
 /// @custom:contact security@morpho.org
 /// @notice The Morpho token contract for Ethereum.
-contract MorphoTokenEthereum is Token {
+contract MorphoTokenEthereum is DelegationToken {
     /* CONSTANTS */
 
     /// @dev The name of the token.

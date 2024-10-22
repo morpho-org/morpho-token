@@ -123,10 +123,8 @@ abstract contract ERC20DelegatesUpgradeable is
         _moveDelegateVotes(delegates(from), delegates(to), value);
     }
 
-    /* PRIVATE */
-
     /// @dev Moves delegated votes from one delegate to another.
-    function _moveDelegateVotes(address from, address to, uint256 amount) private {
+    function _moveDelegateVotes(address from, address to, uint256 amount) internal {
         ERC20DelegatesStorage storage $ = _getERC20DelegatesStorage();
         if (from != to && amount > 0) {
             if (from != address(0)) {
@@ -145,7 +143,7 @@ abstract contract ERC20DelegatesUpgradeable is
     }
 
     /// @dev Returns the ERC20DelegatesStorage struct.
-    function _getERC20DelegatesStorage() private pure returns (ERC20DelegatesStorage storage $) {
+    function _getERC20DelegatesStorage() internal pure returns (ERC20DelegatesStorage storage $) {
         assembly {
             $.slot := ERC20DelegatesStorageLocation
         }

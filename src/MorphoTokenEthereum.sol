@@ -1,16 +1,13 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 pragma solidity 0.8.27;
 
-import {Ownable2StepUpgradeable} from
-    "../lib/openzeppelin-contracts-upgradeable/contracts/access/Ownable2StepUpgradeable.sol";
 import {ERC20PermitDelegatesUpgradeable} from "./ERC20PermitDelegatesUpgradeable.sol";
-import {UUPSUpgradeable} from "../lib/openzeppelin-contracts-upgradeable/contracts/proxy/utils/UUPSUpgradeable.sol";
 
-/// @title MorphoToken
+/// @title MorphoTokenEthereum
 /// @author Morpho Labs
 /// @custom:contact security@morpho.org
 /// @notice The MORPHO Token contract.
-contract MorphoToken is ERC20PermitDelegatesUpgradeable, Ownable2StepUpgradeable, UUPSUpgradeable {
+contract MorphoTokenEthereum is ERC20PermitDelegatesUpgradeable {
     /* CONSTANTS */
 
     /// @dev The name of the token.
@@ -23,13 +20,6 @@ contract MorphoToken is ERC20PermitDelegatesUpgradeable, Ownable2StepUpgradeable
 
     /// @notice Reverts if the address is the zero address.
     error ZeroAddress();
-
-    /* CONSTRUCTOR */
-
-    // @dev Disables initializers for the implementation contract.
-    constructor() {
-        _disableInitializers();
-    }
 
     /* PUBLIC */
 
@@ -45,9 +35,4 @@ contract MorphoToken is ERC20PermitDelegatesUpgradeable, Ownable2StepUpgradeable
         _transferOwnership(owner);
         _mint(wrapper, 1_000_000_000e18); // Mint 1B to the wrapper contract.
     }
-
-    /* INTERNAL */
-
-    /// @inheritdoc UUPSUpgradeable
-    function _authorizeUpgrade(address) internal override onlyOwner {}
 }

@@ -9,7 +9,7 @@ import {EncodeLib} from "./helpers/libraries/EncodeLib.sol";
 import {IERC20} from
     "../lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 
-contract MorphoTokenMigrationTest is BaseTest {
+contract MorphoTokenEthereumMigrationTest is BaseTest {
     address internal constant BUNDLER_ADDRESS = 0x4095F064B8d3c3548A3bebfd0Bbfd04750E30077;
     address internal constant LEGACY_MORPHO = 0x9994E35Db50125E0DF82e4c2dde62496CE330999;
 

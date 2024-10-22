@@ -7,6 +7,9 @@ import {ERC20PermitUpgradeable} from
     "../lib/openzeppelin-contracts-upgradeable/contracts/token/ERC20/extensions/ERC20PermitUpgradeable.sol";
 import {ECDSA} from
     "../lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/utils/cryptography/ECDSA.sol";
+import {Ownable2StepUpgradeable} from
+    "../lib/openzeppelin-contracts-upgradeable/contracts/access/Ownable2StepUpgradeable.sol";
+import {UUPSUpgradeable} from "../lib/openzeppelin-contracts-upgradeable/contracts/proxy/utils/UUPSUpgradeable.sol";
 
 /// @title ERC20PermitDelegatesUpgradeable
 /// @author Morpho Labs
@@ -20,7 +23,12 @@ import {ECDSA} from
 ///
 /// By default, token balance does not account for voting power. This makes transfers cheaper. Whether an account
 /// has to self-delegate to vote depends on the voting contract implementation.
-abstract contract ERC20PermitDelegatesUpgradeable is ERC20PermitUpgradeable, IERC20DelegatesUpgradeable {
+abstract contract ERC20PermitDelegatesUpgradeable is
+    ERC20PermitUpgradeable,
+    IERC20DelegatesUpgradeable,
+    Ownable2StepUpgradeable,
+    UUPSUpgradeable
+{
     /* CONSTANTS */
 
     bytes32 private constant DELEGATION_TYPEHASH =
@@ -54,6 +62,13 @@ abstract contract ERC20PermitDelegatesUpgradeable is ERC20PermitUpgradeable, IER
 
     // @dev Emitted when a delegatee's delegated voting power changes.
     event DelegatedVotingPowerChanged(address indexed delegatee, uint256 oldVotes, uint256 newVotes);
+
+    /* CONSTRUCTOR */
+
+    // @dev Disables initializers for the implementation contract.
+    constructor() {
+        _disableInitializers();
+    }
 
     /* GETTERS */
 
@@ -143,4 +158,7 @@ abstract contract ERC20PermitDelegatesUpgradeable is ERC20PermitUpgradeable, IER
             $.slot := ERC20DelegatesStorageLocation
         }
     }
+
+    /// @inheritdoc UUPSUpgradeable
+    function _authorizeUpgrade(address) internal override onlyOwner {}
 }

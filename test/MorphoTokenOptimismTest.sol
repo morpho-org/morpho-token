@@ -24,11 +24,11 @@ contract MorphoTokenOptimismTest is Test {
         BRIDGE = makeAddr("Bridge");
 
         // DEPLOYMENTS
-        tokenImplem = new MorphoTokenOptimism();
+        tokenImplem = new MorphoTokenOptimism(REMOTE_TOKEN, BRIDGE);
         tokenProxy = new ERC1967Proxy(address(tokenImplem), hex"");
 
         morphoOptimism = MorphoTokenOptimism(payable(address(tokenProxy)));
-        morphoOptimism.initialize(MORPHO_DAO, REMOTE_TOKEN, BRIDGE);
+        morphoOptimism.initialize(MORPHO_DAO);
     }
 
     function testInitializeZeroAddress(address randomAddress) public {
@@ -37,27 +37,21 @@ contract MorphoTokenOptimismTest is Test {
         address proxy = address(new ERC1967Proxy(address(tokenImplem), hex""));
 
         vm.expectRevert();
-        MorphoTokenOptimism(proxy).initialize(address(0), randomAddress, randomAddress);
-
-        vm.expectRevert();
-        MorphoTokenOptimism(proxy).initialize(randomAddress, address(0), randomAddress);
-
-        vm.expectRevert();
-        MorphoTokenOptimism(proxy).initialize(randomAddress, randomAddress, address(0));
+        MorphoTokenOptimism(proxy).initialize(address(0));
     }
 
     function testUpgradeNotOwner(address updater) public {
         vm.assume(updater != address(0));
         vm.assume(updater != MORPHO_DAO);
 
-        address newImplem = address(new MorphoTokenOptimism());
+        address newImplem = address(new MorphoTokenOptimism(REMOTE_TOKEN, BRIDGE));
 
         vm.expectRevert();
         morphoOptimism.upgradeToAndCall(newImplem, hex"");
     }
 
     function testUpgrade() public {
-        address newImplem = address(new MorphoTokenOptimism());
+        address newImplem = address(new MorphoTokenOptimism(REMOTE_TOKEN, BRIDGE));
 
         vm.prank(MORPHO_DAO);
         morphoOptimism.upgradeToAndCall(newImplem, hex"");

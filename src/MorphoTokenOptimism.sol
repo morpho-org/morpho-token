@@ -30,16 +30,21 @@ contract MorphoTokenOptimism is Token, IOptimismMintableERC20 {
 
     /* ERRORS */
 
-    /// @notice Reverts if the address is the zero address.
+    /// @notice Thrown if the address is the zero address.
     error ZeroAddress();
 
-    /// @notice Reverts if the caller is not the bridge.
+    /// @notice Thrown if the caller is not the bridge.
     error NotBridge();
 
     /* CONSTRUCTOR */
 
     /// @notice Construct the contract.
+    /// @param newRemoteToken The remote token address.
+    /// @param newBridge The bridge address.
     constructor(address newRemoteToken, address newBridge) {
+        require(newRemoteToken != address(0), ZeroAddress());
+        require(newBridge != address(0), ZeroAddress());
+
         remoteToken = newRemoteToken;
         bridge = newBridge;
     }

@@ -69,7 +69,6 @@ abstract contract Token is
         _disableInitializers();
     }
 
-
     /* GETTERS */
 
     /// @dev Returns the delegatee that `account` has chosen.

@@ -52,7 +52,7 @@ abstract contract ERC20DelegatesUpgradeable is Initializable, ERC20Upgradeable, 
     /* EXTERNAL */
 
     /// @dev Returns the current amount of votes delegated to `account`.
-    function getDelegatedVotes(address account) external view returns (uint256) {
+    function delegatedVotingPower(address account) external view returns (uint256) {
         ERC20DelegatesStorage storage $ = _getERC20DelegatesStorage();
         return $._delegatedVotingPower[account];
     }

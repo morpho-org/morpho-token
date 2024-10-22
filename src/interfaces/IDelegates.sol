@@ -19,7 +19,7 @@ interface IDelegates {
     event DelegateVotesChanged(address indexed delegate, uint256 previousVotes, uint256 newVotes);
 
     // @dev Returns the current amount of votes that `account` has.
-    function getDelegatedVotes(address account) external view returns (uint256);
+    function delegatedVotingPower(address account) external view returns (uint256);
 
     // @dev Returns the delegate that `account` has chosen.
     function delegates(address account) external view returns (address);

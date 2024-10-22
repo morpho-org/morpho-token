@@ -31,6 +31,7 @@ contract MorphoToken is ERC20DelegatesUpgradeable, ERC20PermitUpgradeable, Ownab
 
     /* CONSTRUCTOR */
 
+    // @dev Disables initializers for the implementation contract.
     constructor() {
         _disableInitializers();
     }

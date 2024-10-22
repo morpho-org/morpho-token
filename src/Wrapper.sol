@@ -1,21 +1,22 @@
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: GPL-2.0-or-later
 pragma solidity 0.8.27;
 
-import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {IERC20} from
+    "../lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 
-/// @title MorphoToken
+/// @title Wrapper
 /// @author Morpho Association
 /// @custom:contact security@morpho.org
-/// @notice The MORPHO Token contract.
+/// @notice The Wrapper contract to migrate from legacy MORPHO tokens.
 contract Wrapper {
     /* CONSTANTS */
 
-    /// @dev The address of the legacy MORPHO token.
-    address public constant LEGACY_MORPHO = address(0x9994E35Db50125E0DF82e4c2dde62496CE330999);
+    /// @dev The address of the legacy Morpho token.
+    address public constant LEGACY_MORPHO = 0x9994E35Db50125E0DF82e4c2dde62496CE330999;
 
     /* IMMUTABLES */
 
-    /// @dev The address of the new MORPHO token.
+    /// @dev The address of the new Morpho token.
     address public immutable NEW_MORPHO;
 
     /* ERRORS */

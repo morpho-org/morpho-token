@@ -16,6 +16,8 @@ import {ECDSA} from
 /// This extension keeps track of the current voting power delegated to each account. Voting power can be delegated
 /// either by calling the `delegate` function directly, or by providing a signature to be used with `delegateBySig`.
 ///
+/// This enables onchain votes on external voting smart contracts leveraging storage proofs.
+///
 /// By default, token balance does not account for voting power. This makes transfers cheaper. Whether an account
 /// has to self-delegate to vote depends on the voting contract implementation.
 abstract contract ERC20PermitDelegatesUpgradeable is ERC20PermitUpgradeable, IERC20DelegatesUpgradeable {

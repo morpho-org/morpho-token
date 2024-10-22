@@ -51,23 +51,23 @@ abstract contract Token is
 
     /* ERRORS */
 
-    // @dev The signature used has expired.
+    /// @dev The signature used has expired.
     error DelegatesExpiredSignature(uint256 expiry);
 
-    // @dev The delegation nonce used by the signer is not its current delegation nonce.
+    /// @dev The delegation nonce used by the signer is not its current delegation nonce.
     error InvalidDelegationNonce();
 
     /* EVENTS */
 
-    // @dev Emitted when an delegator changes their delegatee.
+    /// @dev Emitted when an delegator changes their delegatee.
     event DelegateeChanged(address indexed delegator, address indexed oldDelegatee, address indexed newDelegatee);
 
-    // @dev Emitted when a delegatee's delegated voting power changes.
+    /// @dev Emitted when a delegatee's delegated voting power changes.
     event DelegatedVotingPowerChanged(address indexed delegatee, uint256 oldVotes, uint256 newVotes);
 
     /* CONSTRUCTOR */
 
-    // @dev Disables initializers for the implementation contract.
+    /// @dev Disables initializers for the implementation contract.
     constructor() {
         _disableInitializers();
     }

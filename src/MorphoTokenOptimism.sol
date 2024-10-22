@@ -5,13 +5,13 @@ import {IOptimismMintableERC20} from "./interfaces/IOptimismMintableERC20.sol";
 import {IERC165} from
     "../lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/utils/introspection/IERC165.sol";
 
-import {Token} from "./Token.sol";
+import {DelegationToken} from "./DelegationToken.sol";
 
 /// @title MorphoTokenOptimism
 /// @author Morpho Association
 /// @custom:contact security@morpho.org
 /// @notice The Morpho token contract for Optimism networks.
-contract MorphoTokenOptimism is Token, IOptimismMintableERC20 {
+contract MorphoTokenOptimism is DelegationToken, IOptimismMintableERC20 {
     /* CONSTANTS */
 
     /// @dev The name of the token.

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 pragma solidity ^0.8.27;
 
-import {IERC20DelegatesUpgradeable} from "./interfaces/IERC20DelegatesUpgradeable.sol";
+import {IDelegation} from "./interfaces/IDelegation.sol";
 
 import {ERC20PermitUpgradeable} from
     "../lib/openzeppelin-contracts-upgradeable/contracts/token/ERC20/extensions/ERC20PermitUpgradeable.sol";
@@ -11,7 +11,7 @@ import {Ownable2StepUpgradeable} from
     "../lib/openzeppelin-contracts-upgradeable/contracts/access/Ownable2StepUpgradeable.sol";
 import {UUPSUpgradeable} from "../lib/openzeppelin-contracts-upgradeable/contracts/proxy/utils/UUPSUpgradeable.sol";
 
-/// @title Token
+/// @title DelegationToken
 /// @author Morpho Association
 /// @custom:contact security@morpho.org
 /// @dev Extension of ERC20 to support token delegation.
@@ -23,24 +23,19 @@ import {UUPSUpgradeable} from "../lib/openzeppelin-contracts-upgradeable/contrac
 ///
 /// By default, token balance does not account for voting power. This makes transfers cheaper. Whether an account
 /// has to self-delegate to vote depends on the voting contract implementation.
-abstract contract Token is
-    ERC20PermitUpgradeable,
-    IERC20DelegatesUpgradeable,
-    Ownable2StepUpgradeable,
-    UUPSUpgradeable
-{
+abstract contract DelegationToken is IDelegation, ERC20PermitUpgradeable, Ownable2StepUpgradeable, UUPSUpgradeable {
     /* CONSTANTS */
 
     bytes32 internal constant DELEGATION_TYPEHASH =
         keccak256("Delegation(address delegatee,uint256 nonce,uint256 expiry)");
 
-    // keccak256(abi.encode(uint256(keccak256("morpho.storage.ERC20Delegates")) - 1)) & ~bytes32(uint256(0xff))
+    // keccak256(abi.encode(uint256(keccak256("DelegationToken")) - 1)) & ~bytes32(uint256(0xff))
     bytes32 internal constant ERC20DelegatesStorageLocation =
-        0x1dc92b2c6e971ab6e08dfd7dcec0e9496d223ced663ba2a06543451548549500;
+        0xd583ef41af40c9ecf9cd08176e1b50741710eaecf057b22e93a6b99fa47a6400;
 
     /* STORAGE LAYOUT */
 
-    /// @custom:storage-location erc7201:morpho.storage.ERC20Delegates
+    /// @custom:storage-location erc7201:DelegationToken
     struct ERC20DelegatesStorage {
         mapping(address => address) _delegatee;
         mapping(address => uint256) _delegatedVotingPower;

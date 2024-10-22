@@ -69,6 +69,7 @@ contract MorphoTokenOptimism is Token {
         require(bridge_ != address(0), ZeroAddress());
 
         __ERC20_init(NAME, SYMBOL);
+        __ERC20Permit_init(NAME);
 
         OptimismMintableERC20Storage storage $ = _getOptimismMintableERC20Storage();
         $._remoteToken = remoteToken_;

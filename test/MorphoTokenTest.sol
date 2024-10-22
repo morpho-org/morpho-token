@@ -234,4 +234,53 @@ contract MorphoTokenEthereumTest is BaseTest {
             keccak256(abi.encode(uint256(keccak256("morpho.storage.ERC20Delegates")) - 1)) & ~bytes32(uint256(0xff));
         assertEq(expected, 0x1dc92b2c6e971ab6e08dfd7dcec0e9496d223ced663ba2a06543451548549500);
     }
+
+    function testMint(address to, uint256 amount) public {
+        vm.assume(to != address(0));
+        amount = bound(amount, MIN_TEST_AMOUNT, MAX_TEST_AMOUNT);
+
+        uint256 initialTotalSupply = newMorpho.totalSupply();
+
+        vm.prank(MORPHO_DAO);
+        newMorpho.mint(to, amount);
+
+        assertEq(newMorpho.totalSupply(), initialTotalSupply + amount);
+        assertEq(newMorpho.balanceOf(to), amount);
+    }
+
+    function testMintOverflow(address to, uint256 amount) public {
+        vm.assume(to != address(0));
+        amount = bound(amount, type(uint256).max - newMorpho.totalSupply() + 1, type(uint256).max);
+
+        vm.prank(MORPHO_DAO);
+        vm.expectRevert();
+        newMorpho.mint(to, amount);
+    }
+
+    function testMintAccess(address account, address to, uint256 amount) public {
+        vm.assume(to != address(0));
+        vm.assume(account != MORPHO_DAO);
+        amount = bound(amount, MIN_TEST_AMOUNT, MAX_TEST_AMOUNT);
+
+        vm.expectRevert();
+        vm.prank(account);
+        newMorpho.mint(to, amount);
+    }
+
+    function testBurn(address from, uint256 amountMinted, uint256 amountBurned) public {
+        vm.assume(from != address(0));
+        amountMinted = bound(amountMinted, MIN_TEST_AMOUNT, MAX_TEST_AMOUNT);
+        amountBurned = bound(amountBurned, MIN_TEST_AMOUNT, amountMinted);
+
+        uint256 initialTotalSupply = newMorpho.totalSupply();
+
+        vm.prank(MORPHO_DAO);
+        newMorpho.mint(from, amountMinted);
+
+        vm.prank(from);
+        newMorpho.burn(amountBurned);
+
+        assertEq(newMorpho.totalSupply(), initialTotalSupply + amountMinted - amountBurned);
+        assertEq(newMorpho.balanceOf(from), amountMinted - amountBurned);
+    }
 }

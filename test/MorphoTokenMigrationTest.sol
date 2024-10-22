@@ -103,6 +103,8 @@ contract MorphoTokenEthereumMigrationTest is BaseTest {
 
     function testMigration(address migrater, uint256 amount) public {
         vm.assume(migrater != address(0));
+        // Unset initiator is address(1), so it can't use the bundler.
+        vm.assume(migrater != address(1));
         vm.assume(migrater != MORPHO_DAO);
         amount = bound(amount, MIN_TEST_AMOUNT, 1_000_000_000e18);
 

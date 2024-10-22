@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
-pragma solidity 0.8.27;
+pragma solidity ^0.8.27;
 
 import {IERC20DelegatesUpgradeable} from "./interfaces/IERC20DelegatesUpgradeable.sol";
 
@@ -11,8 +11,8 @@ import {Ownable2StepUpgradeable} from
     "../lib/openzeppelin-contracts-upgradeable/contracts/access/Ownable2StepUpgradeable.sol";
 import {UUPSUpgradeable} from "../lib/openzeppelin-contracts-upgradeable/contracts/proxy/utils/UUPSUpgradeable.sol";
 
-/// @title ERC20PermitDelegatesUpgradeable
-/// @author Morpho Labs
+/// @title Token
+/// @author Morpho Association
 /// @custom:contact security@morpho.org
 /// @dev Extension of ERC20 to support token delegation.
 ///
@@ -23,7 +23,7 @@ import {UUPSUpgradeable} from "../lib/openzeppelin-contracts-upgradeable/contrac
 ///
 /// By default, token balance does not account for voting power. This makes transfers cheaper. Whether an account
 /// has to self-delegate to vote depends on the voting contract implementation.
-abstract contract ERC20PermitDelegatesUpgradeable is
+abstract contract Token is
     ERC20PermitUpgradeable,
     IERC20DelegatesUpgradeable,
     Ownable2StepUpgradeable,
@@ -31,11 +31,11 @@ abstract contract ERC20PermitDelegatesUpgradeable is
 {
     /* CONSTANTS */
 
-    bytes32 private constant DELEGATION_TYPEHASH =
+    bytes32 internal constant DELEGATION_TYPEHASH =
         keccak256("Delegation(address delegatee,uint256 nonce,uint256 expiry)");
 
     // keccak256(abi.encode(uint256(keccak256("morpho.storage.ERC20Delegates")) - 1)) & ~bytes32(uint256(0xff))
-    bytes32 private constant ERC20DelegatesStorageLocation =
+    bytes32 internal constant ERC20DelegatesStorageLocation =
         0x1dc92b2c6e971ab6e08dfd7dcec0e9496d223ced663ba2a06543451548549500;
 
     /* STORAGE LAYOUT */
@@ -49,23 +49,29 @@ abstract contract ERC20PermitDelegatesUpgradeable is
 
     /* ERRORS */
 
-    // @dev The signature used has expired.
+    /// @dev The signature used has expired.
     error DelegatesExpiredSignature(uint256 expiry);
 
-    // @dev The delegation nonce used by the signer is not its current delegation nonce.
+    /// @dev The delegation nonce used by the signer is not its current delegation nonce.
     error InvalidDelegationNonce();
 
     /* EVENTS */
 
-    // @dev Emitted when an delegator changes their delegatee.
+    /// @dev Emitted when an delegator changes their delegatee.
     event DelegateeChanged(address indexed delegator, address indexed oldDelegatee, address indexed newDelegatee);
 
-    // @dev Emitted when a delegatee's delegated voting power changes.
+    /// @dev Emitted when a delegatee's delegated voting power changes.
     event DelegatedVotingPowerChanged(address indexed delegatee, uint256 oldVotes, uint256 newVotes);
+
+    /// @dev Emitted whenever tokens are minted for an account.
+    event Mint(address indexed account, uint256 amount);
+
+    /// @dev Emitted whenever tokens are burned from an account.
+    event Burn(address indexed account, uint256 amount);
 
     /* CONSTRUCTOR */
 
-    // @dev Disables initializers for the implementation contract.
+    /// @dev Disables initializers for the implementation contract.
     constructor() {
         _disableInitializers();
     }
@@ -119,7 +125,7 @@ abstract contract ERC20PermitDelegatesUpgradeable is
     /// @dev Delegates the balance of the `delegator` to `newDelegatee`.
     function _delegate(address delegator, address newDelegatee) internal {
         ERC20DelegatesStorage storage $ = _getERC20DelegatesStorage();
-        address oldDelegatee = delegatee(delegator);
+        address oldDelegatee = $._delegatee[delegator];
         $._delegatee[delegator] = newDelegatee;
 
         emit DelegateeChanged(delegator, oldDelegatee, newDelegatee);

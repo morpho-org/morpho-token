@@ -276,7 +276,7 @@ contract MorphoTokenEthereumTest is BaseTest {
 
         vm.prank(MORPHO_DAO);
         newMorpho.mint(from, amountMinted);
-        
+
         vm.prank(from);
         newMorpho.burn(amountBurned);
 

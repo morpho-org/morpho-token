@@ -9,8 +9,8 @@ interface IERC20DelegatesUpgradeable {
     // @dev The signature used has expired.
     error DelegatesExpiredSignature(uint256 expiry);
 
-    // @dev The delegation nonce used by `delegator` is not its current delegation nonce.
-    error InvalidDelegationNonce(address delegator, uint256 currentNonce);
+    // @dev The delegation nonce used by the signer is not its current delegation nonce.
+    error InvalidDelegationNonce();
 
     // @dev Emitted when an delegator changes their delegate.
     event DelegateChanged(address indexed delegator, address indexed fromDelegate, address indexed toDelegate);

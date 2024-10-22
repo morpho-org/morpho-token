@@ -54,10 +54,10 @@ abstract contract ERC20DelegatesUpgradeable is
         return $._delegatee[delegator];
     }
 
-    /// @dev Returns the current amount of votes delegated to `delegator`.
-    function delegatedVotingPower(address delegator) external view returns (uint256) {
+    /// @dev Returns the current voting power delegated to `delegatee`.
+    function delegatedVotingPower(address delegatee) external view returns (uint256) {
         ERC20DelegatesStorage storage $ = _getERC20DelegatesStorage();
-        return $._delegatedVotingPower[delegator];
+        return $._delegatedVotingPower[delegatee];
     }
 
     /// @dev Returns the current delegation nonce of `delegator`.
@@ -80,16 +80,14 @@ abstract contract ERC20DelegatesUpgradeable is
     {
         require(block.timestamp <= expiry, DelegatesExpiredSignature(expiry));
 
-        address signer = ECDSA.recover(
+        address delegator = ECDSA.recover(
             _hashTypedDataV4(keccak256(abi.encode(DELEGATION_TYPEHASH, newDelegatee, nonce, expiry))), v, r, s
         );
 
         ERC20DelegatesStorage storage $ = _getERC20DelegatesStorage();
-        uint256 current = $._delegationNonce[signer];
-        require(nonce == current, InvalidDelegationNonce(signer, current));
-        $._delegationNonce[signer]++;
+        require(nonce == $._delegationNonce[delegator]++, InvalidDelegationNonce());
 
-        _delegate(signer, newDelegatee);
+        _delegate(delegator, newDelegatee);
     }
 
     /* INTERNAL */

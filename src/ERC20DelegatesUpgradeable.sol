@@ -48,22 +48,22 @@ abstract contract ERC20DelegatesUpgradeable is
 
     /* GETTERS */
 
-    /// @dev Returns the delegate that `delegator` has chosen.
-    function delegates(address delegator) public view returns (address) {
+    /// @dev Returns the delegate that `account` has chosen.
+    function delegates(address account) public view returns (address) {
         ERC20DelegatesStorage storage $ = _getERC20DelegatesStorage();
-        return $._delegatee[delegator];
+        return $._delegatee[account];
     }
 
-    /// @dev Returns the current voting power delegated to `delegatee`.
-    function delegatedVotingPower(address delegatee) external view returns (uint256) {
+    /// @dev Returns the current voting power delegated to `account`.
+    function delegatedVotingPower(address account) external view returns (uint256) {
         ERC20DelegatesStorage storage $ = _getERC20DelegatesStorage();
-        return $._delegatedVotingPower[delegatee];
+        return $._delegatedVotingPower[account];
     }
 
-    /// @dev Returns the current delegation nonce of `delegator`.
-    function delegationNonce(address delegator) external view returns (uint256) {
+    /// @dev Returns the current delegation nonce of `account`.
+    function delegationNonce(address account) external view returns (uint256) {
         ERC20DelegatesStorage storage $ = _getERC20DelegatesStorage();
-        return $._delegationNonce[delegator];
+        return $._delegationNonce[account];
     }
 
     /* DELEGATE */

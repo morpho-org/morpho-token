@@ -80,18 +80,18 @@ contract MorphoTokenOptimismTest is Test {
         morphoOptimism.mint(to, amount);
     }
 
-    function testMint(address account, uint256 amount) public {
-        vm.assume(account != address(0));
+    function testMint(address to, uint256 amount) public {
+        vm.assume(to != address(0));
         amount = bound(amount, MIN_TEST_AMOUNT, MAX_TEST_AMOUNT);
 
         assertEq(morphoOptimism.totalSupply(), 0, "totalSupply");
-        assertEq(morphoOptimism.balanceOf(account), 0, "balanceOf(account)");
+        assertEq(morphoOptimism.balanceOf(to), 0, "balanceOf(account)");
 
         vm.prank(BRIDGE);
-        morphoOptimism.mint(account, amount);
+        morphoOptimism.mint(to, amount);
 
         assertEq(morphoOptimism.totalSupply(), amount, "totalSupply");
-        assertEq(morphoOptimism.balanceOf(account), amount, "balanceOf(account)");
+        assertEq(morphoOptimism.balanceOf(to), amount, "balanceOf(account)");
     }
 
     function testBurnNoBridge(address account, address from, uint256 amount) public {
@@ -105,18 +105,18 @@ contract MorphoTokenOptimismTest is Test {
         morphoOptimism.burn(from, amount);
     }
 
-    function testBurn(address account, uint256 amountMinted, uint256 amountBurned) public {
-        vm.assume(account != address(0));
+    function testBurn(address from, uint256 amountMinted, uint256 amountBurned) public {
+        vm.assume(from != address(0));
         amountMinted = bound(amountMinted, MIN_TEST_AMOUNT, MAX_TEST_AMOUNT);
         amountBurned = bound(amountBurned, MIN_TEST_AMOUNT, amountMinted);
 
         vm.startPrank(BRIDGE);
-        morphoOptimism.mint(account, amountMinted);
-        morphoOptimism.burn(account, amountBurned);
+        morphoOptimism.mint(from, amountMinted);
+        morphoOptimism.burn(from, amountBurned);
         vm.stopPrank();
 
         assertEq(morphoOptimism.totalSupply(), amountMinted - amountBurned, "totalSupply");
-        assertEq(morphoOptimism.balanceOf(account), amountMinted - amountBurned, "balanceOf(account)");
+        assertEq(morphoOptimism.balanceOf(from), amountMinted - amountBurned, "balanceOf(account)");
     }
 
     function testOptimismMintableERC20StorageLocation() public pure {

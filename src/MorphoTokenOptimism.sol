@@ -35,8 +35,6 @@ contract MorphoTokenOptimism is
     /// @param bridge The address of the StandardBridge contract.
     function initialize(address dao, address remoteToken, address bridge) public initializer {
         require(dao != address(0), ZeroAddress());
-        require(remoteToken != address(0), ZeroAddress());
-        require(bridge != address(0), ZeroAddress());
 
         ERC20Upgradeable.__ERC20_init(NAME, SYMBOL);
         Ownable2StepUpgradeable.__Ownable2Step_init();

@@ -2,9 +2,10 @@
 pragma solidity 0.8.27;
 
 import {IOptimismMintableERC20} from "./interfaces/IOptimismMintableERC20.sol";
-import {IERC165} from "@openzeppelin/contracts/utils/introspection/IERC165.sol";
-import {Initializable} from "lib/openzeppelin-contracts-upgradeable/contracts/proxy/utils/Initializable.sol";
-import {ERC20Upgradeable} from "lib/openzeppelin-contracts-upgradeable/contracts/token/ERC20/ERC20Upgradeable.sol";
+import {IERC165} from
+    "../lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/utils/introspection/IERC165.sol";
+import {Initializable} from "../lib/openzeppelin-contracts-upgradeable/contracts/proxy/utils/Initializable.sol";
+import {ERC20Upgradeable} from "../lib/openzeppelin-contracts-upgradeable/contracts/token/ERC20/ERC20Upgradeable.sol";
 
 /// @title OptimismMintableERC20
 /// @author Morpho Association
@@ -89,10 +90,9 @@ contract OptimismMintableERC20Upgradeable is Initializable, IOptimismMintableERC
     /// @param _interfaceId Interface ID to check.
     /// @return Whether or not the interface is supported by this contract.
     function supportsInterface(bytes4 _interfaceId) external pure returns (bool) {
-        bytes4 iface1 = type(IERC165).interfaceId;
-        // Interface corresponding to the updated OptimismMintableERC20 (this contract).
-        bytes4 iface3 = type(IOptimismMintableERC20).interfaceId;
-        return _interfaceId == iface1 || _interfaceId == iface3;
+        bytes4 interfaceERC165 = type(IERC165).interfaceId;
+        bytes4 interfaceOptimismMintableERC20 = type(IOptimismMintableERC20).interfaceId;
+        return _interfaceId == interfaceERC165 || _interfaceId == interfaceOptimismMintableERC20;
     }
 
     /// @custom:legacy

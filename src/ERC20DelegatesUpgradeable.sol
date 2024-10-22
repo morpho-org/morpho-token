@@ -3,11 +3,9 @@ pragma solidity 0.8.27;
 
 import {IDelegates} from "./interfaces/IDelegates.sol";
 
-import {ERC20Upgradeable} from "lib/openzeppelin-contracts-upgradeable/contracts/token/ERC20/ERC20Upgradeable.sol";
+import {ERC20PermitUpgradeable} from "lib/openzeppelin-contracts-upgradeable/contracts/token/ERC20/extensions/ERC20PermitUpgradeable.sol";
 import {ECDSA} from
     "lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/utils/cryptography/ECDSA.sol";
-import {EIP712Upgradeable} from
-    "lib/openzeppelin-contracts-upgradeable/contracts/utils/cryptography/EIP712Upgradeable.sol";
 import {Initializable} from "lib/openzeppelin-contracts-upgradeable/contracts/proxy/utils/Initializable.sol";
 
 /// @title ERC20DelegatesUpgradeable
@@ -21,7 +19,7 @@ import {Initializable} from "lib/openzeppelin-contracts-upgradeable/contracts/pr
 ///
 /// By default, token balance does not account for voting power. This makes transfers cheaper. The downside is that it
 /// requires users to delegate to themselves in order to activate their voting power.
-abstract contract ERC20DelegatesUpgradeable is Initializable, ERC20Upgradeable, EIP712Upgradeable, IDelegates {
+abstract contract ERC20DelegatesUpgradeable is Initializable, ERC20PermitUpgradeable, IDelegates {
     /* CONSTANTS */
 
     bytes32 private constant DELEGATION_TYPEHASH =

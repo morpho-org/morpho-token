@@ -15,7 +15,7 @@ import {UUPSUpgradeable} from "lib/openzeppelin-contracts-upgradeable/contracts/
 /// @author Morpho Labs
 /// @custom:contact security@morpho.org
 /// @notice The MORPHO Token contract.
-contract MorphoToken is ERC20DelegatesUpgradeable, ERC20PermitUpgradeable, Ownable2StepUpgradeable, UUPSUpgradeable {
+contract MorphoToken is ERC20DelegatesUpgradeable, Ownable2StepUpgradeable, UUPSUpgradeable {
     /* CONSTANTS */
 
     /// @dev The name of the token.
@@ -46,14 +46,6 @@ contract MorphoToken is ERC20DelegatesUpgradeable, ERC20PermitUpgradeable, Ownab
     }
 
     /* INTERNAL */
-
-    /// @inheritdoc ERC20DelegatesUpgradeable
-    function _update(address from, address to, uint256 value)
-        internal
-        override(ERC20Upgradeable, ERC20DelegatesUpgradeable)
-    {
-        ERC20DelegatesUpgradeable._update(from, to, value);
-    }
 
     /// @inheritdoc UUPSUpgradeable
     function _authorizeUpgrade(address) internal override onlyOwner {}

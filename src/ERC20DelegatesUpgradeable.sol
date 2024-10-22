@@ -97,12 +97,7 @@ abstract contract ERC20DelegatesUpgradeable is
         $._delegatee[delegator] = delegatee;
 
         emit DelegateChanged(delegator, oldDelegate, delegatee);
-        _moveDelegateVotes(oldDelegate, delegatee, _getVotingUnits(delegator));
-    }
-
-    /// @dev Returns the voting units held by a delegator.
-    function _getVotingUnits(address delegator) internal view returns (uint256) {
-        return balanceOf(delegator);
+        _moveDelegateVotes(oldDelegate, delegatee, balanceOf(delegator));
     }
 
     /// @dev Moves voting power when tokens are transferred.

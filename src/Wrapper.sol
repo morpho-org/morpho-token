@@ -10,12 +10,12 @@ import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 contract Wrapper {
     /* CONSTANTS */
 
-    /// @dev The address of the legacy MORPHO token.
-    address public constant LEGACY_MORPHO = address(0x9994E35Db50125E0DF82e4c2dde62496CE330999);
+    /// @dev The address of the legacy Morpho token.
+    address public constant LEGACY_MORPHO = 0x9994E35Db50125E0DF82e4c2dde62496CE330999;
 
     /* IMMUTABLES */
 
-    /// @dev The address of the new MORPHO token.
+    /// @dev The address of the new Morpho token.
     address public immutable NEW_MORPHO;
 
     /* ERRORS */

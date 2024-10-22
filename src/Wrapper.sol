@@ -29,11 +29,11 @@ contract Wrapper {
 
     /* CONSTRUCTOR */
 
-    /// @dev MorphoTokenEthereum address can be precomputed using create2.
-    constructor(address MorphoTokenEthereum) {
-        require(MorphoTokenEthereum != address(0), ZeroAddress());
+    /// @dev morphoToken address can be precomputed using create2.
+    constructor(address morphoToken) {
+        require(morphoToken != address(0), ZeroAddress());
 
-        NEW_MORPHO = MorphoTokenEthereum;
+        NEW_MORPHO = morphoToken;
     }
 
     /* PUBLIC */

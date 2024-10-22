@@ -4,11 +4,11 @@ This repository contains the latest version of the Morpho protocol’s ERC20 tok
 
 ## Upgradability
 
-The Morpho Token leverages the eip-1967 to enable upgrade of the logic. This will allow new features to be added in the future.
+The Morpho token leverages the eip-1967 to enable upgrade of the logic. This will allow new features to be added in the future.
 
 ## Delegation
 
-The Morpho Token enables onchain voting power delegation. The contract keeps track of all the addresses current voting power, which allows onchain votes thanks to storage proofs (on specific voting contracts).
+The Morpho token enables onchain voting power delegation. The contract keeps track of all the addresses current voting power, which allows onchain votes thanks to storage proofs (on specific voting contracts).
 
 ## Migration
 

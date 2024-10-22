@@ -2,7 +2,7 @@
 pragma solidity >=0.5.0;
 
 /// @title IDelegates
-/// @author Morpho Labs
+/// @author Morpho Association
 /// @custom:contact security@morpho.org
 interface IERC20DelegatesUpgradeable {
     function delegatedVotingPower(address account) external view returns (uint256);

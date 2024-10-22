@@ -31,11 +31,11 @@ abstract contract Token is
 {
     /* CONSTANTS */
 
-    bytes32 private constant DELEGATION_TYPEHASH =
+    bytes32 internal constant DELEGATION_TYPEHASH =
         keccak256("Delegation(address delegatee,uint256 nonce,uint256 expiry)");
 
     // keccak256(abi.encode(uint256(keccak256("morpho.storage.ERC20Delegates")) - 1)) & ~bytes32(uint256(0xff))
-    bytes32 private constant ERC20DelegatesStorageLocation =
+    bytes32 internal constant ERC20DelegatesStorageLocation =
         0x1dc92b2c6e971ab6e08dfd7dcec0e9496d223ced663ba2a06543451548549500;
 
     /* STORAGE LAYOUT */
@@ -62,6 +62,12 @@ abstract contract Token is
 
     /// @dev Emitted when a delegatee's delegated voting power changes.
     event DelegatedVotingPowerChanged(address indexed delegatee, uint256 oldVotes, uint256 newVotes);
+
+    /// @dev Emitted whenever tokens are minted for an account.
+    event Mint(address indexed account, uint256 amount);
+
+    /// @dev Emitted whenever tokens are burned from an account.
+    event Burn(address indexed account, uint256 amount);
 
     /* CONSTRUCTOR */
 
@@ -119,7 +125,7 @@ abstract contract Token is
     /// @dev Delegates the balance of the `delegator` to `newDelegatee`.
     function _delegate(address delegator, address newDelegatee) internal {
         ERC20DelegatesStorage storage $ = _getERC20DelegatesStorage();
-        address oldDelegatee = delegatee(delegator);
+        address oldDelegatee = $._delegatee[delegator];
         $._delegatee[delegator] = newDelegatee;
 
         emit DelegateeChanged(delegator, oldDelegatee, newDelegatee);

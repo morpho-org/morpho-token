@@ -36,7 +36,6 @@ contract MorphoToken is ERC20DelegatesUpgradeable, ERC20PermitUpgradeable, Ownab
     /// @param wrapper The wrapper contract address to migrate legacy MORPHO tokens to the new one.
     function initialize(address dao, address wrapper) public initializer {
         require(dao != address(0), ZeroAddress());
-        require(wrapper != address(0), ZeroAddress());
 
         ERC20Upgradeable.__ERC20_init(NAME, SYMBOL);
         Ownable2StepUpgradeable.__Ownable2Step_init();
@@ -44,11 +43,6 @@ contract MorphoToken is ERC20DelegatesUpgradeable, ERC20PermitUpgradeable, Ownab
 
         _transferOwnership(dao); // Transfer ownership to the DAO.
         _mint(wrapper, 1_000_000_000e18); // Mint 1B to the wrapper contract.
-    }
-
-    /// @inheritdoc ERC20PermitUpgradeable
-    function nonces(address owner) public view override(ERC20PermitUpgradeable, NoncesUpgradeable) returns (uint256) {
-        return ERC20PermitUpgradeable.nonces(owner);
     }
 
     /* INTERNAL */

@@ -6,7 +6,6 @@ import {IDelegates} from "./interfaces/IDelegates.sol";
 import {ERC20Upgradeable} from "lib/openzeppelin-contracts-upgradeable/contracts/token/ERC20/ERC20Upgradeable.sol";
 import {ECDSA} from
     "lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/utils/cryptography/ECDSA.sol";
-import {NoncesUpgradeable} from "lib/openzeppelin-contracts-upgradeable/contracts/utils/NoncesUpgradeable.sol";
 import {EIP712Upgradeable} from
     "lib/openzeppelin-contracts-upgradeable/contracts/utils/cryptography/EIP712Upgradeable.sol";
 import {Initializable} from "lib/openzeppelin-contracts-upgradeable/contracts/proxy/utils/Initializable.sol";
@@ -18,17 +17,11 @@ import {Initializable} from "lib/openzeppelin-contracts-upgradeable/contracts/pr
 ///
 /// This extension keeps track of each account's vote power. Vote power can be delegated either by calling the
 /// {delegate} function directly, or by providing a signature to be used with {delegateBySig}. Voting power can be
-/// queried through the public accessor {getVotes}.
+/// queried through the external accessor {getVotes}.
 ///
 /// By default, token balance does not account for voting power. This makes transfers cheaper. The downside is that it
 /// requires users to delegate to themselves in order to activate their voting power.
-abstract contract ERC20DelegatesUpgradeable is
-    Initializable,
-    ERC20Upgradeable,
-    EIP712Upgradeable,
-    NoncesUpgradeable,
-    IDelegates
-{
+abstract contract ERC20DelegatesUpgradeable is Initializable, ERC20Upgradeable, EIP712Upgradeable, IDelegates {
     /* CONSTANTS */
 
     bytes32 private constant DELEGATION_TYPEHASH =
@@ -44,15 +37,10 @@ abstract contract ERC20DelegatesUpgradeable is
     struct ERC20DelegatesStorage {
         mapping(address account => address) _delegatee;
         mapping(address delegatee => uint256) _delegatedVotingPower;
+        mapping(address account => uint256) _delegationNonce;
     }
 
     /* PUBLIC */
-
-    /// @dev Returns the current amount of votes delegated to `account`.
-    function getDelegatedVotes(address account) public view returns (uint256) {
-        ERC20DelegatesStorage storage $ = _getERC20DelegatesStorage();
-        return $._delegatedVotingPower[account];
-    }
 
     /// @dev Returns the delegate that `account` has chosen.
     function delegates(address account) public view returns (address) {
@@ -60,21 +48,38 @@ abstract contract ERC20DelegatesUpgradeable is
         return $._delegatee[account];
     }
 
+    /* EXTERNAL */
+
+    /// @dev Returns the current amount of votes delegated to `account`.
+    function getDelegatedVotes(address account) external view returns (uint256) {
+        ERC20DelegatesStorage storage $ = _getERC20DelegatesStorage();
+        return $._delegatedVotingPower[account];
+    }
+
+    function delegationNonce(address account) external view returns (uint256) {
+        ERC20DelegatesStorage storage $ = _getERC20DelegatesStorage();
+        return $._delegationNonce[account];
+    }
+
     /// @dev Delegates votes from the sender to `delegatee`.
-    function delegate(address delegatee) public {
+    function delegate(address delegatee) external {
         address account = _msgSender();
         _delegate(account, delegatee);
     }
 
     /// @dev Delegates votes from signer to `delegatee`.
-    function delegateBySig(address delegatee, uint256 nonce, uint256 expiry, uint8 v, bytes32 r, bytes32 s) public {
-        if (block.timestamp > expiry) {
-            revert DelegatesExpiredSignature(expiry);
-        }
+    function delegateBySig(address delegatee, uint256 nonce, uint256 expiry, uint8 v, bytes32 r, bytes32 s) external {
+        require(block.timestamp <= expiry, DelegatesExpiredSignature(expiry));
+
         address signer = ECDSA.recover(
             _hashTypedDataV4(keccak256(abi.encode(DELEGATION_TYPEHASH, delegatee, nonce, expiry))), v, r, s
         );
-        _useCheckedNonce(signer, nonce);
+
+        ERC20DelegatesStorage storage $ = _getERC20DelegatesStorage();
+        uint256 current = $._delegationNonce[signer];
+        require(nonce == current, InvalidDelegationNonce(signer, current));
+        $._delegationNonce[signer]++;
+
         _delegate(signer, delegatee);
     }
 

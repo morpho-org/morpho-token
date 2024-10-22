@@ -38,6 +38,7 @@ contract MorphoTokenOptimism is Token, IOptimismMintableERC20 {
 
     /* CONSTRUCTOR */
 
+    /// @notice Construct the contract.
     constructor(address newRemoteToken, address newBridge) {
         remoteToken = newRemoteToken;
         bridge = newBridge;

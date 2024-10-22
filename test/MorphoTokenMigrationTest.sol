@@ -1,13 +1,13 @@
-// SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.13;
+// SPDX-License-Identifier: GPL-2.0-or-later
+pragma solidity ^0.8.0;
 
-import {console} from "lib/forge-std/src/Test.sol";
+import {console} from "../lib/forge-std/src/Test.sol";
 import {BaseTest} from "./helpers/BaseTest.sol";
 import {Wrapper} from "../src/Wrapper.sol";
 import {IMulticall} from "./helpers/interfaces/IMulticall.sol";
 import {EncodeLib} from "./helpers/libraries/EncodeLib.sol";
 import {IERC20} from
-    "lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
+    "../lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 
 contract MorphoTokenMigrationTest is BaseTest {
     address internal constant BUNDLER_ADDRESS = 0x4095F064B8d3c3548A3bebfd0Bbfd04750E30077;
@@ -24,7 +24,9 @@ contract MorphoTokenMigrationTest is BaseTest {
         _fork();
 
         vm.startPrank(MORPHO_DAO);
+        // Enable `transferFrom` on the legacy MORPHO token.
         RolesAuthority(LEGACY_MORPHO).setPublicCapability(0x23b872dd, true);
+        // Enable `transfer` on the legacy MORPHO token.
         RolesAuthority(LEGACY_MORPHO).setPublicCapability(0xa9059cbb, true);
         vm.stopPrank();
 
@@ -36,9 +38,8 @@ contract MorphoTokenMigrationTest is BaseTest {
 
     function _fork() internal virtual {
         string memory rpcUrl = vm.rpcUrl("ethereum");
-        uint256 forkBlockNumber = 20969715;
 
-        forkId = vm.createSelectFork(rpcUrl, forkBlockNumber);
+        forkId = vm.createSelectFork(rpcUrl);
         vm.chainId(1);
     }
 

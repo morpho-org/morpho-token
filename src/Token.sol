@@ -3,14 +3,15 @@ pragma solidity 0.8.27;
 
 import {IERC20DelegatesUpgradeable} from "./interfaces/IERC20DelegatesUpgradeable.sol";
 
-import {ERC20Upgradeable} from "lib/openzeppelin-contracts-upgradeable/contracts/token/ERC20/ERC20Upgradeable.sol";
 import {Ownable2StepUpgradeable} from
     "lib/openzeppelin-contracts-upgradeable/contracts/access/Ownable2StepUpgradeable.sol";
 import {ERC20PermitUpgradeable} from
     "../lib/openzeppelin-contracts-upgradeable/contracts/token/ERC20/extensions/ERC20PermitUpgradeable.sol";
 import {ECDSA} from
     "../lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/utils/cryptography/ECDSA.sol";
-import {UUPSUpgradeable} from "lib/openzeppelin-contracts-upgradeable/contracts/proxy/utils/UUPSUpgradeable.sol";
+import {Ownable2StepUpgradeable} from
+    "../lib/openzeppelin-contracts-upgradeable/contracts/access/Ownable2StepUpgradeable.sol";
+import {UUPSUpgradeable} from "../lib/openzeppelin-contracts-upgradeable/contracts/proxy/utils/UUPSUpgradeable.sol";
 
 /// @title Token
 /// @author Morpho Labs
@@ -63,6 +64,8 @@ abstract contract Token is
 
     // @dev Emitted when a delegatee's delegated voting power changes.
     event DelegatedVotingPowerChanged(address indexed delegatee, uint256 oldVotes, uint256 newVotes);
+
+    /* CONSTRUCTOR */
 
     // @dev Disables initializers for the implementation contract.
     constructor() {

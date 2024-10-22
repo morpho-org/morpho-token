@@ -3,35 +3,35 @@ pragma solidity ^0.8.0;
 
 import {BaseTest} from "./helpers/BaseTest.sol";
 import {SigUtils} from "./helpers/SigUtils.sol";
-import {MorphoToken} from "../src/MorphoToken.sol";
+import {MorphoTokenEthereum} from "../src/MorphoTokenEthereum.sol";
 import {ERC1967Proxy} from
     "../lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 
-contract MorphoTokenTest is BaseTest {
+contract MorphoTokenEthereumTest is BaseTest {
     function testInitilizeZeroAddress(address randomAddress) public {
         vm.assume(randomAddress != address(0));
 
         address proxy = address(new ERC1967Proxy(address(tokenImplem), hex""));
 
         vm.expectRevert();
-        MorphoToken(proxy).initialize(address(0), randomAddress);
+        MorphoTokenEthereum(proxy).initialize(address(0), randomAddress);
 
         vm.expectRevert();
-        MorphoToken(proxy).initialize(randomAddress, address(0));
+        MorphoTokenEthereum(proxy).initialize(randomAddress, address(0));
     }
 
     function testUpgradeNotOwner(address updater) public {
         vm.assume(updater != address(0));
         vm.assume(updater != MORPHO_DAO);
 
-        address newImplem = address(new MorphoToken());
+        address newImplem = address(new MorphoTokenEthereum());
 
         vm.expectRevert();
         newMorpho.upgradeToAndCall(newImplem, hex"");
     }
 
     function testUpgrade() public {
-        address newImplem = address(new MorphoToken());
+        address newImplem = address(new MorphoTokenEthereum());
 
         vm.prank(MORPHO_DAO);
         newMorpho.upgradeToAndCall(newImplem, hex"");

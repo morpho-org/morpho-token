@@ -2,7 +2,7 @@
 pragma solidity ^0.8.0;
 
 import {Test} from "../../lib/forge-std/src/Test.sol";
-import {MorphoToken} from "../../src/MorphoToken.sol";
+import {MorphoTokenEthereum} from "../../src/MorphoTokenEthereum.sol";
 import {Wrapper} from "../../src/Wrapper.sol";
 import {ERC1967Proxy} from
     "../../lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/proxy/ERC1967/ERC1967Proxy.sol";
@@ -18,8 +18,8 @@ import {UUPSUpgradeable} from "../../lib/openzeppelin-contracts-upgradeable/cont
 contract BaseTest is Test {
     address public constant MORPHO_DAO = 0xcBa28b38103307Ec8dA98377ffF9816C164f9AFa;
 
-    MorphoToken public tokenImplem;
-    MorphoToken public newMorpho;
+    MorphoTokenEthereum public tokenImplem;
+    MorphoTokenEthereum public newMorpho;
     ERC1967Proxy public tokenProxy;
     Wrapper public wrapper;
 
@@ -28,11 +28,11 @@ contract BaseTest is Test {
 
     function setUp() public virtual {
         // DEPLOYMENTS
-        tokenImplem = new MorphoToken();
+        tokenImplem = new MorphoTokenEthereum();
         tokenProxy = new ERC1967Proxy(address(tokenImplem), hex"");
         wrapper = new Wrapper(address(tokenProxy));
 
-        newMorpho = MorphoToken(payable(address(tokenProxy)));
+        newMorpho = MorphoTokenEthereum(payable(address(tokenProxy)));
         newMorpho.initialize(MORPHO_DAO, address(wrapper));
     }
 

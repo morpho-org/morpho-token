@@ -7,7 +7,7 @@ import {Token} from "./Token.sol";
 /// @author Morpho Association
 /// @custom:contact security@morpho.org
 /// @notice The MORPHO Token contract.
-contract MorphoToken is Token {
+contract MorphoTokenEthereum is Token {
     /* CONSTANTS */
 
     /// @dev The name of the token.

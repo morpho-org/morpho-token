@@ -1,14 +1,14 @@
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: GPL-2.0-or-later
 pragma solidity 0.8.27;
 
 import {IERC20DelegatesUpgradeable} from "./interfaces/IERC20DelegatesUpgradeable.sol";
 
-import {ERC20Upgradeable} from "lib/openzeppelin-contracts-upgradeable/contracts/token/ERC20/ERC20Upgradeable.sol";
+import {ERC20Upgradeable} from "../lib/openzeppelin-contracts-upgradeable/contracts/token/ERC20/ERC20Upgradeable.sol";
 import {ECDSA} from
-    "lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/utils/cryptography/ECDSA.sol";
+    "../lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/utils/cryptography/ECDSA.sol";
 import {EIP712Upgradeable} from
-    "lib/openzeppelin-contracts-upgradeable/contracts/utils/cryptography/EIP712Upgradeable.sol";
-import {Initializable} from "lib/openzeppelin-contracts-upgradeable/contracts/proxy/utils/Initializable.sol";
+    "../lib/openzeppelin-contracts-upgradeable/contracts/utils/cryptography/EIP712Upgradeable.sol";
+import {Initializable} from "../lib/openzeppelin-contracts-upgradeable/contracts/proxy/utils/Initializable.sol";
 
 /// @title ERC20DelegatesUpgradeable
 /// @author Morpho Labs
@@ -16,7 +16,7 @@ import {Initializable} from "lib/openzeppelin-contracts-upgradeable/contracts/pr
 /// @dev Extension of ERC20 to support token delegation.
 ///
 /// This extension keeps track of the current voting power delegated to each account. Voting power can be delegated
-/// either by calling the {delegate} function directly, or by providing a signature to be used with {delegateBySig}.
+/// either by calling the `delegate` function directly, or by providing a signature to be used with `delegateBySig`.
 ///
 /// This enables onchain votes on external voting smart contracts leveraging storage proofs.
 ///

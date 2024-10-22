@@ -48,7 +48,7 @@ abstract contract ERC20DelegatesUpgradeable is
 
     /* GETTERS */
 
-    /// @dev Returns the delegate that `delegator` has chosen.
+    /// @dev Returns the delegatee that `delegator` has chosen.
     function delegatee(address delegator) public view returns (address) {
         ERC20DelegatesStorage storage $ = _getERC20DelegatesStorage();
         return $._delegatee[delegator];

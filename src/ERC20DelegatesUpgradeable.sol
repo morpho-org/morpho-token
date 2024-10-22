@@ -15,12 +15,14 @@ import {Initializable} from "lib/openzeppelin-contracts-upgradeable/contracts/pr
 /// @custom:contact security@morpho.org
 /// @dev Extension of ERC20 to support token delegation.
 ///
-/// This extension keeps track of each account's vote power. Vote power can be delegated either by calling the
-/// {delegate} function directly, or by providing a signature to be used with {delegateBySig}. Voting power can be
-/// queried through the external accessor {getVotes}.
+/// This extension keeps track of the current voting power delegated to each account. Voting power can be delegated
+/// either by calling the {delegate} function directly, or by providing a signature to be used with {delegateBySig}.
+/// Voting power can be queried through the external accessor {getVotes}.
 ///
-/// By default, token balance does not account for voting power. This makes transfers cheaper. The downside is that it
-/// requires users to delegate to themselves in order to activate their voting power.
+/// This enables onchain votes on external voting smart contracts leveraging storage proofs.
+///
+/// By default, token balance does not account for voting power. This makes transfers cheaper. Whether an account
+/// has to self-delegate to vote depends on the voting contract implementation.
 abstract contract ERC20DelegatesUpgradeable is Initializable, ERC20Upgradeable, EIP712Upgradeable, IDelegates {
     /* CONSTANTS */
 

@@ -166,5 +166,5 @@ abstract contract Token is
     }
 
     /// @inheritdoc UUPSUpgradeable
-    function _authorizeUpgrade(address) internal virtual override onlyOwner {}
+    function _authorizeUpgrade(address) internal override onlyOwner {}
 }

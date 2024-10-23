@@ -36,13 +36,13 @@ contract MorphoTokenEthereum is DelegationToken {
         _mint(wrapper, 1_000_000_000e18); // Mint 1B to the wrapper contract.
     }
 
-    /// @dev Mints tokens.
+    /// @notice Mints tokens.
     function mint(address to, uint256 amount) external onlyOwner {
         _mint(to, amount);
         emit Mint(to, amount);
     }
 
-    /// @dev Burns sender's tokens.
+    /// @notice Burns sender's tokens.
     function burn(uint256 amount) external {
         _burn(_msgSender(), amount);
         emit Burn(_msgSender(), amount);

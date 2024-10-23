@@ -44,24 +44,24 @@ abstract contract DelegationToken is IDelegation, ERC20PermitUpgradeable, Ownabl
 
     /* ERRORS */
 
-    /// @dev The signature used has expired.
+    /// @notice The signature used has expired.
     error DelegatesExpiredSignature(uint256 expiry);
 
-    /// @dev The delegation nonce used by the signer is not its current delegation nonce.
+    /// @notice The delegation nonce used by the signer is not its current delegation nonce.
     error InvalidDelegationNonce();
 
     /* EVENTS */
 
-    /// @dev Emitted when an delegator changes their delegatee.
+    /// @notice Emitted when an delegator changes their delegatee.
     event DelegateeChanged(address indexed delegator, address indexed oldDelegatee, address indexed newDelegatee);
 
-    /// @dev Emitted when a delegatee's delegated voting power changes.
+    /// @notice Emitted when a delegatee's delegated voting power changes.
     event DelegatedVotingPowerChanged(address indexed delegatee, uint256 oldVotes, uint256 newVotes);
 
-    /// @dev Emitted whenever tokens are minted for an account.
+    /// @notice Emitted whenever tokens are minted for an account.
     event Mint(address indexed account, uint256 amount);
 
-    /// @dev Emitted whenever tokens are burned from an account.
+    /// @notice Emitted whenever tokens are burned from an account.
     event Burn(address indexed account, uint256 amount);
 
     /* CONSTRUCTOR */
@@ -73,19 +73,19 @@ abstract contract DelegationToken is IDelegation, ERC20PermitUpgradeable, Ownabl
 
     /* GETTERS */
 
-    /// @dev Returns the delegatee that `account` has chosen.
+    /// @notice Returns the delegatee that `account` has chosen.
     function delegatee(address account) public view returns (address) {
         ERC20DelegatesStorage storage $ = _getERC20DelegatesStorage();
         return $._delegatee[account];
     }
 
-    /// @dev Returns the current voting power delegated to `account`.
+    /// @notice Returns the current voting power delegated to `account`.
     function delegatedVotingPower(address account) external view returns (uint256) {
         ERC20DelegatesStorage storage $ = _getERC20DelegatesStorage();
         return $._delegatedVotingPower[account];
     }
 
-    /// @dev Returns the current delegation nonce of `account`.
+    /// @notice Returns the current delegation nonce of `account`.
     function delegationNonce(address account) external view returns (uint256) {
         ERC20DelegatesStorage storage $ = _getERC20DelegatesStorage();
         return $._delegationNonce[account];
@@ -93,7 +93,7 @@ abstract contract DelegationToken is IDelegation, ERC20PermitUpgradeable, Ownabl
 
     /* DELEGATE */
 
-    /// @dev Delegates the balance of the sender to `newDelegatee`.
+    /// @notice Delegates the balance of the sender to `newDelegatee`.
     /// @dev Delegating to the zero address effectively removes the delegation, incidentally making transfers cheaper.
     /// @dev Delegating to the previous delegatee does not revert.
     function delegate(address newDelegatee) external {
@@ -101,7 +101,7 @@ abstract contract DelegationToken is IDelegation, ERC20PermitUpgradeable, Ownabl
         _delegate(delegator, newDelegatee);
     }
 
-    /// @dev Delegates the balance of the signer to `newDelegatee`.
+    /// @notice Delegates the balance of the signer to `newDelegatee`.
     /// @dev Delegating to the zero address effectively removes the delegation, incidentally making transfers cheaper.
     /// @dev Delegating to the previous delegatee effectively revokes past signatures with the same nonce.
     function delegateWithSig(address newDelegatee, uint256 nonce, uint256 expiry, uint8 v, bytes32 r, bytes32 s)

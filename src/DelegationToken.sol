@@ -95,6 +95,7 @@ abstract contract DelegationToken is IDelegation, ERC20PermitUpgradeable, Ownabl
 
     /// @dev Delegates the balance of the sender to `newDelegatee`.
     /// @dev Delegating to the zero address effectively removes the delegation, incidently making transfers cheaper.
+    /// @dev Delegating to the previous delegatee does not revert.
     function delegate(address newDelegatee) external {
         address delegator = _msgSender();
         _delegate(delegator, newDelegatee);

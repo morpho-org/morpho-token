@@ -6,7 +6,7 @@ Additionally, it ships a wrapper contract to simplify the migration of assets fr
 
 ## Upgradability
 
-The Morpho token complies with the EIP-1967 to support upgradeability.
+The Morpho token complies with the [EIP-1967](https://eips.ethereum.org/EIPS/eip-1967) to support upgradeability.
 
 ## Delegation
 
@@ -21,7 +21,6 @@ With the functions `depositFor` and `withdrawTo`, this contract ensures complian
 The `Wrapper` contract will hold the migrated legacy tokens.
 
 ### Migration Flow
-
 
 During contract intialization, 1 billion tokens will be minted for the `Wrapper` contract, which will initially hold the entire supply.
 Any legacy token holder will then be able to migrate their tokens provided that the migration amount is the approved for the wrapper.

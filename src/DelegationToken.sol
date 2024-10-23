@@ -30,13 +30,13 @@ abstract contract DelegationToken is IDelegation, ERC20PermitUpgradeable, Ownabl
         keccak256("Delegation(address delegatee,uint256 nonce,uint256 expiry)");
 
     // keccak256(abi.encode(uint256(keccak256("DelegationToken")) - 1)) & ~bytes32(uint256(0xff))
-    bytes32 internal constant ERC20DelegatesStorageLocation =
+    bytes32 internal constant DelegationTokenStorageLocation =
         0xd583ef41af40c9ecf9cd08176e1b50741710eaecf057b22e93a6b99fa47a6400;
 
     /* STORAGE LAYOUT */
 
     /// @custom:storage-location erc7201:DelegationToken
-    struct ERC20DelegatesStorage {
+    struct DelegationTokenStorage {
         mapping(address => address) _delegatee;
         mapping(address => uint256) _delegatedVotingPower;
         mapping(address => uint256) _delegationNonce;
@@ -75,19 +75,19 @@ abstract contract DelegationToken is IDelegation, ERC20PermitUpgradeable, Ownabl
 
     /// @dev Returns the delegatee that `account` has chosen.
     function delegatee(address account) public view returns (address) {
-        ERC20DelegatesStorage storage $ = _getERC20DelegatesStorage();
+        DelegationTokenStorage storage $ = _getDelegationTokenStorage();
         return $._delegatee[account];
     }
 
     /// @dev Returns the current voting power delegated to `account`.
     function delegatedVotingPower(address account) external view returns (uint256) {
-        ERC20DelegatesStorage storage $ = _getERC20DelegatesStorage();
+        DelegationTokenStorage storage $ = _getDelegationTokenStorage();
         return $._delegatedVotingPower[account];
     }
 
     /// @dev Returns the current delegation nonce of `account`.
     function delegationNonce(address account) external view returns (uint256) {
-        ERC20DelegatesStorage storage $ = _getERC20DelegatesStorage();
+        DelegationTokenStorage storage $ = _getDelegationTokenStorage();
         return $._delegationNonce[account];
     }
 
@@ -104,12 +104,11 @@ abstract contract DelegationToken is IDelegation, ERC20PermitUpgradeable, Ownabl
         external
     {
         require(block.timestamp <= expiry, DelegatesExpiredSignature(expiry));
-
         address delegator = ECDSA.recover(
             _hashTypedDataV4(keccak256(abi.encode(DELEGATION_TYPEHASH, newDelegatee, nonce, expiry))), v, r, s
         );
 
-        ERC20DelegatesStorage storage $ = _getERC20DelegatesStorage();
+        DelegationTokenStorage storage $ = _getDelegationTokenStorage();
         require(nonce == $._delegationNonce[delegator]++, InvalidDelegationNonce());
 
         _delegate(delegator, newDelegatee);
@@ -119,7 +118,7 @@ abstract contract DelegationToken is IDelegation, ERC20PermitUpgradeable, Ownabl
 
     /// @dev Delegates the balance of the `delegator` to `newDelegatee`.
     function _delegate(address delegator, address newDelegatee) internal {
-        ERC20DelegatesStorage storage $ = _getERC20DelegatesStorage();
+        DelegationTokenStorage storage $ = _getDelegationTokenStorage();
         address oldDelegatee = $._delegatee[delegator];
         $._delegatee[delegator] = newDelegatee;
 
@@ -136,7 +135,7 @@ abstract contract DelegationToken is IDelegation, ERC20PermitUpgradeable, Ownabl
 
     /// @dev Moves delegated votes from one delegate to another.
     function _moveDelegateVotes(address from, address to, uint256 amount) internal {
-        ERC20DelegatesStorage storage $ = _getERC20DelegatesStorage();
+        DelegationTokenStorage storage $ = _getDelegationTokenStorage();
         if (from != to && amount > 0) {
             if (from != address(0)) {
                 uint256 oldValue = $._delegatedVotingPower[from];
@@ -153,10 +152,10 @@ abstract contract DelegationToken is IDelegation, ERC20PermitUpgradeable, Ownabl
         }
     }
 
-    /// @dev Returns the ERC20DelegatesStorage struct.
-    function _getERC20DelegatesStorage() internal pure returns (ERC20DelegatesStorage storage $) {
+    /// @dev Returns the DelegationTokenStorage struct.
+    function _getDelegationTokenStorage() internal pure returns (DelegationTokenStorage storage $) {
         assembly {
-            $.slot := ERC20DelegatesStorageLocation
+            $.slot := DelegationTokenStorageLocation
         }
     }
 

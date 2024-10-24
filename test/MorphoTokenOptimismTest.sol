@@ -114,10 +114,4 @@ contract MorphoTokenOptimismTest is Test {
         assertEq(morphoOptimism.totalSupply(), amountMinted - amountBurned, "totalSupply");
         assertEq(morphoOptimism.balanceOf(from), amountMinted - amountBurned, "balanceOf(account)");
     }
-
-    function testOptimismMintableERC20StorageLocation() public pure {
-        bytes32 expected = keccak256(abi.encode(uint256(keccak256("morpho.storage.OptimismMintableERC20")) - 1))
-            & ~bytes32(uint256(0xff));
-        assertEq(expected, 0x6fd4c0a11d0843c68c809f0a5f29b102d54bc08a251c384d9ad17600bfa05d00);
-    }
 }

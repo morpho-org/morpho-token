@@ -26,14 +26,18 @@ During contract intialization, 1 billion tokens will be minted for the `Wrapper`
 Any legacy token holder will then be able to migrate their tokens provided that the migration amount is the approved for the wrapper.
 Migrated legacy tokens may be recovered in order to revert a migration.
 
-### Install dependencies
+## Install dependencies
 
 ```shell
 $ forge install
 ```
 
-### Test
+## Test
 
 ```shell
 $ forge test
 ```
+
+## License
+
+The Morpho token is licensed under `GPL-2.0-or-later`, see [`LICENSE`](./LICENSE).

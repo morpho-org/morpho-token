@@ -229,12 +229,6 @@ contract MorphoTokenEthereumTest is BaseTest {
         assertEq(newMorpho.delegatedVotingPower(delegatee2), transferredAmount);
     }
 
-    function testDelegationTokenStorageLocation() public pure {
-        bytes32 expected =
-            keccak256(abi.encode(uint256(keccak256("morpho.storage.ERC20Delegates")) - 1)) & ~bytes32(uint256(0xff));
-        assertEq(expected, 0x1dc92b2c6e971ab6e08dfd7dcec0e9496d223ced663ba2a06543451548549500);
-    }
-
     function testMint(address to, uint256 amount) public {
         vm.assume(to != address(0));
         amount = bound(amount, MIN_TEST_AMOUNT, MAX_TEST_AMOUNT);

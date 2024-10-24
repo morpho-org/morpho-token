@@ -106,7 +106,7 @@ abstract contract DelegationToken is IDelegation, ERC20PermitUpgradeable, Ownabl
     /// @dev Delegating to the previous delegatee effectively revokes past signatures with the same nonce.
     function delegateWithSig(Delegation memory delegation, Signature calldata signature) external {
         require(block.timestamp <= delegation.expiry, DelegatesExpiredSignature());
-        
+
         address delegator = ECDSA.recover(
             _hashTypedDataV4(keccak256(abi.encode(DELEGATION_TYPEHASH, delegation))),
             signature.v,

@@ -7,7 +7,7 @@ import {DelegationToken} from "../src/DelegationToken.sol";
 contract DelegationTokenInternalTest is Test, DelegationToken {
     uint256 internal constant MAX_TEST_AMOUNT = 1e28;
 
-    function getInitializableStorage() internal pure returns (InitializableStorage storage $) {
+    function _getInitializableStorage() internal pure returns (InitializableStorage storage $) {
         assembly {
             $.slot := 0xf0c57e16840df040f15088dc2f81fe391c3923bec73e23a9662efc9c229c6a00
         }
@@ -19,7 +19,7 @@ contract DelegationTokenInternalTest is Test, DelegationToken {
     }
 
     function testDisabledInitializers() public view {
-        InitializableStorage storage $ = getInitializableStorage();
+        InitializableStorage storage $ = _getInitializableStorage();
         assertEq($._initialized, type(uint64).max, "Initializers not disabled");
     }
 

@@ -74,7 +74,7 @@ contract MorphoTokenEthereumTest is BaseTest {
     }
 
     function testDelegateBySigExpired(SigUtils.Delegation memory delegation, uint256 privateKey) public {
-        delegation.expiry = bound(delegation.expiry, MAX_TEST_AMOUNT, MAX_TEST_AMOUNT);
+        delegation.expiry = bound(delegation.expiry, 0, type(uint32).max);
         privateKey = bound(privateKey, 1, type(uint32).max);
         address delegator = vm.addr(privateKey);
 
@@ -88,7 +88,7 @@ contract MorphoTokenEthereumTest is BaseTest {
         Signature memory sig;
         bytes32 digest = SigUtils.getDelegationTypedDataHash(delegation, address(newMorpho));
         (sig.v, sig.r, sig.s) = vm.sign(privateKey, digest);
-        
+
         vm.warp(delegation.expiry + 1);
 
         vm.expectRevert(abi.encodeWithSelector(DelegationToken.DelegatesExpiredSignature.selector, delegation.expiry));
@@ -107,7 +107,7 @@ contract MorphoTokenEthereumTest is BaseTest {
         addresses[1] = delegation.delegatee;
         _validateAddresses(addresses);
 
-        delegation.expiry = bound(delegation.expiry, block.timestamp, type(uint256).max);
+        delegation.expiry = bound(delegation.expiry, block.timestamp, type(uint32).max);
         delegation.nonce = nounce;
 
         Signature memory sig;
@@ -128,7 +128,7 @@ contract MorphoTokenEthereumTest is BaseTest {
         _validateAddresses(addresses);
         vm.assume(newMorpho.delegationNonce(delegator) == 0);
 
-        delegation.expiry = bound(delegation.expiry, block.timestamp, type(uint256).max);
+        delegation.expiry = bound(delegation.expiry, block.timestamp, type(uint32).max);
         delegation.nonce = 0;
 
         amount = bound(amount, MIN_TEST_AMOUNT, MAX_TEST_AMOUNT);
@@ -233,16 +233,16 @@ contract MorphoTokenEthereumTest is BaseTest {
 
     function testMint(address to, uint256 amount) public {
         vm.assume(to != address(0));
-        vm.assume(to != address(wrapper));
         amount = bound(amount, MIN_TEST_AMOUNT, MAX_TEST_AMOUNT);
 
         uint256 initialTotalSupply = newMorpho.totalSupply();
+        uint256 initialAmount = newMorpho.balanceOf(to);
 
         vm.prank(MORPHO_DAO);
         newMorpho.mint(to, amount);
 
         assertEq(newMorpho.totalSupply(), initialTotalSupply + amount);
-        assertEq(newMorpho.balanceOf(to), amount);
+        assertEq(newMorpho.balanceOf(to), initialAmount + amount);
     }
 
     function testMintOverflow(address to, uint256 amount) public {
@@ -266,11 +266,11 @@ contract MorphoTokenEthereumTest is BaseTest {
 
     function testBurn(address from, uint256 amountMinted, uint256 amountBurned) public {
         vm.assume(from != address(0));
-        vm.assume(from != address(wrapper));
         amountMinted = bound(amountMinted, MIN_TEST_AMOUNT, MAX_TEST_AMOUNT);
         amountBurned = bound(amountBurned, MIN_TEST_AMOUNT, amountMinted);
 
         uint256 initialTotalSupply = newMorpho.totalSupply();
+        uint256 initialAmount = newMorpho.balanceOf(from);
 
         vm.prank(MORPHO_DAO);
         newMorpho.mint(from, amountMinted);
@@ -279,6 +279,6 @@ contract MorphoTokenEthereumTest is BaseTest {
         newMorpho.burn(amountBurned);
 
         assertEq(newMorpho.totalSupply(), initialTotalSupply + amountMinted - amountBurned);
-        assertEq(newMorpho.balanceOf(from), amountMinted - amountBurned);
+        assertEq(newMorpho.balanceOf(from), initialAmount + amountMinted - amountBurned);
     }
 }

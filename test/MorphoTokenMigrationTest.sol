@@ -44,7 +44,7 @@ contract MorphoTokenEthereumMigrationTest is BaseTest {
     }
 
     function testDeployWrapperZeroAddress() public {
-        vm.expectRevert();
+        vm.expectRevert(Wrapper.ZeroAddress.selector);
         new Wrapper(address(0));
     }
 
@@ -60,28 +60,28 @@ contract MorphoTokenEthereumMigrationTest is BaseTest {
     function testDepositForZeroAddress(uint256 amount) public {
         vm.assume(amount != 0);
 
-        vm.expectRevert();
+        vm.expectRevert(Wrapper.ZeroAddress.selector);
         wrapper.depositFor(address(0), amount);
     }
 
     function testDepositForSelfAddress(uint256 amount) public {
         vm.assume(amount != 0);
 
-        vm.expectRevert();
+        vm.expectRevert(Wrapper.SelfAddress.selector);
         wrapper.depositFor(address(wrapper), amount);
     }
 
     function testWithdrawToZeroAddress(uint256 amount) public {
         vm.assume(amount != 0);
 
-        vm.expectRevert();
+        vm.expectRevert(Wrapper.ZeroAddress.selector);
         wrapper.withdrawTo(address(0), amount);
     }
 
     function testWithdrawToSelfAddress(uint256 amount) public {
         vm.assume(amount != 0);
 
-        vm.expectRevert();
+        vm.expectRevert(Wrapper.SelfAddress.selector);
         wrapper.withdrawTo(address(wrapper), amount);
     }
 

@@ -6,6 +6,7 @@ import {MorphoTokenOptimism} from "../src/MorphoTokenOptimism.sol";
 import {ERC1967Proxy} from
     "../lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 import {UUPSUpgradeable} from "../lib/openzeppelin-contracts-upgradeable/contracts/proxy/utils/UUPSUpgradeable.sol";
+import {OwnableUpgradeable} from "../lib/openzeppelin-contracts-upgradeable/contracts/access/OwnableUpgradeable.sol";
 
 contract MorphoTokenOptimismTest is Test {
     address internal constant MORPHO_DAO = 0xcBa28b38103307Ec8dA98377ffF9816C164f9AFa;
@@ -36,7 +37,7 @@ contract MorphoTokenOptimismTest is Test {
 
         address proxy = address(new ERC1967Proxy(address(tokenImplem), hex""));
 
-        vm.expectRevert();
+        vm.expectRevert(MorphoTokenOptimism.ZeroAddress.selector);
         MorphoTokenOptimism(proxy).initialize(address(0));
     }
 
@@ -46,7 +47,8 @@ contract MorphoTokenOptimismTest is Test {
 
         address newImplem = address(new MorphoTokenOptimism(REMOTE_TOKEN, BRIDGE));
 
-        vm.expectRevert();
+        vm.expectRevert(abi.encodeWithSelector(OwnableUpgradeable.OwnableUnauthorizedAccount.selector, updater));
+        vm.prank(updater);
         morphoOptimism.upgradeToAndCall(newImplem, hex"");
     }
 
@@ -69,7 +71,7 @@ contract MorphoTokenOptimismTest is Test {
         vm.assume(account != BRIDGE);
         amount = bound(amount, MIN_TEST_AMOUNT, MAX_TEST_AMOUNT);
 
-        vm.expectRevert();
+        vm.expectRevert(MorphoTokenOptimism.NotBridge.selector);
         vm.prank(account);
         morphoOptimism.mint(to, amount);
     }
@@ -94,7 +96,7 @@ contract MorphoTokenOptimismTest is Test {
         vm.assume(account != BRIDGE);
         amount = bound(amount, MIN_TEST_AMOUNT, MAX_TEST_AMOUNT);
 
-        vm.expectRevert();
+        vm.expectRevert(MorphoTokenOptimism.NotBridge.selector);
         vm.prank(account);
         morphoOptimism.burn(from, amount);
     }

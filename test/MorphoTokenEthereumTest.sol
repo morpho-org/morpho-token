@@ -4,6 +4,10 @@ pragma solidity ^0.8.0;
 import {BaseTest} from "./helpers/BaseTest.sol";
 import {SigUtils} from "./helpers/SigUtils.sol";
 import {MorphoTokenEthereum} from "../src/MorphoTokenEthereum.sol";
+import {DelegationToken} from "../src/DelegationToken.sol";
+import {IERC20Errors} from
+    "../lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/interfaces/draft-IERC6093.sol";
+import {OwnableUpgradeable} from "../lib/openzeppelin-contracts-upgradeable/contracts/access/OwnableUpgradeable.sol";
 import {ERC1967Proxy} from
     "../lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 
@@ -13,10 +17,10 @@ contract MorphoTokenEthereumTest is BaseTest {
 
         address proxy = address(new ERC1967Proxy(address(tokenImplem), hex""));
 
-        vm.expectRevert();
+        vm.expectRevert(MorphoTokenEthereum.ZeroAddress.selector);
         MorphoTokenEthereum(proxy).initialize(address(0), randomAddress);
 
-        vm.expectRevert();
+        vm.expectRevert(abi.encodeWithSelector(IERC20Errors.ERC20InvalidReceiver.selector, address(0)));
         MorphoTokenEthereum(proxy).initialize(randomAddress, address(0));
     }
 
@@ -26,7 +30,8 @@ contract MorphoTokenEthereumTest is BaseTest {
 
         address newImplem = address(new MorphoTokenEthereum());
 
-        vm.expectRevert();
+        vm.expectRevert(abi.encodeWithSelector(OwnableUpgradeable.OwnableUnauthorizedAccount.selector, updater));
+        vm.prank(updater);
         newMorpho.upgradeToAndCall(newImplem, hex"");
     }
 
@@ -68,10 +73,8 @@ contract MorphoTokenEthereumTest is BaseTest {
         assertEq(newMorpho.delegatedVotingPower(delegatee), amount);
     }
 
-    function testDelegateBySigExpired(SigUtils.Delegation memory delegation, uint256 privateKey, uint256 expiry)
-        public
-    {
-        expiry = bound(expiry, MAX_TEST_AMOUNT, MAX_TEST_AMOUNT);
+    function testDelegateBySigExpired(SigUtils.Delegation memory delegation, uint256 privateKey) public {
+        delegation.expiry = bound(delegation.expiry, MAX_TEST_AMOUNT, MAX_TEST_AMOUNT);
         privateKey = bound(privateKey, 1, type(uint32).max);
         address delegator = vm.addr(privateKey);
 
@@ -80,16 +83,15 @@ contract MorphoTokenEthereumTest is BaseTest {
         addresses[1] = delegation.delegatee;
         _validateAddresses(addresses);
 
-        delegation.expiry = expiry;
         delegation.nonce = 0;
 
         Signature memory sig;
         bytes32 digest = SigUtils.getDelegationTypedDataHash(delegation, address(newMorpho));
         (sig.v, sig.r, sig.s) = vm.sign(privateKey, digest);
 
-        vm.warp(expiry + 1);
+        vm.warp(delegation.expiry + 1);
 
-        vm.expectRevert();
+        vm.expectRevert(abi.encodeWithSelector(DelegationToken.DelegatesExpiredSignature.selector, delegation.expiry));
         newMorpho.delegateWithSig(delegation.delegatee, delegation.nonce, delegation.expiry, sig.v, sig.r, sig.s);
     }
 
@@ -112,7 +114,7 @@ contract MorphoTokenEthereumTest is BaseTest {
         bytes32 digest = SigUtils.getDelegationTypedDataHash(delegation, address(newMorpho));
         (sig.v, sig.r, sig.s) = vm.sign(privateKey, digest);
 
-        vm.expectRevert();
+        vm.expectRevert(DelegationToken.InvalidDelegationNonce.selector);
         newMorpho.delegateWithSig(delegation.delegatee, delegation.nonce, delegation.expiry, sig.v, sig.r, sig.s);
     }
 
@@ -237,6 +239,7 @@ contract MorphoTokenEthereumTest is BaseTest {
 
     function testMint(address to, uint256 amount) public {
         vm.assume(to != address(0));
+        vm.assume(to != address(wrapper));
         amount = bound(amount, MIN_TEST_AMOUNT, MAX_TEST_AMOUNT);
 
         uint256 initialTotalSupply = newMorpho.totalSupply();
@@ -262,13 +265,14 @@ contract MorphoTokenEthereumTest is BaseTest {
         vm.assume(account != MORPHO_DAO);
         amount = bound(amount, MIN_TEST_AMOUNT, MAX_TEST_AMOUNT);
 
-        vm.expectRevert();
+        vm.expectRevert(abi.encodeWithSelector(OwnableUpgradeable.OwnableUnauthorizedAccount.selector, account));
         vm.prank(account);
         newMorpho.mint(to, amount);
     }
 
     function testBurn(address from, uint256 amountMinted, uint256 amountBurned) public {
         vm.assume(from != address(0));
+        vm.assume(from != address(wrapper));
         amountMinted = bound(amountMinted, MIN_TEST_AMOUNT, MAX_TEST_AMOUNT);
         amountBurned = bound(amountBurned, MIN_TEST_AMOUNT, amountMinted);
 

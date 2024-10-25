@@ -7,6 +7,9 @@ import {ERC1967Proxy} from
     "../lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 import {UUPSUpgradeable} from "../lib/openzeppelin-contracts-upgradeable/contracts/proxy/utils/UUPSUpgradeable.sol";
 import {OwnableUpgradeable} from "../lib/openzeppelin-contracts-upgradeable/contracts/access/OwnableUpgradeable.sol";
+import {IOptimismMintableERC20} from "../src/interfaces/IOptimismMintableERC20.sol";
+import {IERC165} from
+    "../lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/utils/introspection/IERC165.sol";
 
 contract MorphoTokenOptimismTest is Test {
     address internal constant MORPHO_DAO = 0xcBa28b38103307Ec8dA98377ffF9816C164f9AFa;
@@ -30,6 +33,16 @@ contract MorphoTokenOptimismTest is Test {
 
         morphoOptimism = MorphoTokenOptimism(payable(address(tokenProxy)));
         morphoOptimism.initialize(MORPHO_DAO);
+    }
+
+    function testDeployImplemZeroAddress(address randomAddress) public {
+        vm.assume(randomAddress != address(0));
+
+        vm.expectRevert(MorphoTokenOptimism.ZeroAddress.selector);
+        tokenImplem = new MorphoTokenOptimism(address(0), randomAddress);
+
+        vm.expectRevert(MorphoTokenOptimism.ZeroAddress.selector);
+        tokenImplem = new MorphoTokenOptimism(randomAddress, address(0));
     }
 
     function testInitializeZeroAddress(address randomAddress) public {
@@ -113,5 +126,14 @@ contract MorphoTokenOptimismTest is Test {
 
         assertEq(morphoOptimism.totalSupply(), amountMinted - amountBurned, "totalSupply");
         assertEq(morphoOptimism.balanceOf(from), amountMinted - amountBurned, "balanceOf(account)");
+    }
+
+    function testSupportsInterface(bytes4 randomInterface) public view {
+        vm.assume(randomInterface != type(IERC165).interfaceId);
+        vm.assume(randomInterface != type(IOptimismMintableERC20).interfaceId);
+
+        assertEq(morphoOptimism.supportsInterface(randomInterface), false);
+        assertEq(morphoOptimism.supportsInterface(type(IERC165).interfaceId), true);
+        assertEq(morphoOptimism.supportsInterface(type(IOptimismMintableERC20).interfaceId), true);
     }
 }

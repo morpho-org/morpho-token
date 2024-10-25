@@ -132,6 +132,9 @@ contract MorphoTokenOptimismTest is Test {
 
         assertFalse(morphoOptimism.supportsInterface(randomInterface), "supports random interface");
         assertTrue(morphoOptimism.supportsInterface(type(IERC165).interfaceId), "doesn't support IERC165");
-        assertTrue(morphoOptimism.supportsInterface(type(IOptimismMintableERC20).interfaceId), "doesn't support IOptimismMintableERC20");
+        assertTrue(
+            morphoOptimism.supportsInterface(type(IOptimismMintableERC20).interfaceId),
+            "doesn't support IOptimismMintableERC20"
+        );
     }
 }

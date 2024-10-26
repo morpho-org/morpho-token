@@ -30,7 +30,7 @@ abstract contract DelegationToken is IDelegation, ERC20PermitUpgradeable, Ownabl
         keccak256("Delegation(address delegatee,uint256 nonce,uint256 expiry)");
 
     // keccak256(abi.encode(uint256(keccak256("DelegationToken")) - 1)) & ~bytes32(uint256(0xff))
-    bytes32 internal constant DelegationTokenStorageLocation =
+    bytes32 internal constant DELEGATION_TOKEN_STORAGE_LOCATION =
         0xd583ef41af40c9ecf9cd08176e1b50741710eaecf057b22e93a6b99fa47a6400;
 
     /* STORAGE LAYOUT */
@@ -159,7 +159,7 @@ abstract contract DelegationToken is IDelegation, ERC20PermitUpgradeable, Ownabl
     /// @dev Returns the DelegationTokenStorage struct.
     function _getDelegationTokenStorage() internal pure returns (DelegationTokenStorage storage $) {
         assembly {
-            $.slot := DelegationTokenStorageLocation
+            $.slot := DELEGATION_TOKEN_STORAGE_LOCATION
         }
     }
 

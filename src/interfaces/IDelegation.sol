@@ -3,7 +3,7 @@ pragma solidity >=0.5.0;
 
 /// @title IDelegation
 /// @author Morpho Association
-/// @custom:contact security@morpho.org
+/// @custom:security-contact security@morpho.org
 interface IDelegation {
     function delegatedVotingPower(address account) external view returns (uint256);
 

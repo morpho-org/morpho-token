@@ -13,7 +13,7 @@ import {UUPSUpgradeable} from "../lib/openzeppelin-contracts-upgradeable/contrac
 
 /// @title DelegationToken
 /// @author Morpho Association
-/// @custom:contact security@morpho.org
+/// @custom:security-contact security@morpho.org
 /// @dev Extension of ERC20 to support token delegation.
 ///
 /// This extension keeps track of the current voting power delegated to each account. Voting power can be delegated

@@ -8,6 +8,7 @@ import {IERC165} from
 /// @notice This interface is available on the OptimismMintableERC20 contract.
 ///         We declare it as a separate interface so that it can be used in
 ///         custom implementations of OptimismMintableERC20.
+/// @custom:security-contact security@morpho.org
 interface IOptimismMintableERC20 is IERC165 {
     function remoteToken() external view returns (address);
 

@@ -27,8 +27,6 @@ contract MorphoTokenEthereum is DelegationToken {
     /// @param owner The new owner.
     /// @param wrapper The wrapper contract address to migrate legacy MORPHO tokens to the new one.
     function initialize(address owner, address wrapper) external initializer {
-        require(owner != address(0), ZeroAddress());
-
         __ERC20_init(NAME, SYMBOL);
         __ERC20Permit_init(NAME);
         __Ownable_init(owner);

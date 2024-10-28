@@ -73,7 +73,7 @@ contract MorphoTokenEthereumTest is BaseTest {
         assertEq(newMorpho.delegatedVotingPower(delegatee), amount);
     }
 
-    function testDelegateBySigExpired(Delegation memory delegation, uint256 privateKey) public {
+    function testDelegateWithSigExpired(Delegation memory delegation, uint256 privateKey) public {
         delegation.expiry = bound(delegation.expiry, 0, type(uint32).max);
         privateKey = bound(privateKey, 1, type(uint32).max);
         address delegator = vm.addr(privateKey);
@@ -95,7 +95,7 @@ contract MorphoTokenEthereumTest is BaseTest {
         newMorpho.delegateWithSig(delegation, sig);
     }
 
-    function testDelegateBySigWrongNonce(Delegation memory delegation, uint256 privateKey, uint256 nounce) public {
+    function testDelegateWithSigWrongNonce(Delegation memory delegation, uint256 privateKey, uint256 nounce) public {
         vm.assume(nounce != 0);
         privateKey = bound(privateKey, 1, type(uint32).max);
         address delegator = vm.addr(privateKey);
@@ -116,7 +116,7 @@ contract MorphoTokenEthereumTest is BaseTest {
         newMorpho.delegateWithSig(delegation, sig);
     }
 
-    function testDelegateBySig(Delegation memory delegation, uint256 privateKey, uint256 amount) public {
+    function testDelegateWithSig(Delegation memory delegation, uint256 privateKey, uint256 amount) public {
         privateKey = bound(privateKey, 1, type(uint32).max);
         address delegator = vm.addr(privateKey);
 

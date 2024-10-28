@@ -16,7 +16,7 @@ The Morpho token supports onchain voting and voting power delegation.
 
 ### Role-based permission
 
-The Morpho token no longer has role-based permission of functions.
+The new Morpho token does not have role-based permission of functions.
 
 ### Burning tokens
 

@@ -6,6 +6,8 @@ import {MorphoTokenOptimism} from "../src/MorphoTokenOptimism.sol";
 import {ERC1967Proxy} from
     "../lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 import {UUPSUpgradeable} from "../lib/openzeppelin-contracts-upgradeable/contracts/proxy/utils/UUPSUpgradeable.sol";
+import {OwnableUpgradeable} from "../lib/openzeppelin-contracts-upgradeable/contracts/access/OwnableUpgradeable.sol";
+import {IOptimismMintableERC20, IERC165} from "../src/interfaces/IOptimismMintableERC20.sol";
 
 contract MorphoTokenOptimismTest is Test {
     address internal constant MORPHO_DAO = 0xcBa28b38103307Ec8dA98377ffF9816C164f9AFa;
@@ -31,12 +33,22 @@ contract MorphoTokenOptimismTest is Test {
         morphoOptimism.initialize(MORPHO_DAO);
     }
 
+    function testDeployImplemZeroAddress(address randomAddress) public {
+        vm.assume(randomAddress != address(0));
+
+        vm.expectRevert(MorphoTokenOptimism.ZeroAddress.selector);
+        tokenImplem = new MorphoTokenOptimism(address(0), randomAddress);
+
+        vm.expectRevert(MorphoTokenOptimism.ZeroAddress.selector);
+        tokenImplem = new MorphoTokenOptimism(randomAddress, address(0));
+    }
+
     function testInitializeZeroAddress(address randomAddress) public {
         vm.assume(randomAddress != address(0));
 
         address proxy = address(new ERC1967Proxy(address(tokenImplem), hex""));
 
-        vm.expectRevert();
+        vm.expectRevert(MorphoTokenOptimism.ZeroAddress.selector);
         MorphoTokenOptimism(proxy).initialize(address(0));
     }
 
@@ -46,7 +58,8 @@ contract MorphoTokenOptimismTest is Test {
 
         address newImplem = address(new MorphoTokenOptimism(REMOTE_TOKEN, BRIDGE));
 
-        vm.expectRevert();
+        vm.expectRevert(abi.encodeWithSelector(OwnableUpgradeable.OwnableUnauthorizedAccount.selector, updater));
+        vm.prank(updater);
         morphoOptimism.upgradeToAndCall(newImplem, hex"");
     }
 
@@ -69,7 +82,7 @@ contract MorphoTokenOptimismTest is Test {
         vm.assume(account != BRIDGE);
         amount = bound(amount, MIN_TEST_AMOUNT, MAX_TEST_AMOUNT);
 
-        vm.expectRevert();
+        vm.expectRevert(MorphoTokenOptimism.NotBridge.selector);
         vm.prank(account);
         morphoOptimism.mint(to, amount);
     }
@@ -94,7 +107,7 @@ contract MorphoTokenOptimismTest is Test {
         vm.assume(account != BRIDGE);
         amount = bound(amount, MIN_TEST_AMOUNT, MAX_TEST_AMOUNT);
 
-        vm.expectRevert();
+        vm.expectRevert(MorphoTokenOptimism.NotBridge.selector);
         vm.prank(account);
         morphoOptimism.burn(from, amount);
     }
@@ -113,9 +126,15 @@ contract MorphoTokenOptimismTest is Test {
         assertEq(morphoOptimism.balanceOf(from), amountMinted - amountBurned, "balanceOf(account)");
     }
 
-    function testOptimismMintableERC20StorageLocation() public pure {
-        bytes32 expected = keccak256(abi.encode(uint256(keccak256("morpho.storage.OptimismMintableERC20")) - 1))
-            & ~bytes32(uint256(0xff));
-        assertEq(expected, 0x6fd4c0a11d0843c68c809f0a5f29b102d54bc08a251c384d9ad17600bfa05d00);
+    function testSupportsInterface(bytes4 randomInterface) public view {
+        vm.assume(randomInterface != type(IERC165).interfaceId);
+        vm.assume(randomInterface != type(IOptimismMintableERC20).interfaceId);
+
+        assertFalse(morphoOptimism.supportsInterface(randomInterface), "supports random interface");
+        assertTrue(morphoOptimism.supportsInterface(type(IERC165).interfaceId), "doesn't support IERC165");
+        assertTrue(
+            morphoOptimism.supportsInterface(type(IOptimismMintableERC20).interfaceId),
+            "doesn't support IOptimismMintableERC20"
+        );
     }
 }

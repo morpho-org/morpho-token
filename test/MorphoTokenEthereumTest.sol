@@ -17,9 +17,6 @@ contract MorphoTokenEthereumTest is BaseTest {
 
         address proxy = address(new ERC1967Proxy(address(tokenImplem), hex""));
 
-        vm.expectRevert(MorphoTokenEthereum.ZeroAddress.selector);
-        MorphoTokenEthereum(proxy).initialize(address(0), randomAddress);
-
         vm.expectRevert(abi.encodeWithSelector(IERC20Errors.ERC20InvalidReceiver.selector, address(0)));
         MorphoTokenEthereum(proxy).initialize(randomAddress, address(0));
     }

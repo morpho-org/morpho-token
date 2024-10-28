@@ -6,7 +6,7 @@ Additionally, it ships a wrapper contract to simplify the migration of assets fr
 
 ## Features
 
-### Upgradability
+### Upgradeability
 
 The Morpho token complies with [EIP-1967](https://eips.ethereum.org/EIPS/eip-1967) to support upgradeability.
 

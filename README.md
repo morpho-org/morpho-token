@@ -14,11 +14,11 @@ The Morpho token complies with [EIP-1967](https://eips.ethereum.org/EIPS/eip-196
 
 The Morpho token supports onchain voting and voting power delegation.
 
-### Role-based permission
+### Role-based Permission
 
 The new Morpho token does not have role-based permission of functions.
 
-### Burning tokens
+### Burning Tokens
 
 This version brings a breaking change for this feature.
 In the legacy Morpho token, burning tokens was made possible by transferring them to the zero address.
@@ -39,9 +39,9 @@ During contract initialization, 1 billion tokens will be minted for the `Wrapper
 Any legacy token holder will then be able to migrate their tokens provided that the migration amount is approved for the wrapper.
 Migrated legacy tokens may be recovered in order to revert a migration.
 
-## Getting started
+## Getting Started
 
-### Install dependencies
+### Install Dependencies
 
 ```shell
 $ forge install

@@ -31,8 +31,8 @@ contract MorphoTokenEthereum is DelegationToken {
 
         __ERC20_init(NAME, SYMBOL);
         __ERC20Permit_init(NAME);
+        __Ownable_init(owner);
 
-        _transferOwnership(owner);
         _mint(wrapper, 1_000_000_000e18); // Mint 1B to the wrapper contract.
     }
 

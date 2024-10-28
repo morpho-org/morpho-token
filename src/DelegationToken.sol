@@ -104,7 +104,7 @@ abstract contract DelegationToken is IDelegation, ERC20PermitUpgradeable, Ownabl
     /// @notice Delegates the balance of the signer to `newDelegatee`.
     /// @dev Delegating to the zero address effectively removes the delegation, incidentally making transfers cheaper.
     /// @dev Delegating to the previous delegatee effectively revokes past signatures with the same nonce.
-    function delegateWithSig(Delegation memory delegation, Signature calldata signature) external {
+    function delegateWithSig(Delegation calldata delegation, Signature calldata signature) external {
         require(block.timestamp <= delegation.expiry, DelegatesExpiredSignature());
 
         address delegator = ECDSA.recover(

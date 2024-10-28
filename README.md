@@ -1,16 +1,28 @@
 # Morpho Token
 
-This repository contains the Morpho protocol’s ERC20 token.
+This repository contains the Morpho protocol's ERC20 token.
 It is designed to be upgradable and support onchain delegation.
 Additionally, it ships a wrapper contract to simplify the migration of assets from the previous token contract to the new Morpho token contract.
 
-## Upgradability
+## Features
 
-The Morpho token complies with the [EIP-1967](https://eips.ethereum.org/EIPS/eip-1967) to support upgradeability.
+### Upgradability
 
-## Delegation
+The Morpho token complies with [EIP-1967](https://eips.ethereum.org/EIPS/eip-1967) to support upgradeability.
+
+### Delegation
 
 The Morpho token supports onchain voting and voting power delegation.
+
+### Transferability and roles
+
+The Morpho token no longer has role-based permissions.
+This implies notably that it is transferable by default.
+
+### Burning tokens
+
+Calling `transfer` or `transferFrom` to transfer tokens to the zero address now reverts in the Morpho token.
+Instead, any account approved to spend tokens can use the `burn` function.
 
 ## Migration
 
@@ -22,17 +34,19 @@ The `Wrapper` contract will hold the migrated legacy tokens.
 
 ### Migration Flow
 
-During contract intialization, 1 billion tokens will be minted for the `Wrapper` contract, which will initially hold the entire supply.
-Any legacy token holder will then be able to migrate their tokens provided that the migration amount is the approved for the wrapper.
+During contract initialization, 1 billion tokens will be minted for the `Wrapper` contract, which will initially hold the entire supply.
+Any legacy token holder will then be able to migrate their tokens provided that the migration amount is approved for the wrapper.
 Migrated legacy tokens may be recovered in order to revert a migration.
 
-## Install dependencies
+## Getting started
+
+### Install dependencies
 
 ```shell
 $ forge install
 ```
 
-## Test
+### Test
 
 ```shell
 $ forge test

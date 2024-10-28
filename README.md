@@ -14,15 +14,16 @@ The Morpho token complies with [EIP-1967](https://eips.ethereum.org/EIPS/eip-196
 
 The Morpho token supports onchain voting and voting power delegation.
 
-### Transferability and roles
+### Role-based permission
 
-The Morpho token no longer has role-based permissions.
-This implies notably that it is transferable by default.
+The Morpho token no longer has role-based permission of functions.
 
 ### Burning tokens
 
-Calling `transfer` or `transferFrom` to transfer tokens to the zero address now reverts in the Morpho token.
-Instead, any account approved to spend tokens can use the `burn` function.
+This version brings a breaking change for this feature.
+In the legacy Morpho token, burning tokens was made possible by transferring them to the zero address.
+This approach is deprecated in this version of the Morpho token.
+To burn tokens, approved users may call the `burn` function.
 
 ## Migration
 

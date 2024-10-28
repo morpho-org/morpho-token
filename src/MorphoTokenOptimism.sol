@@ -62,8 +62,6 @@ contract MorphoTokenOptimism is DelegationToken, IOptimismMintableERC20 {
     /// @notice Initializes the contract.
     /// @param owner The new owner.
     function initialize(address owner) external initializer {
-        require(owner != address(0), ZeroAddress());
-
         __ERC20_init(NAME, SYMBOL);
         __ERC20Permit_init(NAME);
         __Ownable_init(owner);

@@ -48,7 +48,7 @@ contract MorphoTokenOptimismTest is Test {
 
         address proxy = address(new ERC1967Proxy(address(tokenImplem), hex""));
 
-        vm.expectRevert(MorphoTokenOptimism.ZeroAddress.selector);
+        vm.expectRevert(abi.encodeWithSelector(OwnableUpgradeable.OwnableInvalidOwner.selector, address(0)));
         MorphoTokenOptimism(proxy).initialize(address(0));
     }
 

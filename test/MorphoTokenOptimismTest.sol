@@ -10,6 +10,7 @@ import {UUPSUpgradeable} from "../lib/openzeppelin-contracts-upgradeable/contrac
 import {OwnableUpgradeable} from "../lib/openzeppelin-contracts-upgradeable/contracts/access/OwnableUpgradeable.sol";
 import {ERC1967Utils} from
     "../lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/proxy/ERC1967/ERC1967Utils.sol";
+import {IOptimismMintableERC20, IERC165} from "../src/interfaces/IOptimismMintableERC20.sol";
 
 contract MorphoTokenOptimismTest is Test {
     address internal constant MORPHO_DAO = 0xcBa28b38103307Ec8dA98377ffF9816C164f9AFa;
@@ -33,6 +34,16 @@ contract MorphoTokenOptimismTest is Test {
 
         morphoOptimism = MorphoTokenOptimism(payable(address(tokenProxy)));
         morphoOptimism.initialize(MORPHO_DAO);
+    }
+
+    function testDeployImplemZeroAddress(address randomAddress) public {
+        vm.assume(randomAddress != address(0));
+
+        vm.expectRevert(MorphoTokenOptimism.ZeroAddress.selector);
+        tokenImplem = new MorphoTokenOptimism(address(0), randomAddress);
+
+        vm.expectRevert(MorphoTokenOptimism.ZeroAddress.selector);
+        tokenImplem = new MorphoTokenOptimism(randomAddress, address(0));
     }
 
     function testInitializeZeroAddress(address randomAddress) public {
@@ -123,5 +134,17 @@ contract MorphoTokenOptimismTest is Test {
 
         assertEq(morphoOptimism.totalSupply(), amountMinted - amountBurned, "totalSupply");
         assertEq(morphoOptimism.balanceOf(from), amountMinted - amountBurned, "balanceOf(account)");
+    }
+
+    function testSupportsInterface(bytes4 randomInterface) public view {
+        vm.assume(randomInterface != type(IERC165).interfaceId);
+        vm.assume(randomInterface != type(IOptimismMintableERC20).interfaceId);
+
+        assertFalse(morphoOptimism.supportsInterface(randomInterface), "supports random interface");
+        assertTrue(morphoOptimism.supportsInterface(type(IERC165).interfaceId), "doesn't support IERC165");
+        assertTrue(
+            morphoOptimism.supportsInterface(type(IOptimismMintableERC20).interfaceId),
+            "doesn't support IOptimismMintableERC20"
+        );
     }
 }

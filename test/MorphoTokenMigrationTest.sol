@@ -108,19 +108,19 @@ contract MorphoTokenEthereumMigrationTest is BaseTest {
         assertEq(newMorpho.balanceOf(MORPHO_DAO), daoTokenAmount, "newMorpho.balanceOf(MORPHO_DAO)");
     }
 
-    function testMigration(address migrater, uint256 amount) public {
-        vm.assume(migrater != address(0));
+    function testMigration(address migrator, uint256 amount) public {
+        vm.assume(migrator != address(0));
         // Unset initiator is address(1), so it can't use the bundler.
-        vm.assume(migrater != address(1));
-        vm.assume(migrater != MORPHO_DAO);
+        vm.assume(migrator != address(1));
+        vm.assume(migrator != MORPHO_DAO);
         amount = bound(amount, MIN_TEST_AMOUNT, 1_000_000_000e18);
 
-        deal(LEGACY_MORPHO, migrater, amount);
+        deal(LEGACY_MORPHO, migrator, amount);
 
         bundle.push(EncodeLib._erc20TransferFrom(LEGACY_MORPHO, amount));
         bundle.push(EncodeLib._erc20WrapperDepositFor(address(wrapper), amount));
 
-        vm.startPrank(migrater);
+        vm.startPrank(migrator);
         legacyMorpho.approve(address(bundler), amount);
 
         vm.expectEmit(LEGACY_MORPHO);
@@ -132,39 +132,39 @@ contract MorphoTokenEthereumMigrationTest is BaseTest {
         bundler.multicall(bundle);
         vm.stopPrank();
 
-        assertEq(legacyMorpho.balanceOf(migrater), 0, "legacyMorpho.balanceOf(migrater)");
+        assertEq(legacyMorpho.balanceOf(migrator), 0, "legacyMorpho.balanceOf(migrator)");
         assertEq(legacyMorpho.balanceOf(address(wrapper)), amount, "legacyMorpho.balanceOf(wrapper)");
         assertEq(newMorpho.balanceOf(address(wrapper)), 1_000_000_000e18 - amount, "newMorpho.balanceOf(wrapper)");
-        assertEq(newMorpho.balanceOf(migrater), amount, "newMorpho.balanceOf(migrater)");
+        assertEq(newMorpho.balanceOf(migrator), amount, "newMorpho.balanceOf(migrator)");
     }
 
-    function testRevertMigration(address migrater, uint256 migratedAmount, uint256 revertedAmount) public {
-        vm.assume(migrater != address(0));
-        vm.assume(migrater != MORPHO_DAO);
+    function testRevertMigration(address migrator, uint256 migratedAmount, uint256 revertedAmount) public {
+        vm.assume(migrator != address(0));
+        vm.assume(migrator != MORPHO_DAO);
         migratedAmount = bound(migratedAmount, MIN_TEST_AMOUNT, 1_000_000_000e18);
         revertedAmount = bound(revertedAmount, MIN_TEST_AMOUNT, migratedAmount);
 
-        deal(LEGACY_MORPHO, migrater, migratedAmount);
+        deal(LEGACY_MORPHO, migrator, migratedAmount);
 
         bundle.push(EncodeLib._erc20TransferFrom(LEGACY_MORPHO, migratedAmount));
         bundle.push(EncodeLib._erc20WrapperDepositFor(address(wrapper), migratedAmount));
 
-        vm.startPrank(migrater);
+        vm.startPrank(migrator);
         legacyMorpho.approve(address(bundler), migratedAmount);
         bundler.multicall(bundle);
         vm.stopPrank();
 
-        vm.startPrank(migrater);
+        vm.startPrank(migrator);
         newMorpho.approve(address(wrapper), revertedAmount);
 
         vm.expectEmit(address(newMorpho));
         emit IERC20.Transfer(migrater, address(wrapper), revertedAmount);
         vm.expectEmit(LEGACY_MORPHO);
         emit IERC20.Transfer(address(wrapper), migrater, revertedAmount);
-        wrapper.withdrawTo(migrater, revertedAmount);
+        wrapper.withdrawTo(migrator, revertedAmount);
         vm.stopPrank();
 
-        assertEq(legacyMorpho.balanceOf(migrater), revertedAmount, "legacyMorpho.balanceOf(migrater)");
+        assertEq(legacyMorpho.balanceOf(migrator), revertedAmount, "legacyMorpho.balanceOf(migrator)");
         assertEq(
             legacyMorpho.balanceOf(address(wrapper)), migratedAmount - revertedAmount, "legacyMorpho.balanceOf(wrapper)"
         );
@@ -173,7 +173,7 @@ contract MorphoTokenEthereumMigrationTest is BaseTest {
             1_000_000_000e18 - migratedAmount + revertedAmount,
             "newMorpho.balanceOf(wrapper)"
         );
-        assertEq(newMorpho.balanceOf(migrater), migratedAmount - revertedAmount, "newMorpho.balanceOf(migrater)");
+        assertEq(newMorpho.balanceOf(migrator), migratedAmount - revertedAmount, "newMorpho.balanceOf(migrator)");
     }
 }
 

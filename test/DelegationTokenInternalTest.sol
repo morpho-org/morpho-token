@@ -25,7 +25,7 @@ contract DelegationTokenInternalTest is Test, DelegationToken {
 
     function testDelegationTokenStorageLocation() public pure {
         bytes32 expectedSlot =
-            keccak256(abi.encode(uint256(keccak256("DelegationToken")) - 1)) & ~bytes32(uint256(0xff));
+            keccak256(abi.encode(uint256(keccak256("morpho.storage.DelegationToken")) - 1)) & ~bytes32(uint256(0xff));
         bytes32 usedSlot = DELEGATION_TOKEN_STORAGE_LOCATION;
         assertEq(expectedSlot, usedSlot, "Wrong slot used");
     }

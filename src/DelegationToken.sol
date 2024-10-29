@@ -13,7 +13,7 @@ import {UUPSUpgradeable} from "../lib/openzeppelin-contracts-upgradeable/contrac
 
 /// @title DelegationToken
 /// @author Morpho Association
-/// @custom:contact security@morpho.org
+/// @custom:security-contact security@morpho.org
 /// @dev Extension of ERC20 to support token delegation.
 ///
 /// This extension keeps track of the current voting power delegated to each account. Voting power can be delegated
@@ -30,7 +30,7 @@ abstract contract DelegationToken is IDelegation, ERC20PermitUpgradeable, Ownabl
         keccak256("Delegation(address delegatee,uint256 nonce,uint256 expiry)");
 
     // keccak256(abi.encode(uint256(keccak256("DelegationToken")) - 1)) & ~bytes32(uint256(0xff))
-    bytes32 internal constant DelegationTokenStorageLocation =
+    bytes32 internal constant DELEGATION_TOKEN_STORAGE_LOCATION =
         0xd583ef41af40c9ecf9cd08176e1b50741710eaecf057b22e93a6b99fa47a6400;
 
     /* STORAGE LAYOUT */
@@ -57,12 +57,6 @@ abstract contract DelegationToken is IDelegation, ERC20PermitUpgradeable, Ownabl
 
     /// @notice Emitted when a delegatee's delegated voting power changes.
     event DelegatedVotingPowerChanged(address indexed delegatee, uint256 oldVotes, uint256 newVotes);
-
-    /// @notice Emitted whenever tokens are minted for an account.
-    event Mint(address indexed account, uint256 amount);
-
-    /// @notice Emitted whenever tokens are burned from an account.
-    event Burn(address indexed account, uint256 amount);
 
     /* CONSTRUCTOR */
 
@@ -159,7 +153,7 @@ abstract contract DelegationToken is IDelegation, ERC20PermitUpgradeable, Ownabl
     /// @dev Returns the DelegationTokenStorage struct.
     function _getDelegationTokenStorage() internal pure returns (DelegationTokenStorage storage $) {
         assembly {
-            $.slot := DelegationTokenStorageLocation
+            $.slot := DELEGATION_TOKEN_STORAGE_LOCATION
         }
     }
 

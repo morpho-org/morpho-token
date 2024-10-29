@@ -127,6 +127,7 @@ contract MorphoTokenEthereumMigrationTest is BaseTest {
     function testRevertMigration(address migrator, uint256 migratedAmount, uint256 revertedAmount) public {
         vm.assume(migrator != address(0));
         vm.assume(migrator != MORPHO_DAO);
+        vm.assume(migrator != address(wrapper));
         migratedAmount = bound(migratedAmount, MIN_TEST_AMOUNT, 1_000_000_000e18);
         revertedAmount = bound(revertedAmount, MIN_TEST_AMOUNT, migratedAmount);
 

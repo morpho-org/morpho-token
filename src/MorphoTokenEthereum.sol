@@ -16,11 +16,6 @@ contract MorphoTokenEthereum is DelegationToken {
     /// @dev The symbol of the token.
     string internal constant SYMBOL = "MORPHO";
 
-    /* ERRORS */
-
-    /// @notice Reverts if the address is the zero address.
-    error ZeroAddress();
-
     /* EXTERNAL */
 
     /// @notice Initializes the contract.

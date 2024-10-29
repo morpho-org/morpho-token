@@ -8,7 +8,7 @@ import {DelegationToken} from "../src/DelegationToken.sol";
 import {IERC20Errors} from
     "../lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/interfaces/draft-IERC6093.sol";
 import {OwnableUpgradeable} from "../lib/openzeppelin-contracts-upgradeable/contracts/access/OwnableUpgradeable.sol";
-import {ERC1967Utils} from
+import {IERC1967} from
     "../lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/proxy/ERC1967/ERC1967Utils.sol";
 import {ERC1967Proxy} from
     "../lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/proxy/ERC1967/ERC1967Proxy.sol";
@@ -41,7 +41,7 @@ contract MorphoTokenEthereumTest is BaseTest {
         address newImplem = address(new MorphoTokenEthereum());
 
         vm.expectEmit(address(newMorpho));
-        emit ERC1967Utils.Upgraded(newImplem);
+        emit IERC1967.Upgraded(newImplem);
         vm.prank(MORPHO_DAO);
         newMorpho.upgradeToAndCall(newImplem, hex"");
     }

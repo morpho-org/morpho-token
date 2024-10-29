@@ -8,7 +8,7 @@ import {ERC1967Proxy} from
     "../lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 import {UUPSUpgradeable} from "../lib/openzeppelin-contracts-upgradeable/contracts/proxy/utils/UUPSUpgradeable.sol";
 import {OwnableUpgradeable} from "../lib/openzeppelin-contracts-upgradeable/contracts/access/OwnableUpgradeable.sol";
-import {ERC1967Utils} from
+import {IERC1967} from
     "../lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/proxy/ERC1967/ERC1967Utils.sol";
 import {IOptimismMintableERC20, IERC165} from "../src/interfaces/IOptimismMintableERC20.sol";
 
@@ -70,7 +70,7 @@ contract MorphoTokenOptimismTest is Test {
         address newImplem = address(new MorphoTokenOptimism(REMOTE_TOKEN, BRIDGE));
 
         vm.expectEmit(address(morphoOptimism));
-        emit ERC1967Utils.Upgraded(newImplem);
+        emit IERC1967.Upgraded(newImplem);
         vm.prank(MORPHO_DAO);
         morphoOptimism.upgradeToAndCall(newImplem, hex"");
     }

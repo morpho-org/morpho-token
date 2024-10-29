@@ -58,12 +58,6 @@ abstract contract DelegationToken is IDelegation, ERC20PermitUpgradeable, Ownabl
     /// @notice Emitted when a delegatee's delegated voting power changes.
     event DelegatedVotingPowerChanged(address indexed delegatee, uint256 oldVotes, uint256 newVotes);
 
-    /// @notice Emitted whenever tokens are minted for an account.
-    event Mint(address indexed account, uint256 amount);
-
-    /// @notice Emitted whenever tokens are burned from an account.
-    event Burn(address indexed account, uint256 amount);
-
     /* CONSTRUCTOR */
 
     /// @dev Disables initializers for the implementation contract.

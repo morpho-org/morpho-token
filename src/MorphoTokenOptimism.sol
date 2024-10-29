@@ -70,13 +70,11 @@ contract MorphoTokenOptimism is DelegationToken, IOptimismMintableERC20 {
     /// @dev Allows the StandardBridge on this network to mint tokens.
     function mint(address to, uint256 amount) external onlyBridge {
         _mint(to, amount);
-        emit Mint(to, amount);
     }
 
     /// @dev Allows the StandardBridge on this network to burn tokens.
     function burn(address from, uint256 amount) external onlyBridge {
         _burn(from, amount);
-        emit Burn(from, amount);
     }
 
     /// @notice ERC165 interface check function.

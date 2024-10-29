@@ -124,11 +124,11 @@ contract MorphoTokenEthereumMigrationTest is BaseTest {
         legacyMorpho.approve(address(bundler), amount);
 
         vm.expectEmit(LEGACY_MORPHO);
-        emit IERC20.Transfer(migrater, address(bundler), amount);
+        emit IERC20.Transfer(migrator, address(bundler), amount);
         emit IERC20.Approval(address(bundler), address(wrapper), amount);
         emit IERC20.Transfer(address(bundler), address(wrapper), amount);
         vm.expectEmit(address(newMorpho));
-        emit IERC20.Transfer(address(wrapper), migrater, amount);
+        emit IERC20.Transfer(address(wrapper), migrator, amount);
         bundler.multicall(bundle);
         vm.stopPrank();
 
@@ -158,9 +158,9 @@ contract MorphoTokenEthereumMigrationTest is BaseTest {
         newMorpho.approve(address(wrapper), revertedAmount);
 
         vm.expectEmit(address(newMorpho));
-        emit IERC20.Transfer(migrater, address(wrapper), revertedAmount);
+        emit IERC20.Transfer(migrator, address(wrapper), revertedAmount);
         vm.expectEmit(LEGACY_MORPHO);
-        emit IERC20.Transfer(address(wrapper), migrater, revertedAmount);
+        emit IERC20.Transfer(address(wrapper), migrator, revertedAmount);
         wrapper.withdrawTo(migrator, revertedAmount);
         vm.stopPrank();
 

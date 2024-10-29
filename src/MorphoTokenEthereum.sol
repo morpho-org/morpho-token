@@ -5,7 +5,7 @@ import {DelegationToken} from "./DelegationToken.sol";
 
 /// @title MorphoTokenEthereum
 /// @author Morpho Association
-/// @custom:contact security@morpho.org
+/// @custom:security-contact security@morpho.org
 /// @notice The Morpho token contract for Ethereum.
 contract MorphoTokenEthereum is DelegationToken {
     /* CONSTANTS */

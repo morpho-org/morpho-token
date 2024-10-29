@@ -21,7 +21,7 @@ The new Morpho token does not have role-based permission of functions.
 ### Burning tokens
 
 In the legacy Morpho token, it was possible to transfer tokens to the zero address.
-This is no longer possible in the new Morpho token, but it's possible for approved users to burn tokens by calling the `burn` function.
+This is no longer possible in the new Morpho token, but it's possible for users to burn tokens by calling the `burn` function.
 
 ## Migration
 

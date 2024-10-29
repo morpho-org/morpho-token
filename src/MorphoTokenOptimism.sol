@@ -5,7 +5,7 @@ import {IOptimismMintableERC20} from "./interfaces/IOptimismMintableERC20.sol";
 import {IERC165} from
     "../lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/utils/introspection/IERC165.sol";
 
-import {DelegationToken} from "./DelegationToken.sol";
+import {DelegationToken} from "./abstracts/DelegationToken.sol";
 
 /// @title MorphoTokenOptimism
 /// @author Morpho Association

@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 import {BaseTest} from "./helpers/BaseTest.sol";
 import {SigUtils} from "./helpers/SigUtils.sol";
 import {MorphoTokenEthereum} from "../src/MorphoTokenEthereum.sol";
-import {DelegationToken} from "../src/DelegationToken.sol";
+import {DelegationToken} from "../src/abstracts/DelegationToken.sol";
 import {IERC20Errors} from
     "../lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/interfaces/draft-IERC6093.sol";
 import {OwnableUpgradeable} from "../lib/openzeppelin-contracts-upgradeable/contracts/access/OwnableUpgradeable.sol";

@@ -2,7 +2,7 @@
 pragma solidity ^0.8.0;
 
 import {Test, console} from "../lib/forge-std/src/Test.sol";
-import {DelegationToken} from "../src/DelegationToken.sol";
+import {DelegationToken} from "../src/abstracts/DelegationToken.sol";
 
 contract DelegationTokenInternalTest is Test, DelegationToken {
     uint256 internal constant MAX_TEST_AMOUNT = 1e28;

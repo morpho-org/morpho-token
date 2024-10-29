@@ -25,5 +25,5 @@ interface IDelegation {
 
     function delegate(address delegatee) external;
 
-    function delegateWithSig(Delegation memory delegation, Signature calldata signature) external;
+    function delegateWithSig(Delegation calldata delegation, Signature calldata signature) external;
 }

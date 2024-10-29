@@ -138,7 +138,6 @@ abstract contract DelegationToken is IDelegation, ERC20PermitUpgradeable, Ownabl
     }
 
     /// @dev Moves voting power when tokens are transferred.
-    /// @dev Emits a {IDelegates-DelegateVotesChanged} event.
     function _update(address from, address to, uint256 value) internal virtual override {
         super._update(from, to, value);
         _moveDelegateVotes(delegatee(from), delegatee(to), value);

@@ -10,6 +10,8 @@ import {ECDSA} from
 import {Ownable2StepUpgradeable} from
     "../lib/openzeppelin-contracts-upgradeable/contracts/access/Ownable2StepUpgradeable.sol";
 import {UUPSUpgradeable} from "../lib/openzeppelin-contracts-upgradeable/contracts/proxy/utils/UUPSUpgradeable.sol";
+import {ERC1967Utils} from
+    "../lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/proxy/ERC1967/ERC1967Utils.sol";
 
 /// @title DelegationToken
 /// @author Morpho Association
@@ -89,6 +91,11 @@ abstract contract DelegationToken is IDelegation, ERC20PermitUpgradeable, Ownabl
     function delegationNonce(address account) external view returns (uint256) {
         DelegationTokenStorage storage $ = _getDelegationTokenStorage();
         return $._delegationNonce[account];
+    }
+
+    /// @notice Returns the contract's current implementation address.
+    function getImplementation() external view returns (address) {
+        return ERC1967Utils.getImplementation();
     }
 
     /* DELEGATE */

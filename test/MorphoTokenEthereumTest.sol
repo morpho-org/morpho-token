@@ -36,10 +36,14 @@ contract MorphoTokenEthereumTest is BaseTest {
     }
 
     function testUpgrade() public {
+        assertEq(newMorpho.getImplementation(), address(tokenImplem));
+
         address newImplem = address(new MorphoTokenEthereum());
 
         vm.prank(MORPHO_DAO);
         newMorpho.upgradeToAndCall(newImplem, hex"");
+
+        assertEq(newMorpho.getImplementation(), newImplem);
     }
 
     function testOwnDelegation(address delegator, uint256 amount) public {

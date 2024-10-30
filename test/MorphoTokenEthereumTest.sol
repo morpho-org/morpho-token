@@ -148,6 +148,7 @@ contract MorphoTokenEthereumTest is BaseTest {
 
         vm.expectEmit(address(newMorpho));
         emit DelegationToken.DelegateeChanged(delegator, address(0), delegation.delegatee);
+        vm.expectEmit(address(newMorpho));
         emit DelegationToken.DelegatedVotingPowerChanged(delegation.delegatee, 0, amount);
         newMorpho.delegateWithSig(delegation.delegatee, delegation.nonce, delegation.expiry, sig.v, sig.r, sig.s);
 
@@ -204,12 +205,14 @@ contract MorphoTokenEthereumTest is BaseTest {
 
         vm.expectEmit(address(newMorpho));
         emit DelegationToken.DelegateeChanged(delegator1, address(0), delegatee);
+        vm.expectEmit(address(newMorpho));
         emit DelegationToken.DelegatedVotingPowerChanged(delegatee, 0, amount1);
         vm.prank(delegator1);
         newMorpho.delegate(delegatee);
 
         vm.expectEmit(address(newMorpho));
         emit DelegationToken.DelegateeChanged(delegator2, address(0), delegatee);
+        vm.expectEmit(address(newMorpho));
         emit DelegationToken.DelegatedVotingPowerChanged(delegatee, amount1, amount1 + amount2);
         vm.prank(delegator2);
         newMorpho.delegate(delegatee);
@@ -244,6 +247,7 @@ contract MorphoTokenEthereumTest is BaseTest {
 
         vm.expectEmit(address(newMorpho));
         emit DelegationToken.DelegatedVotingPowerChanged(delegatee1, initialAmount, initialAmount - transferredAmount);
+        vm.expectEmit(address(newMorpho));
         emit DelegationToken.DelegatedVotingPowerChanged(delegatee2, 0, transferredAmount);
         newMorpho.transfer(delegator2, transferredAmount);
         vm.stopPrank();

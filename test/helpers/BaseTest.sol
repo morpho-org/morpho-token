@@ -47,10 +47,4 @@ contract BaseTest is Test {
             }
         }
     }
-
-    struct Signature {
-        uint8 v;
-        bytes32 r;
-        bytes32 s;
-    }
 }

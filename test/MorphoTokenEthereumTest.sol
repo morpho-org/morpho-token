@@ -71,6 +71,7 @@ contract MorphoTokenEthereumTest is BaseTest {
 
         vm.expectEmit(address(newMorpho));
         emit DelegationToken.DelegateeChanged(delegator, address(0), delegatee);
+        vm.expectEmit(address(newMorpho));
         emit DelegationToken.DelegatedVotingPowerChanged(delegatee, 0, amount);
         vm.prank(delegator);
         newMorpho.delegate(delegatee);

@@ -98,7 +98,7 @@ contract MorphoTokenEthereumMigrationTest is BaseTest {
         emit IERC20.Transfer(MORPHO_DAO, address(bundler), daoTokenAmount);
         vm.expectEmit(LEGACY_MORPHO);
         emit IERC20.Approval(address(bundler), address(wrapper), daoTokenAmount);
-        vm.expectEmit(address(newMorpho));
+        vm.expectEmit(LEGACY_MORPHO);
         emit IERC20.Transfer(address(bundler), address(wrapper), daoTokenAmount);
         vm.expectEmit(address(newMorpho));
         emit IERC20.Transfer(address(wrapper), MORPHO_DAO, daoTokenAmount);
@@ -129,7 +129,7 @@ contract MorphoTokenEthereumMigrationTest is BaseTest {
         emit IERC20.Transfer(migrator, address(bundler), amount);
         vm.expectEmit(LEGACY_MORPHO);
         emit IERC20.Approval(address(bundler), address(wrapper), amount);
-        vm.expectEmit(address(newMorpho));
+        vm.expectEmit(LEGACY_MORPHO);
         emit IERC20.Transfer(address(bundler), address(wrapper), amount);
         vm.expectEmit(address(newMorpho));
         emit IERC20.Transfer(address(wrapper), migrator, amount);

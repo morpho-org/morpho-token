@@ -41,15 +41,10 @@ contract BaseTest is Test {
             vm.assume(addresses[i] != address(0));
             vm.assume(addresses[i] != MORPHO_DAO);
             vm.assume(addresses[i] != address(wrapper));
+            assumeNotPrecompile(addresses[i]);
             for (uint256 j = i + 1; j < addresses.length; j++) {
                 vm.assume(addresses[i] != addresses[j]);
             }
         }
-    }
-
-    struct Signature {
-        uint8 v;
-        bytes32 r;
-        bytes32 s;
     }
 }

@@ -7,6 +7,8 @@ import {MorphoTokenEthereum} from "../src/MorphoTokenEthereum.sol";
 import {DelegationToken} from "../src/DelegationToken.sol";
 import {IERC20Errors} from
     "../lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/interfaces/draft-IERC6093.sol";
+import {IERC20} from
+    "../lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 import {OwnableUpgradeable} from "../lib/openzeppelin-contracts-upgradeable/contracts/access/OwnableUpgradeable.sol";
 import {IERC1967} from
     "../lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/proxy/ERC1967/ERC1967Utils.sol";
@@ -266,7 +268,7 @@ contract MorphoTokenEthereumTest is BaseTest {
         uint256 initialAmount = newMorpho.balanceOf(to);
 
         vm.expectEmit(address(newMorpho));
-        emit DelegationToken.Mint(to, amount);
+        emit IERC20.Transfer(address(0), to, amount);
         vm.prank(MORPHO_DAO);
         newMorpho.mint(to, amount);
 
@@ -305,7 +307,7 @@ contract MorphoTokenEthereumTest is BaseTest {
         newMorpho.mint(from, amountMinted);
 
         vm.expectEmit(address(newMorpho));
-        emit DelegationToken.Burn(from, amountBurned);
+        emit IERC20.Transfer(from, address(0), amountBurned);
         vm.prank(from);
         newMorpho.burn(amountBurned);
 

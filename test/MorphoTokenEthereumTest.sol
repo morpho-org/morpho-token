@@ -7,7 +7,11 @@ import {MorphoTokenEthereum} from "../src/MorphoTokenEthereum.sol";
 import {DelegationToken} from "../src/DelegationToken.sol";
 import {IERC20Errors} from
     "../lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/interfaces/draft-IERC6093.sol";
+import {IERC20} from
+    "../lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 import {OwnableUpgradeable} from "../lib/openzeppelin-contracts-upgradeable/contracts/access/OwnableUpgradeable.sol";
+import {IERC1967} from
+    "../lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/proxy/ERC1967/ERC1967Utils.sol";
 import {ERC1967Proxy} from
     "../lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 
@@ -40,6 +44,8 @@ contract MorphoTokenEthereumTest is BaseTest {
 
         address newImplem = address(new MorphoTokenEthereum());
 
+        vm.expectEmit(address(newMorpho));
+        emit IERC1967.Upgraded(newImplem);
         vm.prank(MORPHO_DAO);
         newMorpho.upgradeToAndCall(newImplem, hex"");
 
@@ -69,6 +75,10 @@ contract MorphoTokenEthereumTest is BaseTest {
 
         deal(address(newMorpho), delegator, amount);
 
+        vm.expectEmit(address(newMorpho));
+        emit DelegationToken.DelegateeChanged(delegator, address(0), delegatee);
+        vm.expectEmit(address(newMorpho));
+        emit DelegationToken.DelegatedVotingPowerChanged(delegatee, 0, amount);
         vm.prank(delegator);
         newMorpho.delegate(delegatee);
 
@@ -140,6 +150,10 @@ contract MorphoTokenEthereumTest is BaseTest {
         bytes32 digest = SigUtils.getDelegationTypedDataHash(delegation, address(newMorpho));
         (sig.v, sig.r, sig.s) = vm.sign(privateKey, digest);
 
+        vm.expectEmit(address(newMorpho));
+        emit DelegationToken.DelegateeChanged(delegator, address(0), delegation.delegatee);
+        vm.expectEmit(address(newMorpho));
+        emit DelegationToken.DelegatedVotingPowerChanged(delegation.delegatee, 0, amount);
         newMorpho.delegateWithSig(delegation, sig);
 
         assertEq(newMorpho.delegatee(delegator), delegation.delegatee);
@@ -193,9 +207,17 @@ contract MorphoTokenEthereumTest is BaseTest {
         deal(address(newMorpho), delegator1, amount1);
         deal(address(newMorpho), delegator2, amount2);
 
+        vm.expectEmit(address(newMorpho));
+        emit DelegationToken.DelegateeChanged(delegator1, address(0), delegatee);
+        vm.expectEmit(address(newMorpho));
+        emit DelegationToken.DelegatedVotingPowerChanged(delegatee, 0, amount1);
         vm.prank(delegator1);
         newMorpho.delegate(delegatee);
 
+        vm.expectEmit(address(newMorpho));
+        emit DelegationToken.DelegateeChanged(delegator2, address(0), delegatee);
+        vm.expectEmit(address(newMorpho));
+        emit DelegationToken.DelegatedVotingPowerChanged(delegatee, amount1, amount1 + amount2);
         vm.prank(delegator2);
         newMorpho.delegate(delegatee);
 
@@ -226,6 +248,11 @@ contract MorphoTokenEthereumTest is BaseTest {
 
         vm.startPrank(delegator1);
         newMorpho.delegate(delegatee1);
+
+        vm.expectEmit(address(newMorpho));
+        emit DelegationToken.DelegatedVotingPowerChanged(delegatee1, initialAmount, initialAmount - transferredAmount);
+        vm.expectEmit(address(newMorpho));
+        emit DelegationToken.DelegatedVotingPowerChanged(delegatee2, 0, transferredAmount);
         newMorpho.transfer(delegator2, transferredAmount);
         vm.stopPrank();
 
@@ -240,6 +267,8 @@ contract MorphoTokenEthereumTest is BaseTest {
         uint256 initialTotalSupply = newMorpho.totalSupply();
         uint256 initialAmount = newMorpho.balanceOf(to);
 
+        vm.expectEmit(address(newMorpho));
+        emit IERC20.Transfer(address(0), to, amount);
         vm.prank(MORPHO_DAO);
         newMorpho.mint(to, amount);
 
@@ -277,6 +306,8 @@ contract MorphoTokenEthereumTest is BaseTest {
         vm.prank(MORPHO_DAO);
         newMorpho.mint(from, amountMinted);
 
+        vm.expectEmit(address(newMorpho));
+        emit IERC20.Transfer(from, address(0), amountBurned);
         vm.prank(from);
         newMorpho.burn(amountBurned);
 

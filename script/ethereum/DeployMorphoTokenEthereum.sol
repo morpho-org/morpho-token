@@ -22,6 +22,8 @@ contract DeployMorphoTokenEthereum is Script {
     address public newMorphoAddress;
 
     function run() public returns (address, address) {
+        vm.createSelectFork(vm.rpcUrl(network));
+
         vm.startBroadcast();
 
         // Deploy Token implementation

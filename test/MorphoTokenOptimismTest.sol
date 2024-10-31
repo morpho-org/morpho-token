@@ -100,7 +100,7 @@ contract MorphoTokenOptimismTest is Test {
         assertEq(morphoOptimism.balanceOf(to), 0, "balanceOf(account)");
 
         vm.expectEmit(address(morphoOptimism));
-        emit DelegationToken.Mint(to, amount);
+        emit IERC20.Transfer(address(0), to, amount);
         vm.prank(BRIDGE);
         morphoOptimism.mint(to, amount);
 
@@ -128,7 +128,7 @@ contract MorphoTokenOptimismTest is Test {
         morphoOptimism.mint(from, amountMinted);
 
         vm.expectEmit(address(morphoOptimism));
-        emit DelegationToken.Burn(from, amountBurned);
+        emit IERC20.Transfer(from, address(0), amount);
         morphoOptimism.burn(from, amountBurned);
         vm.stopPrank();
 

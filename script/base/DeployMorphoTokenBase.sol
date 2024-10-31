@@ -6,11 +6,11 @@ import "../ConfiguredScript.sol";
 import {MorphoTokenOptimism} from "../../src/MorphoTokenOptimism.sol";
 
 contract DeployMorphoTokenBase is ConfiguredScript {
-    address public constant REMOTE_TOKEN;
+    address public REMOTE_TOKEN;
     address public constant BRIDGE = 0x4200000000000000000000000000000000000010;
 
-    bytes32 public constant IMPLEMENTATION_SALT;
-    bytes32 public constant PROXY_SALT;
+    bytes32 public IMPLEMENTATION_SALT;
+    bytes32 public PROXY_SALT;
 
     address public implementationAddress;
     MorphoTokenOptimism public token;

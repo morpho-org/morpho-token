@@ -6,9 +6,9 @@ import "../ConfiguredScript.sol";
 import {MorphoTokenEthereum} from "../../src/MorphoTokenEthereum.sol";
 
 contract DeployMorphoTokenEthereum is ConfiguredScript {
-    bytes32 public constant IMPLEMENTATION_SALT;
-    bytes32 public constant PROXY_SALT;
-    bytes32 public constant WRAPPER_SALT;
+    bytes32 public IMPLEMENTATION_SALT;
+    bytes32 public PROXY_SALT;
+    bytes32 public WRAPPER_SALT;
 
     address public implementationAddress;
     MorphoTokenEthereum public token;

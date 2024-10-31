@@ -22,7 +22,7 @@ contract DeployMorphoTokenBase is Script {
     address public newMorphoAddress;
 
     function run() public returns (address) {
-        vm.createSelectFork(vm.rpcUrl(network));
+        vm.createSelectFork(vm.rpcUrl("base"));
 
         vm.startBroadcast();
 

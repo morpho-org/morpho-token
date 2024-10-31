@@ -130,7 +130,7 @@ contract MorphoTokenOptimismTest is Test {
         morphoOptimism.mint(from, amountMinted);
 
         vm.expectEmit(address(morphoOptimism));
-        emit IERC20.Transfer(from, address(0), amount);
+        emit IERC20.Transfer(from, address(0), amountBurned);
         morphoOptimism.burn(from, amountBurned);
         vm.stopPrank();
 

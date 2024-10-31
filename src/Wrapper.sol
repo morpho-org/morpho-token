@@ -6,7 +6,7 @@ import {IERC20} from
 
 /// @title Wrapper
 /// @author Morpho Association
-/// @custom:contact security@morpho.org
+/// @custom:security-contact security@morpho.org
 /// @notice The Wrapper contract to migrate from legacy MORPHO tokens.
 contract Wrapper {
     /* CONSTANTS */

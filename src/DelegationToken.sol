@@ -37,7 +37,7 @@ abstract contract DelegationToken is IDelegation, ERC20PermitUpgradeable, Ownabl
 
     /* STORAGE LAYOUT */
 
-    /// @custom:storage-location erc7201:DelegationToken
+    /// @custom:storage-location erc7201:morpho.storage.DelegationToken
     struct DelegationTokenStorage {
         mapping(address => address) _delegatee;
         mapping(address => uint256) _delegatedVotingPower;

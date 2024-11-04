@@ -78,7 +78,7 @@ rule mint(env e) {
             toVotingPowerBefore + amount > max_uint256 || e.msg.sender != currentContract.bridge;
     } else {
         // updates balance and totalSupply
-        assert e.msg.sender == owner();
+        assert e.msg.sender == currentContract.bridge;
         assert to_mathint(balanceOf(to)) == toBalanceBefore   + amount;
         assert to_mathint(totalSupply()) == totalSupplyBefore + amount;
 

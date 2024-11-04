@@ -17,15 +17,15 @@ jobs:
       matrix:
         conf:
           - DelegationEthereum
-	  - DelegationOptimism
+          - DelegationOptimism
           - ERC20Ethereum
-	  - ERC20Optimism
+          - ERC20Optimism
           - ImmutabilityEthereum
-	  - ImmutabilityOptimism
+          - ImmutabilityOptimism
           - MintBurnEthereum
-	  - MintBurnOptimism
+          - MintBurnOptimism
           - ReentrancyEthereum
-	  - ReentrancyOptimism
+          - ReentrancyOptimism
 
     steps:
       - uses: actions/checkout@v4

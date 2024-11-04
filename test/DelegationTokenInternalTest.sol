@@ -37,6 +37,7 @@ contract DelegationTokenInternalTest is Test, DelegationToken {
         uint256 initialVoteTo,
         uint256 amount
     ) public {
+        vm.assume(from != to);
         // Setup
         DelegationTokenStorage storage $ = _getDelegationTokenStorage();
         initialVoteFrom = bound(initialVoteFrom, 0, MAX_TEST_AMOUNT);

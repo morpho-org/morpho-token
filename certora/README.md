@@ -44,4 +44,4 @@ The [`certora/specs`](specs) folder contains the following files:
 - [`ERC20.spec`](specs/ERC20.spec) ensure that the Morpho token is compliant with the [ERC20](https://eips.ethereum.org/EIPS/eip-20) specification, we also check Morpho token `burn` and `mint` function in [`MintBurnEthereum`](specs/MintBurnEthereum.spec) and [`MintBurnOptimism`](specs/MintBurnOptimism.spec);
 - [`Delegation.spec`](specs/Delegation.spec) checks the logic for voting power delegation is correct.
 
-The [`certora/confs`](confs) folder contains a configuration file for each corresponding specification file for bot the Ethereum and the Optimism version.
+The [`certora/confs`](confs) folder contains a configuration file for each corresponding specification file for both the Ethereum and the Optimism version.

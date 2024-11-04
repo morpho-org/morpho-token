@@ -53,7 +53,6 @@ invariant totalSupplyIsSumOfBalances()
 invariant zeroAddressNoBalance()
     balanceOf(0) == 0;
 
-
 /*
 ┌─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
 │ Rules: only the token holder (or a permit) can increase allowance. The spender can decrease it by using it          │

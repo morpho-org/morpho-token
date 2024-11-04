@@ -19,7 +19,7 @@ rule onlyAuthorizedCanTransfer(env e, method f){
     assert (
         balanceAfter < balanceBefore
     ) => (
-        f.selector == sig:burn(uint256).selector ||
+        f.selector == sig:burn(address, uint256).selector ||
         e.msg.sender == account ||
         balanceBefore - balanceAfter <= to_mathint(allowanceBefore)
     );
@@ -45,8 +45,8 @@ rule noChangeTotalSupply(env e, method f) // filtered {
     f(e, args);
     uint256 totalSupplyAfter = totalSupply();
 
-    assert totalSupplyAfter > totalSupplyBefore => f.selector == sig:mint(address,uint256).selector || f.selector == sig:initialize(address, address).selector;
-    assert totalSupplyAfter < totalSupplyBefore => f.selector == sig:burn(uint256).selector;
+    assert totalSupplyAfter > totalSupplyBefore => f.selector == sig:mint(address, uint256).selector;
+    assert totalSupplyAfter < totalSupplyBefore => f.selector == sig:burn(address, uint256).selector;
 }
 
 /*
@@ -75,7 +75,7 @@ rule mint(env e) {
     // check outcome
     if (lastReverted) {
         assert e.msg.sender != owner() || to == 0 || totalSupplyBefore + amount > max_uint256 ||
-            toVotingPowerBefore + amount > max_uint256;
+            toVotingPowerBefore + amount > max_uint256 || e.msg.sender != currentContract.bridge;
     } else {
         // updates balance and totalSupply
         assert e.msg.sender == owner();
@@ -109,11 +109,12 @@ rule burn(env e) {
     uint256 totalSupplyBefore  = totalSupply();
 
     // run transaction
-    burn@withrevert(e, amount);
+    burn@withrevert(e, from,  amount);
 
     // check outcome
     if (lastReverted) {
-        assert e.msg.sender == 0x0 ||  fromBalanceBefore < amount || fromVotingPowerBefore < amount ;
+           assert e.msg.sender == 0x0 ||  fromBalanceBefore < amount || fromVotingPowerBefore < amount
+               || e.msg.sender != currentContract.bridge;
     } else {
         // updates balance and totalSupply
         assert to_mathint(balanceOf(from)) == fromBalanceBefore - amount;

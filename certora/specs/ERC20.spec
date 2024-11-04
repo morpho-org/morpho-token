@@ -53,30 +53,6 @@ invariant totalSupplyIsSumOfBalances()
 invariant zeroAddressNoBalance()
     balanceOf(0) == 0;
 
-/*
-┌─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
-│ Rules: only the token holder or an approved third party can reduce an account's balance                             │
-└─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
-*/
-rule onlyAuthorizedCanTransfer(env e, method f){
-    requireInvariant totalSupplyIsSumOfBalances();
-
-    calldataarg args;
-    address account;
-
-    uint256 allowanceBefore = allowance(account, e.msg.sender);
-    uint256 balanceBefore   = balanceOf(account);
-    f(e, args);
-    uint256 balanceAfter    = balanceOf(account);
-
-    assert (
-        balanceAfter < balanceBefore
-    ) => (
-        f.selector == sig:burn(uint256).selector ||
-        e.msg.sender == account ||
-        balanceBefore - balanceAfter <= to_mathint(allowanceBefore)
-    );
-}
 
 /*
 ┌─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐

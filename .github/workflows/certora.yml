@@ -19,7 +19,7 @@ jobs:
           - DelegationEthereum
           - ERC20Ethereum
           - ImmutabilityEthereum
-          - MintAndBurnEthereum
+          - MintBurnEthereum
           - ReentrancyEthereum
 
     steps:

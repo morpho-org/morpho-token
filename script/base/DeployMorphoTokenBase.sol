@@ -10,8 +10,10 @@ import {ERC1967Proxy} from
 
 contract DeployMorphoTokenBase is Script {
     address public constant MORPHO_DAO = 0xcBa28b38103307Ec8dA98377ffF9816C164f9AFa;
-    address public REMOTE_TOKEN;
+    address public REMOTE_TOKEN = 0x12Ec7dF395E8B974537006Cf3DF8b8fFE5C0D41C;
     address public constant BRIDGE = 0x4200000000000000000000000000000000000010;
+
+    address constant DEPLOYER = 0x937Ce2d6c488b361825D2DB5e8A70e26d48afEd5;
 
     bytes32 public IMPLEMENTATION_SALT;
     bytes32 public PROXY_SALT;
@@ -23,7 +25,7 @@ contract DeployMorphoTokenBase is Script {
     function run() public returns (address) {
         vm.createSelectFork(vm.rpcUrl("base"));
 
-        vm.startBroadcast();
+        vm.startBroadcast(DEPLOYER);
 
         // Deploy Token implementation
         tokenImplementation = address(new MorphoTokenOptimism{salt: IMPLEMENTATION_SALT}(REMOTE_TOKEN, BRIDGE));

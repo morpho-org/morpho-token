@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 pragma solidity ^0.8.0;
 
-import {Test} from "../../lib/forge-std/src/Test.sol";
+import {Test, console} from "../../lib/forge-std/src/Test.sol";
 
 import {MorphoTokenEthereum} from "../../src/MorphoTokenEthereum.sol";
 import {Wrapper} from "../../src/Wrapper.sol";
@@ -19,7 +19,7 @@ contract EthereumDeploymentTest is DeployMorphoTokenEthereum, Test {
         (tokenAddress, wrapperAddress) = run();
     }
 
-    function testSupply() public {
+    function testSupply() public view {
         assertEq(IERC20(tokenAddress).totalSupply(), 1_000_000_000e18);
         assertEq(IERC20(tokenAddress).balanceOf(wrapperAddress), 1_000_000_000e18);
     }

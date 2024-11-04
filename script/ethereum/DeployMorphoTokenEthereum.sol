@@ -16,6 +16,8 @@ contract DeployMorphoTokenEthereum is Script {
     bytes32 public PROXY_SALT;
     bytes32 public WRAPPER_SALT;
 
+    address constant DEPLOYER = 0x937Ce2d6c488b361825D2DB5e8A70e26d48afEd5;
+
     address public tokenImplementation;
     MorphoTokenEthereum public token;
     address public wrapper;
@@ -24,7 +26,7 @@ contract DeployMorphoTokenEthereum is Script {
     function run() public returns (address, address) {
         vm.createSelectFork(vm.rpcUrl("ethereum"));
 
-        vm.startBroadcast();
+        vm.startBroadcast(DEPLOYER);
 
         // Deploy Token implementation
         tokenImplementation = address(new MorphoTokenEthereum{salt: IMPLEMENTATION_SALT}());

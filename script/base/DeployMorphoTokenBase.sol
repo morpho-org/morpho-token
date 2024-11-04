@@ -16,9 +16,8 @@ contract DeployMorphoTokenBase is Script {
     bytes32 public IMPLEMENTATION_SALT;
     bytes32 public PROXY_SALT;
 
-    address public implementationAddress;
+    address public tokenImplementation;
     MorphoTokenOptimism public token;
-    address public wrapperAddress;
     address public newMorphoAddress;
 
     function run() public returns (address) {
@@ -27,12 +26,12 @@ contract DeployMorphoTokenBase is Script {
         vm.startBroadcast();
 
         // Deploy Token implementation
-        implementationAddress = address(new MorphoTokenOptimism{salt: IMPLEMENTATION_SALT}(REMOTE_TOKEN, BRIDGE));
+        tokenImplementation = address(new MorphoTokenOptimism{salt: IMPLEMENTATION_SALT}(REMOTE_TOKEN, BRIDGE));
 
-        console.log("Deployed token implementation at", implementationAddress);
+        console.log("Deployed token implementation at", tokenImplementation);
 
         // Deploy Token proxy
-        token = MorphoTokenOptimism(address(new ERC1967Proxy{salt: PROXY_SALT}(implementationAddress, hex"")));
+        token = MorphoTokenOptimism(address(new ERC1967Proxy{salt: PROXY_SALT}(tokenImplementation, hex"")));
 
         console.log("Deployed token proxy at", address(token));
 

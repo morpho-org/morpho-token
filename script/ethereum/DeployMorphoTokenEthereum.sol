@@ -16,9 +16,9 @@ contract DeployMorphoTokenEthereum is Script {
     bytes32 public PROXY_SALT;
     bytes32 public WRAPPER_SALT;
 
-    address public implementationAddress;
+    address public tokenImplementation;
     MorphoTokenEthereum public token;
-    address public wrapperAddress;
+    address public wrapper;
     address public newMorphoAddress;
 
     function run() public returns (address, address) {
@@ -27,25 +27,25 @@ contract DeployMorphoTokenEthereum is Script {
         vm.startBroadcast();
 
         // Deploy Token implementation
-        implementationAddress = address(new MorphoTokenEthereum{salt: IMPLEMENTATION_SALT}());
+        tokenImplementation = address(new MorphoTokenEthereum{salt: IMPLEMENTATION_SALT}());
 
-        console.log("Deployed token implementation at", implementationAddress);
+        console.log("Deployed token implementation at", tokenImplementation);
 
         // Deploy Token proxy
-        token = MorphoTokenEthereum(address(new ERC1967Proxy{salt: PROXY_SALT}(implementationAddress, hex"")));
+        token = MorphoTokenEthereum(address(new ERC1967Proxy{salt: PROXY_SALT}(tokenImplementation, hex"")));
 
         console.log("Deployed token proxy at", address(token));
 
         // Deploy Wrapper
-        wrapperAddress = address(new Wrapper{salt: WRAPPER_SALT}(address(token)));
+        wrapper = address(new Wrapper{salt: WRAPPER_SALT}(address(token)));
 
-        console.log("Deployed wrapper at", wrapperAddress);
+        console.log("Deployed wrapper at", wrapper);
 
         // Initialize Token
-        token.initialize(MORPHO_DAO, wrapperAddress);
+        token.initialize(MORPHO_DAO, wrapper);
 
         vm.stopBroadcast();
 
-        return (address(token), wrapperAddress);
+        return (address(token), wrapper);
     }
 }

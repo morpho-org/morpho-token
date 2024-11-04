@@ -19,7 +19,7 @@ contract EthereumDeploymentTest is DeployMorphoTokenEthereum, Test {
         (tokenAddress, wrapperAddress) = run();
     }
 
-    function testAssertions() public {
+    function testSupply() public {
         assertEq(IERC20(tokenAddress).totalSupply(), 1_000_000_000e18);
         assertEq(IERC20(tokenAddress).balanceOf(wrapperAddress), 1_000_000_000e18);
     }

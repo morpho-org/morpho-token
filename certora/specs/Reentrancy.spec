@@ -21,7 +21,7 @@ hook CALL(uint g, address addr, uint value, uint argsOffset, uint argsLength, ui
         hasCallAfterAccessingStorage = hasAccessedStorage;
 }
 
-// Check that no function is accessing storage, then making an external CALL other than to the IRM, and accessing storage again.
+// Check that no function is accessing storage, then making an external CALL and accessing storage again.
 rule reentrancySafe(method f, env e, calldataarg data) {
     // Set up the initial state.
     require !hasAccessedStorage && !hasCallAfterAccessingStorage && !hasReentrancyUnsafeCall;

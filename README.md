@@ -37,6 +37,10 @@ During contract initialization, 1 billion tokens will be minted for the `Wrapper
 Any legacy token holder will then be able to migrate their tokens provided that the migration amount is approved for the wrapper.
 Migrated legacy tokens may be recovered in order to revert a migration.
 
+## Audits
+
+All audits are stored in the audits' folder.
+
 ## Getting started
 
 ### Install dependencies

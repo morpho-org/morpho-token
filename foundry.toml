@@ -4,6 +4,7 @@ out = "out"
 libs = ["lib"]
 via-ir = true
 optimizer_runs = 999999
+evm_version = "cancun"
 
 [profile.default.fuzz]
 runs = 256

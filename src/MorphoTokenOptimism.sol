@@ -9,7 +9,7 @@ import {DelegationToken} from "./DelegationToken.sol";
 
 /// @title MorphoTokenOptimism
 /// @author Morpho Association
-/// @custom:contact security@morpho.org
+/// @custom:security-contact security@morpho.org
 /// @notice The Morpho token contract for Optimism networks.
 contract MorphoTokenOptimism is DelegationToken, IOptimismMintableERC20 {
     /* CONSTANTS */
@@ -62,24 +62,19 @@ contract MorphoTokenOptimism is DelegationToken, IOptimismMintableERC20 {
     /// @notice Initializes the contract.
     /// @param owner The new owner.
     function initialize(address owner) external initializer {
-        require(owner != address(0), ZeroAddress());
-
         __ERC20_init(NAME, SYMBOL);
         __ERC20Permit_init(NAME);
-
-        _transferOwnership(owner);
+        __Ownable_init(owner);
     }
 
     /// @dev Allows the StandardBridge on this network to mint tokens.
     function mint(address to, uint256 amount) external onlyBridge {
         _mint(to, amount);
-        emit Mint(to, amount);
     }
 
     /// @dev Allows the StandardBridge on this network to burn tokens.
     function burn(address from, uint256 amount) external onlyBridge {
         _burn(from, amount);
-        emit Burn(from, amount);
     }
 
     /// @notice ERC165 interface check function.

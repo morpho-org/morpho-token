@@ -6,7 +6,7 @@ via-ir = true
 optimizer_runs = 999999
 
 [profile.default.fuzz]
-runs = 32
+runs = 256
 
 [profile.default.fmt]
 wrap_comments = true

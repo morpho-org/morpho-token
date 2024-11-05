@@ -93,6 +93,15 @@ contract MorphoTokenEthereumMigrationTest is BaseTest {
 
         vm.startPrank(MORPHO_DAO);
         legacyMorpho.approve(address(bundler), daoTokenAmount);
+
+        vm.expectEmit(LEGACY_MORPHO);
+        emit IERC20.Transfer(MORPHO_DAO, address(bundler), daoTokenAmount);
+        vm.expectEmit(LEGACY_MORPHO);
+        emit IERC20.Approval(address(bundler), address(wrapper), type(uint256).max);
+        vm.expectEmit(LEGACY_MORPHO);
+        emit IERC20.Transfer(address(bundler), address(wrapper), daoTokenAmount);
+        vm.expectEmit(address(newMorpho));
+        emit IERC20.Transfer(address(wrapper), MORPHO_DAO, daoTokenAmount);
         bundler.multicall(bundle);
         vm.stopPrank();
 
@@ -115,6 +124,15 @@ contract MorphoTokenEthereumMigrationTest is BaseTest {
 
         vm.startPrank(migrator);
         legacyMorpho.approve(address(bundler), amount);
+
+        vm.expectEmit(LEGACY_MORPHO);
+        emit IERC20.Transfer(migrator, address(bundler), amount);
+        vm.expectEmit(LEGACY_MORPHO);
+        emit IERC20.Approval(address(bundler), address(wrapper), type(uint256).max);
+        vm.expectEmit(LEGACY_MORPHO);
+        emit IERC20.Transfer(address(bundler), address(wrapper), amount);
+        vm.expectEmit(address(newMorpho));
+        emit IERC20.Transfer(address(wrapper), migrator, amount);
         bundler.multicall(bundle);
         vm.stopPrank();
 
@@ -126,7 +144,9 @@ contract MorphoTokenEthereumMigrationTest is BaseTest {
 
     function testRevertMigration(address migrator, uint256 migratedAmount, uint256 revertedAmount) public {
         vm.assume(migrator != address(0));
+        vm.assume(migrator != address(1));
         vm.assume(migrator != MORPHO_DAO);
+        vm.assume(migrator != address(wrapper));
         migratedAmount = bound(migratedAmount, MIN_TEST_AMOUNT, 1_000_000_000e18);
         revertedAmount = bound(revertedAmount, MIN_TEST_AMOUNT, migratedAmount);
 
@@ -142,6 +162,11 @@ contract MorphoTokenEthereumMigrationTest is BaseTest {
 
         vm.startPrank(migrator);
         newMorpho.approve(address(wrapper), revertedAmount);
+
+        vm.expectEmit(address(newMorpho));
+        emit IERC20.Transfer(migrator, address(wrapper), revertedAmount);
+        vm.expectEmit(LEGACY_MORPHO);
+        emit IERC20.Transfer(address(wrapper), migrator, revertedAmount);
         wrapper.withdrawTo(migrator, revertedAmount);
         vm.stopPrank();
 

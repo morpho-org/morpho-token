@@ -45,3 +45,5 @@ The [`certora/specs`](specs) folder contains the following files:
 - [`Delegation.spec`](specs/Delegation.spec) checks the logic for voting power delegation is correct.
 
 The [`certora/confs`](confs) folder contains a configuration file for each corresponding specification file for both the Ethereum and the Optimism version.
+
+The [`certora/helpers`](helpers) folder contains a harnesses to expose internal functions of the DelegationToken.

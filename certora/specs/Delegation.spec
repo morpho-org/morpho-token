@@ -5,7 +5,7 @@ methods {
     function _burnExternal(address, uint256) external envfree;
     function ERC20Upgradeable._burn(address account, uint256 value) internal
         => summaryBurn(account, value);
-    function DelegationTokenHarness._moveDelegateVotes(address from, address to, uint256 amount) internal
+    function DelegationToken._moveDelegateVotes(address from, address to, uint256 amount) internal
         => summaryMove(from, to, amount);
 }
 

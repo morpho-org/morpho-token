@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 pragma solidity ^0.8.27;
 
-import {IDelegation} from "./interfaces/IDelegation.sol";
+import {IDelegation, Signature, Delegation} from "./interfaces/IDelegation.sol";
 
 import {ERC20PermitUpgradeable} from
     "../lib/openzeppelin-contracts-upgradeable/contracts/token/ERC20/extensions/ERC20PermitUpgradeable.sol";
@@ -10,10 +10,12 @@ import {ECDSA} from
 import {Ownable2StepUpgradeable} from
     "../lib/openzeppelin-contracts-upgradeable/contracts/access/Ownable2StepUpgradeable.sol";
 import {UUPSUpgradeable} from "../lib/openzeppelin-contracts-upgradeable/contracts/proxy/utils/UUPSUpgradeable.sol";
+import {ERC1967Utils} from
+    "../lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/proxy/ERC1967/ERC1967Utils.sol";
 
 /// @title DelegationToken
 /// @author Morpho Association
-/// @custom:contact security@morpho.org
+/// @custom:security-contact security@morpho.org
 /// @dev Extension of ERC20 to support token delegation.
 ///
 /// This extension keeps track of the current voting power delegated to each account. Voting power can be delegated
@@ -29,13 +31,13 @@ abstract contract DelegationToken is IDelegation, ERC20PermitUpgradeable, Ownabl
     bytes32 internal constant DELEGATION_TYPEHASH =
         keccak256("Delegation(address delegatee,uint256 nonce,uint256 expiry)");
 
-    // keccak256(abi.encode(uint256(keccak256("DelegationToken")) - 1)) & ~bytes32(uint256(0xff))
-    bytes32 internal constant DelegationTokenStorageLocation =
-        0xd583ef41af40c9ecf9cd08176e1b50741710eaecf057b22e93a6b99fa47a6400;
+    // keccak256(abi.encode(uint256(keccak256("morpho.storage.DelegationToken")) - 1)) & ~bytes32(uint256(0xff))
+    bytes32 internal constant DELEGATION_TOKEN_STORAGE_LOCATION =
+        0x669be2f4ee1b0b5f3858e4135f31064efe8fa923b09bf21bf538f64f2c3e1100;
 
     /* STORAGE LAYOUT */
 
-    /// @custom:storage-location erc7201:DelegationToken
+    /// @custom:storage-location erc7201:morpho.storage.DelegationToken
     struct DelegationTokenStorage {
         mapping(address => address) _delegatee;
         mapping(address => uint256) _delegatedVotingPower;
@@ -45,7 +47,7 @@ abstract contract DelegationToken is IDelegation, ERC20PermitUpgradeable, Ownabl
     /* ERRORS */
 
     /// @notice The signature used has expired.
-    error DelegatesExpiredSignature(uint256 expiry);
+    error DelegatesExpiredSignature();
 
     /// @notice The delegation nonce used by the signer is not its current delegation nonce.
     error InvalidDelegationNonce();
@@ -57,12 +59,6 @@ abstract contract DelegationToken is IDelegation, ERC20PermitUpgradeable, Ownabl
 
     /// @notice Emitted when a delegatee's delegated voting power changes.
     event DelegatedVotingPowerChanged(address indexed delegatee, uint256 oldVotes, uint256 newVotes);
-
-    /// @notice Emitted whenever tokens are minted for an account.
-    event Mint(address indexed account, uint256 amount);
-
-    /// @notice Emitted whenever tokens are burned from an account.
-    event Burn(address indexed account, uint256 amount);
 
     /* CONSTRUCTOR */
 
@@ -91,6 +87,11 @@ abstract contract DelegationToken is IDelegation, ERC20PermitUpgradeable, Ownabl
         return $._delegationNonce[account];
     }
 
+    /// @notice Returns the contract's current implementation address.
+    function getImplementation() external view returns (address) {
+        return ERC1967Utils.getImplementation();
+    }
+
     /* DELEGATE */
 
     /// @notice Delegates the balance of the sender to `newDelegatee`.
@@ -104,18 +105,20 @@ abstract contract DelegationToken is IDelegation, ERC20PermitUpgradeable, Ownabl
     /// @notice Delegates the balance of the signer to `newDelegatee`.
     /// @dev Delegating to the zero address effectively removes the delegation, incidentally making transfers cheaper.
     /// @dev Delegating to the previous delegatee effectively revokes past signatures with the same nonce.
-    function delegateWithSig(address newDelegatee, uint256 nonce, uint256 expiry, uint8 v, bytes32 r, bytes32 s)
-        external
-    {
-        require(block.timestamp <= expiry, DelegatesExpiredSignature(expiry));
+    function delegateWithSig(Delegation calldata delegation, Signature calldata signature) external {
+        require(block.timestamp <= delegation.expiry, DelegatesExpiredSignature());
+
         address delegator = ECDSA.recover(
-            _hashTypedDataV4(keccak256(abi.encode(DELEGATION_TYPEHASH, newDelegatee, nonce, expiry))), v, r, s
+            _hashTypedDataV4(keccak256(abi.encode(DELEGATION_TYPEHASH, delegation))),
+            signature.v,
+            signature.r,
+            signature.s
         );
 
         DelegationTokenStorage storage $ = _getDelegationTokenStorage();
-        require(nonce == $._delegationNonce[delegator]++, InvalidDelegationNonce());
+        require(delegation.nonce == $._delegationNonce[delegator]++, InvalidDelegationNonce());
 
-        _delegate(delegator, newDelegatee);
+        _delegate(delegator, delegation.delegatee);
     }
 
     /* INTERNAL */
@@ -131,7 +134,6 @@ abstract contract DelegationToken is IDelegation, ERC20PermitUpgradeable, Ownabl
     }
 
     /// @dev Moves voting power when tokens are transferred.
-    /// @dev Emits a {IDelegates-DelegateVotesChanged} event.
     function _update(address from, address to, uint256 value) internal virtual override {
         super._update(from, to, value);
         _moveDelegateVotes(delegatee(from), delegatee(to), value);
@@ -159,7 +161,7 @@ abstract contract DelegationToken is IDelegation, ERC20PermitUpgradeable, Ownabl
     /// @dev Returns the DelegationTokenStorage struct.
     function _getDelegationTokenStorage() internal pure returns (DelegationTokenStorage storage $) {
         assembly {
-            $.slot := DelegationTokenStorageLocation
+            $.slot := DELEGATION_TOKEN_STORAGE_LOCATION
         }
     }
 

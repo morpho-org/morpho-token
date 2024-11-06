@@ -23,12 +23,7 @@ import {UUPSUpgradeable} from "lib/openzeppelin-contracts-upgradeable/contracts/
 ///
 /// By default, token balance does not account for voting power. This makes transfers cheaper. Whether an account
 /// has to self-delegate to vote depends on the voting contract implementation.
-abstract contract DelegationTokenHarness is
-    IDelegation,
-    ERC20PermitUpgradeable,
-    Ownable2StepUpgradeable,
-    UUPSUpgradeable
-{
+contract DelegationTokenHarness is IDelegation, ERC20PermitUpgradeable, Ownable2StepUpgradeable, UUPSUpgradeable {
     /* CONSTANTS */
 
     bytes32 internal constant DELEGATION_TYPEHASH =

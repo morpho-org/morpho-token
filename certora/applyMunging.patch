@@ -1,0 +1,44 @@
+diff -ruN MorphoTokenEthereum.sol MorphoTokenEthereum.sol
+--- MorphoTokenEthereum.sol	2024-11-06 18:57:11.000000000 +0100
++++ MorphoTokenEthereum.sol	2024-11-06 19:14:37.000000000 +0100
+@@ -1,13 +1,13 @@
+ // SPDX-License-Identifier: GPL-2.0-or-later
+ pragma solidity 0.8.27;
+ 
+-import {DelegationToken} from "./DelegationToken.sol";
++import {DelegationTokenHarness} from "../helpers/DelegationTokenHarness.sol";
+ 
+ /// @title MorphoTokenEthereum
+ /// @author Morpho Association
+ /// @custom:security-contact security@morpho.org
+ /// @notice The Morpho token contract for Ethereum.
+-contract MorphoTokenEthereum is DelegationToken {
++contract MorphoTokenEthereum is DelegationTokenHarness {
+     /* CONSTANTS */
+ 
+     /// @dev The name of the token.
+diff -ruN MorphoTokenOptimism.sol MorphoTokenOptimism.sol
+--- MorphoTokenOptimism.sol	2024-11-06 18:57:11.000000000 +0100
++++ MorphoTokenOptimism.sol	2024-11-06 19:15:24.000000000 +0100
+@@ -1,17 +1,17 @@
+ // SPDX-License-Identifier: GPL-2.0-or-later
+ pragma solidity 0.8.27;
+ 
+-import {IOptimismMintableERC20} from "./interfaces/IOptimismMintableERC20.sol";
++import {IOptimismMintableERC20} from "../../src/interfaces/IOptimismMintableERC20.sol";
+ import {IERC165} from
+-    "../lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/utils/introspection/IERC165.sol";
++    "../../lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/utils/introspection/IERC165.sol";
+ 
+-import {DelegationToken} from "./DelegationToken.sol";
++import {DelegationTokenHarness} from "../helpers/DelegationTokenHarness.sol";
+ 
+ /// @title MorphoTokenOptimism
+ /// @author Morpho Association
+ /// @custom:security-contact security@morpho.org
+ /// @notice The Morpho token contract for Optimism networks.
+-contract MorphoTokenOptimism is DelegationToken, IOptimismMintableERC20 {
++contract MorphoTokenOptimism is DelegationTokenHarness, IOptimismMintableERC20 {
+     /* CONSTANTS */
+ 
+     /// @dev The name of the token.

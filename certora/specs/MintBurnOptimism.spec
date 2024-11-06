@@ -5,7 +5,11 @@ import "Delegation.spec";
 │ Rules: only the token holder or an approved third party can reduce an account's balance                             │
 └─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
 */
-rule onlyAuthorizedCanTransfer(env e, method f){
+rule onlyAuthorizedCanTransfer(env e, method f)filtered {
+    f-> f.selector != sig:_moveDelegateVotesExternal(address,address,uint256).selector
+        && f.selector != sig:_burnExternal(address, uint256).selector
+        && f.selector != sig:upgradeToAndCall(address, bytes).selector
+} {
     requireInvariant totalSupplyIsSumOfBalances();
 
     calldataarg args;
@@ -30,13 +34,11 @@ rule onlyAuthorizedCanTransfer(env e, method f){
 │ Rules: only mint and burn can change total supply                                                                   │
 └─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
 */
-rule noChangeTotalSupply(env e, method f) // filtered {
-//     f -> f.selector != sig:nested_init_init().selector &&
-//          f.selector != sig:nested_init_reinit(uint64).selector &&
-//          f.selector != sig:nested_reinit_init(uint64).selector &&
-//          f.selector != sig:nested_reinit_reinit(uint64, uint64).selector
-// }
- {
+rule noChangeTotalSupply(env e, method f) filtered {
+    f-> f.selector != sig:_moveDelegateVotesExternal(address,address,uint256).selector
+        && f.selector != sig:_burnExternal(address, uint256).selector
+        && f.selector != sig:upgradeToAndCall(address, bytes).selector
+} {
     requireInvariant totalSupplyIsSumOfBalances();
 
     calldataarg args;

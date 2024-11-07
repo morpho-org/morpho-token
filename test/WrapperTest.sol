@@ -107,6 +107,7 @@ contract WrapperTest is BaseTest {
         // Unset initiator is address(1), so it can't use the bundler.
         vm.assume(migrator != address(1));
         vm.assume(migrator != MORPHO_DAO);
+        vm.assume(migrator != wrapper);
         amount = bound(amount, MIN_TEST_AMOUNT, 1_000_000_000e18);
 
         deal(address(legacyMorpho), migrator, amount);

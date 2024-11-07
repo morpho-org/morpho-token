@@ -9,31 +9,26 @@ import {EncodeLib} from "./helpers/libraries/EncodeLib.sol";
 import {IERC20} from
     "../lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 
-contract MorphoTokenEthereumMigrationTest is BaseTest {
+contract WrapperTest is BaseTest {
     address internal constant BUNDLER_ADDRESS = 0x4095F064B8d3c3548A3bebfd0Bbfd04750E30077;
     address internal constant LEGACY_MORPHO = 0x9994E35Db50125E0DF82e4c2dde62496CE330999;
 
-    IMulticall internal bundler;
-    IERC20 internal legacyMorpho;
+    IMulticall internal bundler = IMulticall(0x4095F064B8d3c3548A3bebfd0Bbfd04750E30077);
+    IERC20 internal legacyMorpho = IERC20(0x9994E35Db50125E0DF82e4c2dde62496CE330999);
 
     uint256 internal forkId;
 
     bytes[] internal bundle;
 
     function setUp() public virtual override {
+        super.setUp();
+
         _fork();
 
         vm.startPrank(MORPHO_DAO);
-        // Enable `transferFrom` on the legacy MORPHO token.
-        RolesAuthority(LEGACY_MORPHO).setPublicCapability(0x23b872dd, true);
-        // Enable `transfer` on the legacy MORPHO token.
-        RolesAuthority(LEGACY_MORPHO).setPublicCapability(0xa9059cbb, true);
+        RolesAuthority(LEGACY_MORPHO).setUserRole(address(wrapper), 0, true);
+        RolesAuthority(LEGACY_MORPHO).setUserRole(address(bundler), 0, true);
         vm.stopPrank();
-
-        bundler = IMulticall(BUNDLER_ADDRESS);
-        legacyMorpho = IERC20(LEGACY_MORPHO);
-
-        super.setUp();
     }
 
     function _fork() internal virtual {
@@ -185,4 +180,6 @@ contract MorphoTokenEthereumMigrationTest is BaseTest {
 
 interface RolesAuthority {
     function setPublicCapability(bytes4 functionSig, bool enabled) external;
+    function setUserRole(address user, uint8 role, bool enabled) external;
+    function setRoleCapability(uint8 role, bytes4 functionSig, bool enabled) external;
 }

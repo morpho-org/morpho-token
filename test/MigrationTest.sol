@@ -9,7 +9,11 @@ import {EncodeLib} from "./helpers/libraries/EncodeLib.sol";
 import {IERC20} from
     "../lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 
-contract WrapperTest is BaseTest {
+interface RolesAuthority {
+    function setUserRole(address user, uint8 role, bool enabled) external;
+}
+
+contract MigrationTest is BaseTest {
     IMulticall internal bundler = IMulticall(0x4095F064B8d3c3548A3bebfd0Bbfd04750E30077);
     IERC20 internal legacyMorpho = IERC20(0x9994E35Db50125E0DF82e4c2dde62496CE330999);
 
@@ -175,8 +179,4 @@ contract WrapperTest is BaseTest {
         );
         assertEq(newMorpho.balanceOf(migrator), migratedAmount - revertedAmount, "newMorpho.balanceOf(migrator)");
     }
-}
-
-interface RolesAuthority {
-    function setUserRole(address user, uint8 role, bool enabled) external;
 }

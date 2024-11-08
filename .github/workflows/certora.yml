@@ -22,6 +22,8 @@ jobs:
           - ERC20Optimism
           - ImmutabilityEthereum
           - ImmutabilityOptimism
+          - MintBurnEthereum
+          - MintBurnOptimism
           - ReentrancyEthereum
           - ReentrancyOptimism
 

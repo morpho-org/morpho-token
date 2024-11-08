@@ -177,7 +177,5 @@ contract WrapperTest is BaseTest {
 }
 
 interface RolesAuthority {
-    function setPublicCapability(bytes4 functionSig, bool enabled) external;
     function setUserRole(address user, uint8 role, bool enabled) external;
-    function setRoleCapability(uint8 role, bytes4 functionSig, bool enabled) external;
 }

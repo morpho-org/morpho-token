@@ -23,6 +23,7 @@ contract WrapperTest is BaseTest {
         _fork();
 
         vm.startPrank(MORPHO_DAO);
+        // The role 0 already has transfer capabilities.
         RolesAuthority(address(legacyMorpho)).setUserRole(address(wrapper), 0, true);
         RolesAuthority(address(legacyMorpho)).setUserRole(address(bundler), 0, true);
         vm.stopPrank();

@@ -6,11 +6,10 @@ import "Delegation.spec";
 └─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
 */
 rule onlyAuthorizedCanTransfer(env e, method f)filtered {
-    f-> f.selector != sig:_moveDelegateVotesExternal(address,address,uint256).selector
-        && f.selector != sig:_burnExternal(address, uint256).selector
-        && f.selector != sig:upgradeToAndCall(address, bytes).selector
+    f-> f.selector != sig:upgradeToAndCall(address, bytes).selector
 } {
     requireInvariant totalSupplyIsSumOfBalances();
+
 
     calldataarg args;
     address account;
@@ -35,9 +34,7 @@ rule onlyAuthorizedCanTransfer(env e, method f)filtered {
 └─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
 */
 rule noChangeTotalSupply(env e, method f) filtered {
-    f-> f.selector != sig:_moveDelegateVotesExternal(address,address,uint256).selector
-        && f.selector != sig:_burnExternal(address, uint256).selector
-        && f.selector != sig:upgradeToAndCall(address, bytes).selector
+    f-> f.selector != sig:upgradeToAndCall(address, bytes).selector
 } {
     requireInvariant totalSupplyIsSumOfBalances();
 
@@ -58,6 +55,7 @@ rule noChangeTotalSupply(env e, method f) filtered {
 */
 rule mint(env e) {
     requireInvariant totalSupplyIsSumOfBalances();
+    requireInvariant totalSupplyLTEqSumOfVotingPower();
     requireInvariant zeroAddressNoVotingPower();
     require nonpayable(e);
 
@@ -96,6 +94,7 @@ rule mint(env e) {
 */
 rule burn(env e) {
     requireInvariant totalSupplyIsSumOfBalances();
+    requireInvariant totalSupplyLTEqSumOfVotingPower();
     requireInvariant zeroAddressNoVotingPower();
     require nonpayable(e);
 

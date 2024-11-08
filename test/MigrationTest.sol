@@ -22,9 +22,9 @@ contract MigrationTest is BaseTest {
     bytes[] internal bundle;
 
     function setUp() public virtual override {
-        super.setUp();
-
         _fork();
+
+        super.setUp();
 
         vm.startPrank(MORPHO_DAO);
         // The role 0 already has transfer capabilities.

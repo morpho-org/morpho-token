@@ -11,14 +11,14 @@ import {DeploymentImplementation} from "../helpers/DeploymentImplementation.sol"
 
 contract DeployMorphoTokenBase is Script {
     address public constant MORPHO_DAO = 0xcBa28b38103307Ec8dA98377ffF9816C164f9AFa;
-    address public REMOTE_TOKEN = 0x12Ec7dF395E8B974537006Cf3DF8b8fFE5C0D41C;
+    address public constant REMOTE_TOKEN = 0x12Ec7dF395E8B974537006Cf3DF8b8fFE5C0D41C;
     address public constant BRIDGE = 0x4200000000000000000000000000000000000010;
-
-    address constant DEPLOYER = 0x937Ce2d6c488b361825D2DB5e8A70e26d48afEd5;
 
     bytes32 public DEPLOYMENT_IMPLEMENTATION_SALT;
     bytes32 public IMPLEMENTATION_SALT;
     bytes32 public PROXY_SALT;
+
+    address constant DEPLOYER = 0x937Ce2d6c488b361825D2DB5e8A70e26d48afEd5;
 
     address public deploymentImplementation;
     address public tokenImplementation;

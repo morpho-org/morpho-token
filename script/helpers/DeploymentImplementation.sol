@@ -7,6 +7,7 @@ import {UUPSUpgradeable} from "../../lib/openzeppelin-contracts-upgradeable/cont
 /// @author Morpho Association
 /// @custom:security-contact security@morpho.org
 /// Contract meant to be the implementation of an ERC1967Proxy at deployment.
+/// It is used to deploy all tokens with the same implentation and have the same address.
 contract DeploymentImplementation is UUPSUpgradeable {
     /// @inheritdoc UUPSUpgradeable
     function _authorizeUpgrade(address) internal override {}

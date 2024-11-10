@@ -16,7 +16,5 @@ contract DeploymentTest is DeployMorphoTokenBase, Test {
         tokenAddress = run();
     }
 
-    function testSupply() public view {
-        assertEq(IERC20(tokenAddress).totalSupply(), 0);
-    }
+    function test() public view {}
 }

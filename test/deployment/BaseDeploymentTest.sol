@@ -9,14 +9,14 @@ import {IERC20} from
     "../../lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 
 contract EthereumDeploymentTest is DeployMorphoTokenBase, Test {
-    address tokenAddress;
+    address token;
 
     function setUp() public virtual {
         // DEPLOYMENTS
-        tokenAddress = run();
+        token = run();
     }
 
-    function testSupply() public view {
-        assertEq(IERC20(tokenAddress).totalSupply(), 0);
+    function testDeployment() public view {
+        assertEq(IERC20(token).totalSupply(), 0);
     }
 }

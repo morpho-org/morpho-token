@@ -11,18 +11,17 @@ import {ERC1967Proxy} from
 
 contract DeployMorphoTokenEthereum is Script {
     address public constant MORPHO_DAO = 0xcBa28b38103307Ec8dA98377ffF9816C164f9AFa;
-    address public constant DEPLOYER = 0x937Ce2d6c488b361825D2DB5e8A70e26d48afEd5;
 
     function run() public returns (address, address) {
         vm.createSelectFork(vm.rpcUrl("ethereum"));
 
-        vm.startBroadcast(DEPLOYER);
+        vm.startBroadcast();
 
         // Deploy Token implementation
         address tokenImplementation = address(new MorphoTokenEthereum());
         console.log("Deployed token implementation at", tokenImplementation);
 
-        address expectedWrapper = vm.computeCreateAddress(DEPLOYER, vm.getNonce(DEPLOYER) + 1);
+        address expectedWrapper = vm.computeCreateAddress(msg.sender, vm.getNonce(msg.sender) + 1);
 
         // Deploy Token proxy
         address token = address(
@@ -37,6 +36,8 @@ contract DeployMorphoTokenEthereum is Script {
         // Deploy Wrapper
         address wrapper = address(new Wrapper(address(token)));
         console.log("Deployed wrapper at", wrapper);
+
+        require(wrapper == expectedWrapper, "wrapper != expectedWrapper");
 
         vm.stopBroadcast();
 

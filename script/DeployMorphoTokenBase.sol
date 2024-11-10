@@ -10,7 +10,7 @@ import {ERC1967Proxy} from
 
 contract DeployMorphoTokenBase is Script {
     address public constant MORPHO_DAO = 0xcBa28b38103307Ec8dA98377ffF9816C164f9AFa;
-    address public constant REMOTE_TOKEN = address(0); // TO UPDATE ONCE THE TOKEN IS DEPLOYED ON ETHEREUM.
+    address public constant REMOTE_TOKEN = 0x58D97B57BB95320F9a05dC918Aef65434969c2B2;
     address public constant BRIDGE = 0x4200000000000000000000000000000000000010;
 
     function run() public returns (address) {
@@ -21,8 +21,6 @@ contract DeployMorphoTokenBase is Script {
         // Deploy Token implementation
         address tokenImplementation = address(new MorphoTokenOptimism(REMOTE_TOKEN, BRIDGE));
         console.log("Deployed token implementation at", tokenImplementation);
-
-        require(REMOTE_TOKEN != address(0));
 
         // Deploy Token proxy and initialize it.
         address token = address(

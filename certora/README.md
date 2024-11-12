@@ -15,9 +15,8 @@ Please ensure that `CERTORAKEY` is set up in your environment.
 
 ## Overview
 
-These Morpho token contracts replace the legacy version and add support for delegation of voting power, upgradeability and cross-chain interactions.
-Due to the upgradeable nature of the new Morpho token, the contract isn't properly immutable.
-Instead, we verify that the implementation doesn't perform delegate calls.
+These Morpho token is an ERC20 token with support for delegation of voting power, upgradeability and cross-chain interactions.
+Despite the contract being upgradeable, we verify however that the implementation doesn't perform delegate calls, which implies that the implementation is immutable.
 
 Note: the compiled contracts may include loops related to handling strings from the EIP712, for this reason the verification is carried with the option `optimistic_loop` set to `true` in order to avoid related counterexamples.
 
@@ -31,6 +30,6 @@ This is checked in [`ExternalCalls.spec`](specs/ExternalCalls.spec).
 
 The [`certora/specs`](specs) folder contains the following files:
 
-- [`ExternalCalls.spec`](specs/Reentrancy.spec) checks that the Morpho token implementation are reentrancy safe by ensuring that no function is making and external call and, that the implementation is immutable because it doesn't perform any delegate call.
+- [`ExternalCalls.spec`](specs/Reentrancy.spec) checks that the Morpho token implementation is reentrancy safe by ensuring that no function is making and external calls and, that the implementation is immutable as it doesn't perform any delegate call.
 
 The [`certora/confs`](confs) folder contains a configuration file for each corresponding specification file for both the Ethereum and the Optimism version.

@@ -16,10 +16,8 @@ jobs:
 
       matrix:
         conf:
-          - ImmutabilityEthereum
-          - ImmutabilityOptimism
-          - ReentrancyEthereum
-          - ReentrancyOptimism
+          - ExternalCallsEthereum
+          - ExternalCallsOptimism
 
     steps:
       - uses: actions/checkout@v4

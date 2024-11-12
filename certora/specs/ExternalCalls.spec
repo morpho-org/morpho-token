@@ -22,7 +22,7 @@ hook DELEGATECALL(uint g, address addr, uint argsOffset, uint argsLength, uint r
 invariant reentrancySafe()
   !hasExternalCall;
 
-// Check that the contract makes no delegate call.
+// Check that the contract makes no delegate call, except during an upgrade when doing a setup call to the new implementation.
 invariant noDelegateCalls()
   !hasDelegateCall
   filtered {

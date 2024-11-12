@@ -4,10 +4,10 @@ diff -ruN DelegationToken.sol DelegationToken.sol
 @@ -1,17 +1,17 @@
  // SPDX-License-Identifier: GPL-2.0-or-later
  pragma solidity ^0.8.27;
- 
+
 -import {IDelegation, Signature, Delegation} from "./interfaces/IDelegation.sol";
 +import {IDelegation, Signature, Delegation} from "../../src/interfaces/IDelegation.sol";
- 
+
  import {ERC20PermitUpgradeable} from
 -    "../lib/openzeppelin-contracts-upgradeable/contracts/token/ERC20/extensions/ERC20PermitUpgradeable.sol";
 +    "../../lib/openzeppelin-contracts-upgradeable/contracts/token/ERC20/extensions/ERC20PermitUpgradeable.sol";
@@ -22,19 +22,20 @@ diff -ruN DelegationToken.sol DelegationToken.sol
  import {ERC1967Utils} from
 -    "../lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/proxy/ERC1967/ERC1967Utils.sol";
 +    "../../lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/proxy/ERC1967/ERC1967Utils.sol";
- 
+
  /// @title DelegationToken
  /// @author Morpho Association
-@@ -44,6 +44,8 @@
+@@ -44,6 +44,9 @@
          mapping(address => uint256) _delegationNonce;
      }
- 
+
++    // A ghost variable to track the theoretical voting power of address zero.
 +    uint256 _zeroVirtualVotingPower = 0;
 +
      /* ERRORS */
- 
+
      /// @notice The signature used has expired.
-@@ -148,12 +150,16 @@
+@@ -148,12 +151,16 @@
                  uint256 newValue = oldValue - amount;
                  $._delegatedVotingPower[from] = newValue;
                  emit DelegatedVotingPowerChanged(from, oldValue, newValue);
@@ -63,13 +64,13 @@ diff -ruN MorphoTokenEthereum.sol MorphoTokenEthereum.sol
 +        _zeroVirtualVotingPower = 1_000_000_000e18;
          _mint(wrapper, 1_000_000_000e18); // Mint 1B to the wrapper contract.
      }
- 
+
      /// @notice Mints tokens.
      function mint(address to, uint256 amount) external onlyOwner {
 +        _zeroVirtualVotingPower += amount;
          _mint(to, amount);
      }
- 
+
      /// @notice Burns sender's tokens.
      function burn(uint256 amount) external {
          _burn(_msgSender(), amount);
@@ -82,27 +83,27 @@ diff -ruN MorphoTokenOptimism.sol MorphoTokenOptimism.sol
 @@ -1,9 +1,9 @@
  // SPDX-License-Identifier: GPL-2.0-or-later
  pragma solidity 0.8.27;
- 
+
 -import {IOptimismMintableERC20} from "./interfaces/IOptimismMintableERC20.sol";
 +import {IOptimismMintableERC20} from "../../src/interfaces/IOptimismMintableERC20.sol";
  import {IERC165} from
 -    "../lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/utils/introspection/IERC165.sol";
 +    "../../lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/utils/introspection/IERC165.sol";
- 
+
  import {DelegationToken} from "./DelegationToken.sol";
- 
+
 @@ -69,12 +69,14 @@
- 
+
      /// @dev Allows the StandardBridge on this network to mint tokens.
      function mint(address to, uint256 amount) external onlyBridge {
 +        _zeroVirtualVotingPower += amount;
          _mint(to, amount);
      }
- 
+
      /// @dev Allows the StandardBridge on this network to burn tokens.
      function burn(address from, uint256 amount) external onlyBridge {
          _burn(from, amount);
 +        _zeroVirtualVotingPower -= amount;
      }
- 
+
      /// @notice ERC165 interface check function.

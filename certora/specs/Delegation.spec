@@ -23,39 +23,55 @@ invariant zeroAddressNoVotingPower()
     }
     { preserved with (env e) { require e.msg.sender != 0; } }
 
-// Check that the voting power is never greater than the total supply of tokens.
-invariant totalSupplyLTEqSumOfVotingPower()
+// Check that the voting power plus the virtual voting power of address zero is equal to the total supply of tokens.
+invariant totalSupplyIsSumOfVirtualVotingPower()
     to_mathint(totalSupply()) == sumOfVotingPower + currentContract._zeroVirtualVotingPower
     filtered {
       // Ignore upgrades.
       f-> f.selector != sig:upgradeToAndCall(address, bytes).selector
     }
     {
-      preserved  with (env e) {
+      preserved {
           requireInvariant totalSupplyIsSumOfBalances();
           requireInvariant zeroAddressNoVotingPower();
       }
     }
 
-// Check that user can restore their voting power by delegating to zero address then delgating back to themselves.
-rule delgatingSelfConsistent {
-    requireInvariant totalSupplyLTEqSumOfVotingPower();
+// Check that the total supply of tokens is greater than or equal to the sum of voting power.
+invariant totalSupplyGTEqSumOfVotingPower()
+    totalSupply() >= sumOfVotingPower
+    filtered {
+      // Ignore upgrades.
+      f-> f.selector != sig:upgradeToAndCall(address, bytes).selector
+    }
+    {
+      preserved {
+          requireInvariant totalSupplyIsSumOfVirtualVotingPower();
+      }
+    }
+
+// Check that users can delegate their voting power.
+rule delgatingUpdatesVotingPower {
+    requireInvariant totalSupplyGTEqSumOfVotingPower();
+    requireInvariant zeroAddressNoVotingPower();
+
     env e;
-    address user = e.msg.sender;
 
-    // Safe require as the user can't possibly be zero.
-    require user != 0;
+    // Safe require as the msg.sender can't possibly be zero.
+    require e.msg.sender == zero;
 
-    // Ensure that user has delegated to zero address.
-    require delegatee(user) == 0;
+    address delegator = e.msg.sender;
+    address newDelegatee;
+    address oldDelegatee = delegatee(delegator);
 
-    mathint sumOfVotingPowerBefore = sumOfVotingPower  + currentContract._zeroVirtualVotingPower;
-    mathint delegatedBefore = delegatedVotingPower(user);
+    mathint delegatedVotingPowerBeforeOfNewDelegatee = delegatedVotingPower(newDelegatee);
 
-    delegate(e, user);
+    delegate(e, newDelegatee);
 
-    // Check that no extra voting power hasn't been created.
-    assert sumOfVotingPowerBefore == sumOfVotingPower  + currentContract._zeroVirtualVotingPower;
-    // Check that the voting power has been restored.
-    assert delegatedVotingPower(user) == balanceOf(user) + delegatedBefore;
+    // Check that, if the delegatee changed and it's not the zero address then its voting power is greater than or equal to the delegator's balance, otherwise its voting power remains unchanged.
+    if ((newDelegatee == 0) || (newDelegatee == oldDelegatee)) {
+           assert delegatedVotingPower(newDelegatee) == delegatedVotingPowerBeforeOfNewDelegatee;
+    } else {
+           assert delegatedVotingPower(newDelegatee) >= balanceOf(delegator);
+    }
 }

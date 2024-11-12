@@ -1,3 +1,5 @@
+// This is spec is taken from the Open Zeppelin repositories at https://github.com/OpenZeppelin/openzeppelin-contracts/blob/448efeea6640bbbc09373f03fbc9c88e280147ba/certora/specs/ERC20.spec, and patched to support the DelegationToken.
+
 definition nonpayable(env e) returns bool = e.msg.value == 0;
 definition nonzerosender(env e) returns bool = e.msg.sender != 0;
 
@@ -13,7 +15,7 @@ methods {
     function delegatee(address)                    external returns address   envfree;
     function nonces(address)                       external returns (uint256) envfree;
     function DOMAIN_SEPARATOR()                    external returns (bytes32) envfree;
-    function upgradeToAndCall(address, bytes memory) internal => CONSTANT;
+    function upgradeToAndCall(address, bytes memory) internal => DELETE;
 }
 /*
 ┌─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐

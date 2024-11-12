@@ -18,10 +18,8 @@ jobs:
         conf:
           - ERC20Ethereum
           - ERC20Optimism
-          - ImmutabilityEthereum
-          - ImmutabilityOptimism
-          - ReentrancyEthereum
-          - ReentrancyOptimism
+          - ExternalCallsEthereum
+          - ExternalCallsOptimism
 
     steps:
       - uses: actions/checkout@v4

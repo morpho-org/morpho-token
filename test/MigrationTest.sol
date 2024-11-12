@@ -9,12 +9,13 @@ import {EncodeLib} from "./helpers/libraries/EncodeLib.sol";
 import {IERC20} from
     "../lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 
-contract MorphoTokenEthereumMigrationTest is BaseTest {
-    address internal constant BUNDLER_ADDRESS = 0x4095F064B8d3c3548A3bebfd0Bbfd04750E30077;
-    address internal constant LEGACY_MORPHO = 0x9994E35Db50125E0DF82e4c2dde62496CE330999;
+interface RolesAuthority {
+    function setUserRole(address user, uint8 role, bool enabled) external;
+}
 
-    IMulticall internal bundler;
-    IERC20 internal legacyMorpho;
+contract MigrationTest is BaseTest {
+    IMulticall internal bundler = IMulticall(0x4095F064B8d3c3548A3bebfd0Bbfd04750E30077);
+    IERC20 internal legacyMorpho = IERC20(0x9994E35Db50125E0DF82e4c2dde62496CE330999);
 
     uint256 internal forkId;
 
@@ -23,24 +24,20 @@ contract MorphoTokenEthereumMigrationTest is BaseTest {
     function setUp() public virtual override {
         _fork();
 
-        vm.startPrank(MORPHO_DAO);
-        // Enable `transferFrom` on the legacy MORPHO token.
-        RolesAuthority(LEGACY_MORPHO).setPublicCapability(0x23b872dd, true);
-        // Enable `transfer` on the legacy MORPHO token.
-        RolesAuthority(LEGACY_MORPHO).setPublicCapability(0xa9059cbb, true);
-        vm.stopPrank();
-
-        bundler = IMulticall(BUNDLER_ADDRESS);
-        legacyMorpho = IERC20(LEGACY_MORPHO);
-
         super.setUp();
+
+        vm.startPrank(MORPHO_DAO);
+        // The role 0 already has transfer capabilities.
+        RolesAuthority(address(legacyMorpho)).setUserRole(address(wrapper), 0, true);
+        RolesAuthority(address(legacyMorpho)).setUserRole(address(bundler), 0, true);
+        vm.stopPrank();
     }
 
     function _fork() internal virtual {
         string memory rpcUrl = vm.rpcUrl("ethereum");
 
         forkId = vm.createSelectFork(rpcUrl);
-        vm.chainId(1);
+        require(block.chainid == 1, "wrong chain");
     }
 
     function testDeployWrapperZeroAddress() public {
@@ -88,17 +85,17 @@ contract MorphoTokenEthereumMigrationTest is BaseTest {
     function testDAOMigration() public {
         uint256 daoTokenAmount = legacyMorpho.balanceOf(MORPHO_DAO);
 
-        bundle.push(EncodeLib._erc20TransferFrom(LEGACY_MORPHO, daoTokenAmount));
+        bundle.push(EncodeLib._erc20TransferFrom(address(legacyMorpho), daoTokenAmount));
         bundle.push(EncodeLib._erc20WrapperDepositFor(address(wrapper), daoTokenAmount));
 
         vm.startPrank(MORPHO_DAO);
         legacyMorpho.approve(address(bundler), daoTokenAmount);
 
-        vm.expectEmit(LEGACY_MORPHO);
+        vm.expectEmit(address(legacyMorpho));
         emit IERC20.Transfer(MORPHO_DAO, address(bundler), daoTokenAmount);
-        vm.expectEmit(LEGACY_MORPHO);
+        vm.expectEmit(address(legacyMorpho));
         emit IERC20.Approval(address(bundler), address(wrapper), type(uint256).max);
-        vm.expectEmit(LEGACY_MORPHO);
+        vm.expectEmit(address(legacyMorpho));
         emit IERC20.Transfer(address(bundler), address(wrapper), daoTokenAmount);
         vm.expectEmit(address(newMorpho));
         emit IERC20.Transfer(address(wrapper), MORPHO_DAO, daoTokenAmount);
@@ -115,21 +112,22 @@ contract MorphoTokenEthereumMigrationTest is BaseTest {
         // Unset initiator is address(1), so it can't use the bundler.
         vm.assume(migrator != address(1));
         vm.assume(migrator != MORPHO_DAO);
+        vm.assume(migrator != address(wrapper));
         amount = bound(amount, MIN_TEST_AMOUNT, 1_000_000_000e18);
 
-        deal(LEGACY_MORPHO, migrator, amount);
+        deal(address(legacyMorpho), migrator, amount);
 
-        bundle.push(EncodeLib._erc20TransferFrom(LEGACY_MORPHO, amount));
+        bundle.push(EncodeLib._erc20TransferFrom(address(legacyMorpho), amount));
         bundle.push(EncodeLib._erc20WrapperDepositFor(address(wrapper), amount));
 
         vm.startPrank(migrator);
         legacyMorpho.approve(address(bundler), amount);
 
-        vm.expectEmit(LEGACY_MORPHO);
+        vm.expectEmit(address(legacyMorpho));
         emit IERC20.Transfer(migrator, address(bundler), amount);
-        vm.expectEmit(LEGACY_MORPHO);
+        vm.expectEmit(address(legacyMorpho));
         emit IERC20.Approval(address(bundler), address(wrapper), type(uint256).max);
-        vm.expectEmit(LEGACY_MORPHO);
+        vm.expectEmit(address(legacyMorpho));
         emit IERC20.Transfer(address(bundler), address(wrapper), amount);
         vm.expectEmit(address(newMorpho));
         emit IERC20.Transfer(address(wrapper), migrator, amount);
@@ -150,9 +148,9 @@ contract MorphoTokenEthereumMigrationTest is BaseTest {
         migratedAmount = bound(migratedAmount, MIN_TEST_AMOUNT, 1_000_000_000e18);
         revertedAmount = bound(revertedAmount, MIN_TEST_AMOUNT, migratedAmount);
 
-        deal(LEGACY_MORPHO, migrator, migratedAmount);
+        deal(address(legacyMorpho), migrator, migratedAmount);
 
-        bundle.push(EncodeLib._erc20TransferFrom(LEGACY_MORPHO, migratedAmount));
+        bundle.push(EncodeLib._erc20TransferFrom(address(legacyMorpho), migratedAmount));
         bundle.push(EncodeLib._erc20WrapperDepositFor(address(wrapper), migratedAmount));
 
         vm.startPrank(migrator);
@@ -165,7 +163,7 @@ contract MorphoTokenEthereumMigrationTest is BaseTest {
 
         vm.expectEmit(address(newMorpho));
         emit IERC20.Transfer(migrator, address(wrapper), revertedAmount);
-        vm.expectEmit(LEGACY_MORPHO);
+        vm.expectEmit(address(legacyMorpho));
         emit IERC20.Transfer(address(wrapper), migrator, revertedAmount);
         wrapper.withdrawTo(migrator, revertedAmount);
         vm.stopPrank();
@@ -181,8 +179,4 @@ contract MorphoTokenEthereumMigrationTest is BaseTest {
         );
         assertEq(newMorpho.balanceOf(migrator), migratedAmount - revertedAmount, "newMorpho.balanceOf(migrator)");
     }
-}
-
-interface RolesAuthority {
-    function setPublicCapability(bytes4 functionSig, bool enabled) external;
 }

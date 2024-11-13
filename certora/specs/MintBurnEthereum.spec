@@ -5,7 +5,7 @@ import "Delegation.spec";
 │ Rules: only the token holder or an approved third party can reduce an account's balance                             │
 └─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
 */
-rule onlyAuthorizedCanTransfer(env e, method f)  filtered {
+rule onlyAuthorizedCanTransfer(env e, method f) filtered {
     f-> f.selector != sig:upgradeToAndCall(address, bytes).selector
 } {
     requireInvariant totalSupplyIsSumOfBalances();

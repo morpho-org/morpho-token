@@ -1,4 +1,5 @@
 // This is spec is taken from the Open Zeppelin repositories at https://github.com/OpenZeppelin/openzeppelin-contracts/blob/448efeea6640bbbc09373f03fbc9c88e280147ba/certora/specs/ERC20.spec, and patched to support the DelegationToken.
+// Note: the scope of this specification encompases only the implementation contract and not the interactions with the implementation contract and the proxy.
 
 definition nonpayable(env e) returns bool = e.msg.value == 0;
 definition nonzerosender(env e) returns bool = e.msg.sender != 0;
@@ -15,8 +16,9 @@ methods {
     function delegatee(address)                    external returns address   envfree;
     function nonces(address)                       external returns (uint256) envfree;
     function DOMAIN_SEPARATOR()                    external returns (bytes32) envfree;
-    function upgradeToAndCall(address, bytes memory) internal => DELETE;
+    function upgradeToAndCall(address, bytes) external => NONDET DELETE;
 }
+
 /*
 ┌─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
 │ Ghost & hooks: sum of all balances                                                                                  │
@@ -60,7 +62,7 @@ invariant zeroAddressNoBalance()
 │ Rules: only the token holder (or a permit) can increase allowance. The spender can decrease it by using it          │
 └─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
 */
-rule onlyHolderOfSpenderCanChangeAllowance(env e, method f){
+rule onlyHolderOrSpenderCanChangeAllowance(env e, method f){
     requireInvariant totalSupplyIsSumOfBalances();
 
     calldataarg args;

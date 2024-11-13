@@ -34,7 +34,7 @@ This is checked in [`ERC20.spec`](specs/ERC20.spec).
 
 The [`certora/specs`](specs) folder contains the following files:
 
-- [`ExternalCalls.spec`](specs/Reentrancy.spec) checks that the Morpho token implementation is reentrancy safe by ensuring that no function is making and external calls and, that the implementation is immutable as it doesn't perform any delegate call;
+- [`ExternalCalls.spec`](specs/ExternalCalls.spec) checks that the Morpho token implementation is reentrancy safe by ensuring that no function is making and external calls and, that the implementation is immutable as it doesn't perform any delegate call;
 - [`ERC20.spec`](specs/ERC20.spec) ensure that the Morpho token is compliant with the [ERC20](https://eips.ethereum.org/EIPS/eip-20) specification.
 
 

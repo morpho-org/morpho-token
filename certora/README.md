@@ -24,6 +24,10 @@ Note: the compiled contracts may include loops related to handling strings from 
 
 This is checked in [`ExternalCalls.spec`](specs/ExternalCalls.spec).
 
+### Reverts
+
+This is checks in [`RevertsERC20.spec`](specs/RevertsERC20.spec), [`RevertsMintBurnEthereum.spec`](specs/RevertsMintBurnEthereum.spec) and [`RevertsMintBurnOptimism.spec`](specs/RevertsMintBurnOptimism.spec).
+
 ## Verification architecture
 
 ### Folders and file structure
@@ -31,5 +35,6 @@ This is checked in [`ExternalCalls.spec`](specs/ExternalCalls.spec).
 The [`certora/specs`](specs) folder contains the following files:
 
 - [`ExternalCalls.spec`](specs/Reentrancy.spec) checks that the Morpho token implementation is reentrancy safe by ensuring that no function is making and external calls and, that the implementation is immutable as it doesn't perform any delegate call.
+- [`RevertsERC20.spec`](specs/RevertsERC20.spec), [`RevertsMintBurnEthereum.spec`](specs/RevertsMintBurnEthereum.spec) and [`RevertsMintBurnOptimism.spec`](specs/RevertsMintBurnOptimism.spec) check that conditions for reverts and inputs are correctly validated.
 
 The [`certora/confs`](confs) folder contains a configuration file for each corresponding specification file for both the Ethereum and the Optimism version.

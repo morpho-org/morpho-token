@@ -16,7 +16,7 @@ methods {
     function delegatee(address)                    external returns address   envfree;
     function nonces(address)                       external returns (uint256) envfree;
     function DOMAIN_SEPARATOR()                    external returns (bytes32) envfree;
-    function upgradeToAndCall(address, bytes) external => NONDET DELETE;
+    function upgradeToAndCall(address, bytes)      external => NONDET DELETE;
 }
 
 /*

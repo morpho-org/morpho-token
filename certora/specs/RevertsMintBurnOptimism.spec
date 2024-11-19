@@ -8,24 +8,17 @@ methods {
     function _._moveDelegateVotes(address, address, uint256) internal => CONSTANT;
 }
 
-// Check that minting to zero address or msg.sender is not bridge revert.
-rule mintReverts(env e, address to, uint256 amount) {
-    // Safe require as mint is a non-payable function.
-    require e.msg.value == 0;
-
-    require totalSupply() + amount <= max_uint256;
+// Check the revert conditions for the mint function.
+rule mintRevertConditions(env e, address to, uint256 amount) {
+    mathint totalSupplyBefore = totalSupply();
 
     mint@withrevert(e, to, amount);
-    assert   !(lastReverted) <=> e.msg.sender == currentContract.bridge && to != 0;
+    assert lastReverted <=> e.msg.sender != currentContract.bridge || to == 0 || e.msg.value != 0 || (totalSupplyBefore + amount) > max_uint256;
 }
 
-// Check that burnning from zero address, msg.sender is not bridge or too large amounts revert.
-rule burnReverts(env e, address from, uint256 amount) {
-    // Safe require as burn is a non-payable function.
-
+// Check the revert conditions for the burn function.
+rule burnRevertConditions(env e, address from, uint256 amount) {
     uint256 balanceOfFromBefore = balanceOf(from);
-    require e.msg.value == 0 ;
-
     burn@withrevert(e, from, amount);
-    assert !lastReverted <=> e.msg.sender == currentContract.bridge && from != 0 && balanceOfFromBefore >= amount;
+    assert lastReverted <=> e.msg.sender != currentContract.bridge || from == 0 || balanceOfFromBefore < amount ||  e.msg.value != 0;
 }

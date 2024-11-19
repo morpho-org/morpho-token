@@ -17,19 +17,11 @@ hook Sstore (slot 0x669be2f4ee1b0b5f3858e4135f31064efe8fa923b09bf21bf538f64f2c3e
 // Check that zero address has no voting power assuming that zero address can't make transactions.
 invariant zeroAddressNoVotingPower()
     delegatee(0x0) == 0x0 && delegatedVotingPower(0x0) == 0
-    filtered {
-      // Ignore upgrades.
-      f-> f.selector != sig:upgradeToAndCall(address, bytes).selector
-    }
     { preserved with (env e) { require e.msg.sender != 0; } }
 
 // Check that the voting power plus the virtual voting power of address zero is equal to the total supply of tokens.
 invariant totalSupplyIsSumOfVirtualVotingPower()
     to_mathint(totalSupply()) == sumOfVotingPower + currentContract._zeroVirtualVotingPower
-    filtered {
-      // Ignore upgrades.
-      f-> f.selector != sig:upgradeToAndCall(address, bytes).selector
-    }
     {
       preserved {
           requireInvariant totalSupplyIsSumOfBalances();
@@ -37,28 +29,22 @@ invariant totalSupplyIsSumOfVirtualVotingPower()
       }
     }
 
+function isTotalGTEqSumOfVotingPower() returns bool {
+    requireInvariant totalSupplyIsSumOfVirtualVotingPower();
+    return totalSupply() >= sumOfVotingPower;
+}
+
 // Check that the total supply of tokens is greater than or equal to the sum of voting power.
-invariant totalSupplyGTEqSumOfVotingPower()
-    totalSupply() >= sumOfVotingPower
-    filtered {
-      // Ignore upgrades.
-      f-> f.selector != sig:upgradeToAndCall(address, bytes).selector
-    }
-    {
-      preserved {
-          requireInvariant totalSupplyIsSumOfVirtualVotingPower();
-      }
-    }
+rule totalSupplyGTEqSumOfVotingPower {
+    assert isTotalGTEqSumOfVotingPower();
+}
 
 // Check that users can delegate their voting power.
-rule delgatingUpdatesVotingPower {
-    requireInvariant totalSupplyGTEqSumOfVotingPower();
+rule delegatingUpdatesVotingPower {
     requireInvariant zeroAddressNoVotingPower();
+    assert isTotalGTEqSumOfVotingPower();
 
     env e;
-
-    // Safe require as the msg.sender can't possibly be zero.
-    require e.msg.sender == zero;
 
     address delegator = e.msg.sender;
     address newDelegatee;
@@ -70,8 +56,8 @@ rule delgatingUpdatesVotingPower {
 
     // Check that, if the delegatee changed and it's not the zero address then its voting power is greater than or equal to the delegator's balance, otherwise its voting power remains unchanged.
     if ((newDelegatee == 0) || (newDelegatee == oldDelegatee)) {
-           assert delegatedVotingPower(newDelegatee) == delegatedVotingPowerBeforeOfNewDelegatee;
+        assert delegatedVotingPower(newDelegatee) == delegatedVotingPowerBeforeOfNewDelegatee;
     } else {
-           assert delegatedVotingPower(newDelegatee) >= balanceOf(delegator);
+        assert delegatedVotingPower(newDelegatee) >= balanceOf(delegator);
     }
 }

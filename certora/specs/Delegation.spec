@@ -19,8 +19,10 @@ invariant totalSupplyIsSumOfVirtualVotingPower()
     to_mathint(totalSupply()) == sumOfVotingPower + currentContract._zeroVirtualVotingPower
     {
       preserved {
+          // Safe requires because the proxy contract should be initialized right after construction.
           require totalSupply() == 0;
           require sumOfVotingPower == 0;
+
           requireInvariant totalSupplyIsSumOfBalances();
           requireInvariant zeroAddressNoVotingPower();
       }

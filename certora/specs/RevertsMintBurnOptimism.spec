@@ -13,7 +13,7 @@ rule mintRevertConditions(env e, address to, uint256 amount) {
     mathint totalSupplyBefore = totalSupply();
 
     mint@withrevert(e, to, amount);
-    assert lastReverted <=> e.msg.sender != currentContract.bridge || to == 0 || e.msg.value != 0 || (totalSupplyBefore + amount) > max_uint256;
+    assert lastReverted <=> e.msg.sender != currentContract.bridge || to == 0 || e.msg.value != 0 || totalSupplyBefore + amount > max_uint256;
 }
 
 // Check the revert conditions for the burn function.

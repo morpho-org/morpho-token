@@ -9,7 +9,7 @@ methods {
 }
 
 // Check the revert conditions for the transfer function.
-rule transferRevertConditions(env e, address to,uint256 amount) {
+rule transferRevertConditions(env e, address to, uint256 amount) {
     uint256 balanceOfSenderBefore = balanceOf(e.msg.sender);
 
     transfer@withrevert(e, to, amount);
@@ -17,7 +17,7 @@ rule transferRevertConditions(env e, address to,uint256 amount) {
 }
 
 // Check the revert conditions for the transferFrom function.
-rule transferFromRevertConditions(env e, address from, address to,uint256 amount) {
+rule transferFromRevertConditions(env e, address from, address to, uint256 amount) {
     uint256 allowanceOfSenderBefore = allowance(from, e.msg.sender);
     uint256 balanceOfFromBefore = balanceOf(from);
 

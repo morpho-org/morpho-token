@@ -16,6 +16,8 @@ jobs:
 
       matrix:
         conf:
+          - ERC20Ethereum
+          - ERC20Optimism
           - ExternalCallsEthereum
           - ExternalCallsOptimism
           - RevertsERC20Ethereum

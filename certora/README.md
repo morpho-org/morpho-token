@@ -24,6 +24,10 @@ Note: the compiled contracts may include loops related to handling strings from 
 
 This is checked in [`ExternalCalls.spec`](specs/ExternalCalls.spec).
 
+### ERC20 Compliance
+
+This is checked in [`ERC20.spec`](specs/ERC20.spec).
+
 ### Reverts
 
 This is checks in [`RevertsERC20.spec`](specs/RevertsERC20.spec), [`RevertsMintBurnEthereum.spec`](specs/RevertsMintBurnEthereum.spec) and [`RevertsMintBurnOptimism.spec`](specs/RevertsMintBurnOptimism.spec).
@@ -34,7 +38,8 @@ This is checks in [`RevertsERC20.spec`](specs/RevertsERC20.spec), [`RevertsMintB
 
 The [`certora/specs`](specs) folder contains the following files:
 
-- [`ExternalCalls.spec`](specs/Reentrancy.spec) checks that the Morpho token implementation is reentrancy safe by ensuring that no function is making and external calls and, that the implementation is immutable as it doesn't perform any delegate call.
+- [`ExternalCalls.spec`](specs/ExternalCalls.spec) checks that the Morpho token implementation is reentrancy safe by ensuring that no function is making and external calls and, that the implementation is immutable as it doesn't perform any delegate call;
+- [`ERC20.spec`](specs/ERC20.spec) ensure that the Morpho token is compliant with the [ERC20](https://eips.ethereum.org/EIPS/eip-20) specification;
 - [`RevertsERC20.spec`](specs/RevertsERC20.spec), [`RevertsMintBurnEthereum.spec`](specs/RevertsMintBurnEthereum.spec) and [`RevertsMintBurnOptimism.spec`](specs/RevertsMintBurnOptimism.spec) check that conditions for reverts and inputs are correctly validated.
 
 The [`certora/confs`](confs) folder contains a configuration file for each corresponding specification file for both the Ethereum and the Optimism version.

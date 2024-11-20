@@ -28,20 +28,20 @@ invariant totalSupplyIsSumOfVirtualVotingPower()
       }
     }
 
-function isTotalGTEqSumOfVotingPower() returns bool {
+function isTotalSupplyGTEqSumOfVotingPower() returns bool {
     requireInvariant totalSupplyIsSumOfVirtualVotingPower();
     return totalSupply() >= sumOfVotingPower;
 }
 
 // Check that the total supply of tokens is greater than or equal to the sum of voting power.
 rule totalSupplyGTEqSumOfVotingPower {
-    assert isTotalGTEqSumOfVotingPower();
+    assert isTotalSupplyGTEqSumOfVotingPower();
 }
 
 // Check that users can delegate their voting power.
 rule delegatingUpdatesVotingPower(env e, address newDelegatee) {
     requireInvariant zeroAddressNoVotingPower();
-    assert isTotalGTEqSumOfVotingPower();
+    assert isTotalSupplyGTEqSumOfVotingPower();
 
     address oldDelegatee = delegatee(e.msg.sender);
 

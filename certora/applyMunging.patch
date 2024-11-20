@@ -1,26 +1,6 @@
 diff -ruN DelegationToken.sol DelegationToken.sol
 --- DelegationToken.sol	2024-11-14 11:00:56.877231237 +0100
-+++ DelegationToken.sol	2024-11-20 16:18:55.750677310 +0100
-@@ -4,14 +4,14 @@
- import {IDelegation, Signature, Delegation} from "./interfaces/IDelegation.sol";
- 
- import {ERC20PermitUpgradeable} from
--    "../lib/openzeppelin-contracts-upgradeable/contracts/token/ERC20/extensions/ERC20PermitUpgradeable.sol";
-+    "../../lib/openzeppelin-contracts-upgradeable/contracts/token/ERC20/extensions/ERC20PermitUpgradeable.sol";
- import {ECDSA} from
--    "../lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/utils/cryptography/ECDSA.sol";
-+    "../../lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/utils/cryptography/ECDSA.sol";
- import {Ownable2StepUpgradeable} from
--    "../lib/openzeppelin-contracts-upgradeable/contracts/access/Ownable2StepUpgradeable.sol";
--import {UUPSUpgradeable} from "../lib/openzeppelin-contracts-upgradeable/contracts/proxy/utils/UUPSUpgradeable.sol";
-+    "../../lib/openzeppelin-contracts-upgradeable/contracts/access/Ownable2StepUpgradeable.sol";
-+import {UUPSUpgradeable} from "../../lib/openzeppelin-contracts-upgradeable/contracts/proxy/utils/UUPSUpgradeable.sol";
- import {ERC1967Utils} from
--    "../lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/proxy/ERC1967/ERC1967Utils.sol";
-+    "../../lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/proxy/ERC1967/ERC1967Utils.sol";
- 
- /// @title DelegationToken
- /// @author Morpho Association
++++ DelegationToken.sol	2024-11-20 16:25:54.293242988 +0100
 @@ -44,6 +44,9 @@
          mapping(address => uint256) _delegationNonce;
      }
@@ -50,7 +30,7 @@ diff -ruN DelegationToken.sol DelegationToken.sol
      }
 diff -ruN MorphoTokenEthereum.sol MorphoTokenEthereum.sol
 --- MorphoTokenEthereum.sol	2024-11-14 11:00:56.877231237 +0100
-+++ MorphoTokenEthereum.sol	2024-11-20 13:29:38.986459880 +0100
++++ MorphoTokenEthereum.sol	2024-11-20 16:25:01.589657195 +0100
 @@ -26,16 +26,19 @@
          __ERC20Permit_init(NAME);
          __Ownable_init(owner);
@@ -73,16 +53,7 @@ diff -ruN MorphoTokenEthereum.sol MorphoTokenEthereum.sol
  }
 diff -ruN MorphoTokenOptimism.sol MorphoTokenOptimism.sol
 --- MorphoTokenOptimism.sol	2024-11-14 11:00:56.877231237 +0100
-+++ MorphoTokenOptimism.sol	2024-11-20 16:19:11.314241653 +0100
-@@ -3,7 +3,7 @@
- 
- import {IOptimismMintableERC20} from "./interfaces/IOptimismMintableERC20.sol";
- import {IERC165} from
--    "../lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/utils/introspection/IERC165.sol";
-+    "../../lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/utils/introspection/IERC165.sol";
- 
- import {DelegationToken} from "./DelegationToken.sol";
- 
++++ MorphoTokenOptimism.sol	2024-11-20 16:26:04.278975659 +0100
 @@ -69,12 +69,14 @@
  
      /// @dev Allows the StandardBridge on this network to mint tokens.

@@ -4,7 +4,7 @@ munged: $(wildcard ../src/*.sol) applyMunging.patch
 	@patch -p0 -d munged < applyMunging.patch
 
 record:
-	diff -ruN ../src munged | sed 's+\.\./src/++g' | sed 's+munged/++g' > applyMunging.patch
+	diff -ruN ../src munged | sed 's+ \.\./src/+ +g' | sed 's+munged/++g' > applyMunging.patch
 
 clean:
 	rm -rf munged

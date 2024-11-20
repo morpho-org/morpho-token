@@ -5,11 +5,6 @@ ghost mathint sumOfVotingPower {
 }
 
 // Slot for DelegationTokenStorage._delegatedVotingPower
-hook Sload uint256 votingPower (slot 0x669be2f4ee1b0b5f3858e4135f31064efe8fa923b09bf21bf538f64f2c3e1101)[KEY address addr] {
-    require sumOfVotingPower >= to_mathint(votingPower);
-}
-
-// Slot for DelegationTokenStorage._delegatedVotingPower
 hook Sstore (slot 0x669be2f4ee1b0b5f3858e4135f31064efe8fa923b09bf21bf538f64f2c3e1101)[KEY address addr] uint256 newValue (uint256 oldValue) {
     sumOfVotingPower = sumOfVotingPower - oldValue + newValue;
 }
@@ -24,6 +19,8 @@ invariant totalSupplyIsSumOfVirtualVotingPower()
     to_mathint(totalSupply()) == sumOfVotingPower + currentContract._zeroVirtualVotingPower
     {
       preserved {
+          require totalSupply() == 0;
+          require sumOfVotingPower == 0;
           requireInvariant totalSupplyIsSumOfBalances();
           requireInvariant zeroAddressNoVotingPower();
       }

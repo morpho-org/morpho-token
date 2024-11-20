@@ -37,15 +37,11 @@ rule totalSupplyGTEqSumOfVotingPower {
 }
 
 // Check that users can delegate their voting power.
-rule delegatingUpdatesVotingPower {
+rule delegatingUpdatesVotingPower(env e, address newDelegatee) {
     requireInvariant zeroAddressNoVotingPower();
     assert isTotalGTEqSumOfVotingPower();
 
-    env e;
-
-    address delegator = e.msg.sender;
-    address newDelegatee;
-    address oldDelegatee = delegatee(delegator);
+    address oldDelegatee = delegatee(e.msg.sender);
 
     mathint delegatedVotingPowerBeforeOfNewDelegatee = delegatedVotingPower(newDelegatee);
 
@@ -55,6 +51,6 @@ rule delegatingUpdatesVotingPower {
     if ((newDelegatee == 0) || (newDelegatee == oldDelegatee)) {
         assert delegatedVotingPower(newDelegatee) == delegatedVotingPowerBeforeOfNewDelegatee;
     } else {
-        assert delegatedVotingPower(newDelegatee) >= balanceOf(delegator);
+        assert delegatedVotingPower(newDelegatee) >= balanceOf(e.msg.sender);
     }
 }

@@ -5,11 +5,6 @@ ghost mathint sumOfVotingPower {
 }
 
 // Slot for DelegationTokenStorage._delegatedVotingPower
-hook Sload uint256 votingPower (slot 0x669be2f4ee1b0b5f3858e4135f31064efe8fa923b09bf21bf538f64f2c3e1101)[KEY address addr] {
-    require sumOfVotingPower >= to_mathint(votingPower);
-}
-
-// Slot for DelegationTokenStorage._delegatedVotingPower
 hook Sstore (slot 0x669be2f4ee1b0b5f3858e4135f31064efe8fa923b09bf21bf538f64f2c3e1101)[KEY address addr] uint256 newValue (uint256 oldValue) {
     sumOfVotingPower = sumOfVotingPower - oldValue + newValue;
 }
@@ -24,6 +19,10 @@ invariant totalSupplyIsSumOfVirtualVotingPower()
     to_mathint(totalSupply()) == sumOfVotingPower + currentContract._zeroVirtualVotingPower
     {
       preserved {
+          // Safe requires because the proxy contract should be initialized right after construction.
+          require totalSupply() == 0;
+          require sumOfVotingPower == 0;
+
           requireInvariant totalSupplyIsSumOfBalances();
           requireInvariant zeroAddressNoVotingPower();
       }
@@ -40,15 +39,11 @@ rule totalSupplyGTEqSumOfVotingPower {
 }
 
 // Check that users can delegate their voting power.
-rule delegatingUpdatesVotingPower {
+rule delegatingUpdatesVotingPower(env e, address newDelegatee) {
     requireInvariant zeroAddressNoVotingPower();
     assert isTotalGTEqSumOfVotingPower();
 
-    env e;
-
-    address delegator = e.msg.sender;
-    address newDelegatee;
-    address oldDelegatee = delegatee(delegator);
+    address oldDelegatee = delegatee(e.msg.sender);
 
     mathint delegatedVotingPowerBeforeOfNewDelegatee = delegatedVotingPower(newDelegatee);
 
@@ -58,6 +53,6 @@ rule delegatingUpdatesVotingPower {
     if ((newDelegatee == 0) || (newDelegatee == oldDelegatee)) {
         assert delegatedVotingPower(newDelegatee) == delegatedVotingPowerBeforeOfNewDelegatee;
     } else {
-        assert delegatedVotingPower(newDelegatee) >= balanceOf(delegator);
+        assert delegatedVotingPower(newDelegatee) >= balanceOf(e.msg.sender);
     }
 }

@@ -29,14 +29,14 @@ ghost mathint sumOfBalances {
 }
 
 // Slot is ERC20Storage._balances slot
-hook Sload uint256 balance (slot 0x52c63247e1f47db19d5ce0460030c497f067ca4cebf71ba98eeadabe20bace00)[KEY address addr] {
-   require sumOfBalances >= to_mathint(balance);
-}
+//hook Sload uint256 balance (slot 0x52c63247e1f47db19d5ce0460030c497f067ca4cebf71ba98eeadabe20bace00)[KEY address addr] {
+//    require sumOfBalances >= to_mathint(balance);
+//}
 
-// Slot is ERC20Storage._balances slot
-hook Sstore (slot 0x52c63247e1f47db19d5ce0460030c497f067ca4cebf71ba98eeadabe20bace00)[KEY address addr] uint256 newValue (uint256 oldValue) {
-   sumOfBalances = sumOfBalances - oldValue + newValue;
-}
+//Slot is ERC20Storage._balances slot
+//hook Sstore (slot 0x52c63247e1f47db19d5ce0460030c497f067ca4cebf71ba98eeadabe20bace00)[KEY address addr] uint256 newValue (uint256 oldValue) {
+//   sumOfBalances = sumOfBalances - oldValue + newValue;
+//}
 
 /*
 ┌─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐

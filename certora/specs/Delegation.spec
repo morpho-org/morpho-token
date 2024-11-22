@@ -14,7 +14,20 @@ hook Sstore (slot 0x52c63247e1f47db19d5ce0460030c497f067ca4cebf71ba98eeadabe20ba
     ghost_balances[addr] = newValue;
 }
 
-// Partial sum of balances.
+// ghost copy of delegatees
+ghost mapping(address => address) ghost_delegatees {
+    init_state axiom forall address addr. ghost_delegatees[addr] == 0;
+}
+
+hook Sload address _delegatee (slot 0x669be2f4ee1b0b5f3858e4135f31064efe8fa923b09bf21bf538f64f2c3e1100)[KEY address account] {
+    require ghost_delegatees[account] == _delegatee;
+}
+
+hook Sstore (slot 0x669be2f4ee1b0b5f3858e4135f31064efe8fa923b09bf21bf538f64f2c3e1100)[KEY address account] address _delegatee (address _delegatee_old) {
+    ghost_delegatees[account] = _delegatee;
+}
+
+// Partial sum of voting power.
 //  sumOfvotes[x] = \sum_{i=0}^{x-1} delegatedVotingPower[i];
 ghost mapping(mathint => mathint) sumsOfVotes {
     init_state axiom forall mathint addr. sumsOfVotes[addr] == 0;
@@ -25,18 +38,8 @@ ghost mapping(address => uint256) ghost_delegatedVotingPower {
     init_state axiom forall address addr. ghost_delegatedVotingPower[addr] == 0;
 }
 
-
 hook Sload uint256 _votingPower (slot 0x669be2f4ee1b0b5f3858e4135f31064efe8fa923b09bf21bf538f64f2c3e1101)[KEY address account] {
     require ghost_delegatedVotingPower[account] == _votingPower;
-}
-
-// ghost copy of delegatee
-ghost mapping(address => address) ghost_delegatee {
-    init_state axiom forall address addr. ghost_delegatee[addr] == 0;
-}
-
-hook Sload address _delegatee (slot 0x669be2f4ee1b0b5f3858e4135f31064efe8fa923b09bf21bf538f64f2c3e1100)[KEY address account] {
-    require ghost_delegatee[account] == _delegatee;
 }
 
 hook Sstore (slot 0x669be2f4ee1b0b5f3858e4135f31064efe8fa923b09bf21bf538f64f2c3e1101)[KEY address account] uint256 _votingPower (uint256 _votingPower_old) {
@@ -45,10 +48,6 @@ hook Sstore (slot 0x669be2f4ee1b0b5f3858e4135f31064efe8fa923b09bf21bf538f64f2c3e
         forall mathint x. sumsOfVotes@new[x] ==
             sumsOfVotes@old[x] + (to_mathint(account) < x ? _votingPower - _votingPower_old : 0);
     ghost_delegatedVotingPower[account] = _votingPower;
-}
-
-hook Sstore (slot 0x669be2f4ee1b0b5f3858e4135f31064efe8fa923b09bf21bf538f64f2c3e1100)[KEY address account] address _delegatee (address _delegatee_old) {
-    ghost_delegatee[account] = _delegatee;
 }
 
 invariant sumOfVotesStartsAtZero()
@@ -67,6 +66,16 @@ invariant sumOfVotesMonotone()
         }
     }
 
+invariant sumOfVotesMonotone2()
+    forall address i. forall address j. to_mathint(i)+1 == to_mathint(j) && to_mathint(j) <= 2^160 => sumsOfVotes[to_mathint(j)] - sumsOfVotes[to_mathint(i)]  == ghost_delegatedVotingPower[j]
+    {
+        preserved {
+            requireInvariant sumOfVotesStartsAtZero();
+            requireInvariant sumOfVotesGrowsCorrectly();
+        }
+    }
+
+
 invariant sumOfVotesLTEqTotalSupply()
     sumsOfVotes[2^160] + currentContract._zeroVirtualVotingPower == to_mathint(totalSupply())
     {
@@ -78,7 +87,10 @@ invariant sumOfVotesLTEqTotalSupply()
     }
 
 invariant Y()
-    forall address a. a != 1 && ghost_delegatedVotingPower[a] == 0 => ghost_delegatedVotingPower[1] == sumsOfVotes[1]
+    forall address a. forall address b.
+    a != 1 && ghost_delegatedVotingPower[a] == 0  &&
+    (ghost_delegatees[b] == 0 || ghost_delegatees[b] == 1) =>
+    ghost_delegatedVotingPower[1] == sumsOfVotes[1]
     {
         preserved {
             requireInvariant sumOfVotesStartsAtZero();
@@ -90,7 +102,7 @@ invariant Y()
 
 
 invariant X(address holder)
-    ghost_delegatee[holder] == 1  =>
+    ghost_delegatees[holder] == 1  =>
     ghost_delegatedVotingPower[1] == sumsOfVotes[1] &&
     ghost_delegatedVotingPower[1] >= ghost_balances[holder]
     {

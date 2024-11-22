@@ -15,9 +15,8 @@ rule mintRevertConditions(env e, address to, uint256 amount) {
     // Safe require as zero address can't possibly delegate voting power.
     require delegatee(0) == 0;
 
-    // Assume that if the delegatee of the recipient is not the zero address then the newly minted amount is not counted in the delegatee's voting power.
+    // Safe require because if the delegatee is not zero the recipient's voting power excludes the newly minted value.
     require delegatee(to) != 0 => toVotingPowerBefore <= totalSupply() - amount;
-
 
     mint@withrevert(e, to, amount);
     assert lastReverted <=> e.msg.sender != currentContract.bridge || to == 0 || e.msg.value != 0 || totalSupplyBefore + amount > max_uint256;
@@ -31,7 +30,7 @@ rule burnRevertConditions(env e, address from, uint256 amount) {
     // Safe require as zero address can't possibly delegate voting power.
     require delegatee(0) == 0;
 
-    // Assume that the delegatee's voting power is greater or equal to the holder's balance.
+    // Safe require because a holder's balance is added to the delegatee's voting power upon delegation.
     require delegatee(from) != 0 => fromVotingPowerBefore >= balanceOfFromBefore;
 
     burn@withrevert(e, from, amount);

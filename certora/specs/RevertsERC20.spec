@@ -14,10 +14,10 @@ rule transferRevertConditions(env e, address to, uint256 amount) {
     uint256 senderVotingPowerBefore = delegatedVotingPower(delegatee(e.msg.sender));
     uint256 recipientVotingPowerBefore = delegatedVotingPower(delegatee(to));
 
-    // Assume that the delegatee voting power is greater or equal to the holder's balance.
+    // Safe require because a holder's balance is added to the delegatee's voting power upon delegation.
     require delegatee(e.msg.sender) != 0 => senderVotingPowerBefore >= balanceOfSenderBefore;
-    // Assume that if the holder's and recipient's delegatees are different and not the zero address then, the recipient delegatee's voting power doesn't count the holder's voting power.
-    require delegatee(to) != 0 && delegatee(to) != delegatee(e.msg.sender) => recipientVotingPowerBefore <= totalSupply() - balanceOfSenderBefore;
+    // Safe require because if delegatees are different the recipient's voting power excludes the holder's balance.
+    require delegatee(to) != delegatee(e.msg.sender) => recipientVotingPowerBefore <= totalSupply() - balanceOfSenderBefore;
 
     transfer@withrevert(e, to, amount);
     assert lastReverted <=> e.msg.sender == 0 || to == 0 || balanceOfSenderBefore < amount || e.msg.value != 0;
@@ -30,10 +30,10 @@ rule transferFromRevertConditions(env e, address from, address to, uint256 amoun
     uint256 holderVotingPowerBefore = delegatedVotingPower(delegatee(from));
     uint256 recipientVotingPowerBefore = delegatedVotingPower(delegatee(to));
 
-    // Assume that the delegatee voting power is greater or equal to the holder's balance.
+    // Safe require because a holder's balance is added to the delegatee's voting power upon delegation.
     require delegatee(from) != 0 => holderVotingPowerBefore >= balanceOfHolderBefore;
-    // Assume that if the holder's and recipient's delegatees are different and not the zero address then, the recipient delegatee's voting power doesn't count the holder's voting power.
-    require delegatee(to) != 0 && delegatee(to) != delegatee(from) => recipientVotingPowerBefore <= totalSupply() - balanceOfHolderBefore;
+    // Safe require because if delegatees are different the recipient's voting power excludes the holder's balance.
+    require delegatee(to) != delegatee(from) => recipientVotingPowerBefore <= totalSupply() - balanceOfHolderBefore;
 
     transferFrom@withrevert(e, from, to, amount);
     bool generalRevertConditions = from == 0 || to == 0 || balanceOfHolderBefore < amount || e.msg.value != 0;

@@ -16,7 +16,7 @@ rule mintRevertConditions(env e, address to, uint256 amount) {
     require delegatee(0) == 0;
 
     // Assume that if the delegatee of the recipient is not the zero address then the newly minted amount is not counted in the delegatee's voting power.
-    require delegatee(to) !=0 => toVotingPowerBefore <= totalSupply() - amount;
+    require delegatee(to) != 0 => toVotingPowerBefore <= totalSupply() - amount;
 
 
     mint@withrevert(e, to, amount);
@@ -32,7 +32,7 @@ rule burnRevertConditions(env e, address from, uint256 amount) {
     require delegatee(0) == 0;
 
     // Assume that the delegatee's voting power is greater or equal to the holder's balance.
-    require delegatee(from) !=0 => fromVotingPowerBefore >= balanceOfFromBefore;
+    require delegatee(from) != 0 => fromVotingPowerBefore >= balanceOfFromBefore;
 
     burn@withrevert(e, from, amount);
     assert lastReverted <=> e.msg.sender != currentContract.bridge || from == 0 || balanceOfFromBefore < amount ||  e.msg.value != 0;

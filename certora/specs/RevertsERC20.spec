@@ -15,9 +15,9 @@ rule transferRevertConditions(env e, address to, uint256 amount) {
     uint256 recipientVotingPowerBefore = delegatedVotingPower(delegatee(to));
 
     // Assume that the delegatee voting power is greater or equal to the holder's balance.
-    require delegatee(e.msg.sender) !=0 => senderVotingPowerBefore >= balanceOfSenderBefore;
+    require delegatee(e.msg.sender) != 0 => senderVotingPowerBefore >= balanceOfSenderBefore;
     // Assume that if the holder's and recipient's delegatees are different and not the zero address then, the recipient delegatee's voting power doesn't count the holder's voting power.
-    require delegatee(to) !=0 && delegatee(to) != delegatee(e.msg.sender) => recipientVotingPowerBefore <= totalSupply() - balanceOfSenderBefore;
+    require delegatee(to) != 0 && delegatee(to) != delegatee(e.msg.sender) => recipientVotingPowerBefore <= totalSupply() - balanceOfSenderBefore;
 
     transfer@withrevert(e, to, amount);
     assert lastReverted <=> e.msg.sender == 0 || to == 0 || balanceOfSenderBefore < amount || e.msg.value != 0;
@@ -31,9 +31,9 @@ rule transferFromRevertConditions(env e, address from, address to, uint256 amoun
     uint256 recipientVotingPowerBefore = delegatedVotingPower(delegatee(to));
 
     // Assume that the delegatee voting power is greater or equal to the holder's balance.
-    require delegatee(from) !=0 => holderVotingPowerBefore >= balanceOfHolderBefore;
+    require delegatee(from) != 0 => holderVotingPowerBefore >= balanceOfHolderBefore;
     // Assume that if the holder's and recipient's delegatees are different and not the zero address then, the recipient delegatee's voting power doesn't count the holder's voting power.
-    require delegatee(to) !=0 && delegatee(to) != delegatee(from) => recipientVotingPowerBefore <= totalSupply() - balanceOfHolderBefore;
+    require delegatee(to) != 0 && delegatee(to) != delegatee(from) => recipientVotingPowerBefore <= totalSupply() - balanceOfHolderBefore;
 
     transferFrom@withrevert(e, from, to, amount);
     bool generalRevertConditions = from == 0 || to == 0 || balanceOfHolderBefore < amount || e.msg.value != 0;

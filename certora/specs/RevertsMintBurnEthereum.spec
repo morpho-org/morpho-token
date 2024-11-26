@@ -27,13 +27,13 @@ rule mintRevertConditions(env e, address to, uint256 amount) {
 // Check the revert conditions for the burn function.
 rule burnRevertConditions(env e, uint256 amount) {
     uint256 balanceOfSenderBefore = balanceOf(e.msg.sender);
-    uint256 senderVotingPowerBefore = delegatedVotingPower(delegatee(e.msg.sender));
+    uint256 delegateeVotingPowerBefore = delegatedVotingPower(delegatee(e.msg.sender));
 
     // Safe require as zero address can't possibly delegate voting power.
     require delegatee(0) == 0;
 
     // Safe require because a holder's balance is added to the delegatee's voting power upon delegation.
-    require delegatee(e.msg.sender) != 0 => senderVotingPowerBefore >= balanceOfSenderBefore;
+    require delegatee(e.msg.sender) != 0 => delegateeVotingPowerBefore >= balanceOfSenderBefore;
 
     burn@withrevert(e, amount);
     assert lastReverted <=> e.msg.sender == 0 || balanceOfSenderBefore < amount || e.msg.value != 0;

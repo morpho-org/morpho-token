@@ -7,6 +7,8 @@ import {ECDSA} from
     "../../lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/utils/cryptography/ECDSA.sol";
 
 contract MorphoTokenOptimismHarness is MorphoTokenOptimism {
+    constructor(address newRemoteToken, address newBridge) MorphoTokenOptimism(newRemoteToken, newBridge) {}
+
     function delegatorFromSig(Delegation calldata delegation, Signature calldata signature)
         external
         view

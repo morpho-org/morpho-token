@@ -1,6 +1,6 @@
 diff -ruN DelegationToken.sol DelegationToken.sol
---- DelegationToken.sol	2024-11-06 18:57:11.000000000 +0100
-+++ DelegationToken.sol	2024-11-26 11:36:31.000000000 +0100
+--- DelegationToken.sol	2024-11-26 11:51:35.000000000 +0100
++++ DelegationToken.sol	2024-11-28 18:57:16.000000000 +0100
 @@ -4,14 +4,14 @@
  import {IDelegation, Signature, Delegation} from "./interfaces/IDelegation.sol";
  
@@ -31,27 +31,7 @@ diff -ruN DelegationToken.sol DelegationToken.sol
      /* ERRORS */
  
      /// @notice The signature used has expired.
-@@ -102,6 +105,19 @@
-         _delegate(delegator, newDelegatee);
-     }
- 
-+    function _delegatorFromSig(Delegation calldata delegation, Signature calldata signature)
-+        external
-+        returns (address)
-+    {
-+        address delegator = ECDSA.recover(
-+            _hashTypedDataV4(keccak256(abi.encode(DELEGATION_TYPEHASH, delegation))),
-+            signature.v,
-+            signature.r,
-+            signature.s
-+        );
-+        return delegator;
-+    }
-+
-     /// @notice Delegates the balance of the signer to `newDelegatee`.
-     /// @dev Delegating to the zero address effectively removes the delegation, incidentally making transfers cheaper.
-     /// @dev Delegating to the previous delegatee effectively revokes past signatures with the same nonce.
-@@ -148,12 +164,16 @@
+@@ -148,12 +151,16 @@
                  uint256 newValue = oldValue - amount;
                  $._delegatedVotingPower[from] = newValue;
                  emit DelegatedVotingPowerChanged(from, oldValue, newValue);

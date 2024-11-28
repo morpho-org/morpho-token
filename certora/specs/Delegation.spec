@@ -1,7 +1,7 @@
 import "ERC20.spec";
 
 methods {
-    function _delegatorFromSig(DelegationToken.Delegation, DelegationToken.Signature) external returns address envfree;
+    function delegatorFromSig(DelegationToken.Delegation, DelegationToken.Signature) external returns address envfree;
     function delegationNonce(address) external returns uint256 envfree;
 }
 
@@ -67,7 +67,7 @@ rule delegatingWithSigUpdatesVotingPower(env e, DelegationToken.Delegation deleg
     requireInvariant zeroAddressNoVotingPower();
     assert isTotalSupplyGTEqSumOfVotingPower();
 
-    address delegator = _delegatorFromSig(delegation, signature);
+    address delegator = delegatorFromSig(delegation, signature);
 
     address oldDelegatee = delegatee(delegator);
     mathint delegationNonceBefore = delegationNonce(delegator);
@@ -80,7 +80,6 @@ rule delegatingWithSigUpdatesVotingPower(env e, DelegationToken.Delegation deleg
     assert delegation.nonce == delegationNonceBefore;
     // Check that the current block timestamp is not later than the delegation's expiry timestamp.
     assert e.block.timestamp <= delegation.expiry;
-    // assert Utils.delegatorFromSig(delegation, signature) == delegator;
 
     // Check that, if the delegatee changed and it's not the zero address then its voting power is greater than or equal to the delegator's balance, otherwise its voting power remains unchanged.
     if ((delegation.delegatee == 0) || (delegation.delegatee == oldDelegatee)) {

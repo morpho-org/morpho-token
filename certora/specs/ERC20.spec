@@ -1,6 +1,8 @@
 // This is spec is taken from the Open Zeppelin repositories at https://github.com/OpenZeppelin/openzeppelin-contracts/blob/448efeea6640bbbc09373f03fbc9c88e280147ba/certora/specs/ERC20.spec, and patched to support the DelegationToken.
 // Note: the scope of this specification encompases only the implementation contract and not the interactions with the implementation contract and the proxy.
 
+import "ERC20Invariants.spec";
+
 definition nonpayable(env e) returns bool = e.msg.value == 0;
 definition nonzerosender(env e) returns bool = e.msg.sender != 0;
 
@@ -8,35 +10,11 @@ methods {
     function name()                                external returns (string)  envfree;
     function symbol()                              external returns (string)  envfree;
     function decimals()                            external returns (uint8)   envfree;
-    function totalSupply()                         external returns (uint256) envfree;
-    function balanceOf(address)                    external returns (uint256) envfree;
     function allowance(address,address)            external returns (uint256) envfree;
     function owner()                               external returns address   envfree;
-    function delegatedVotingPower(address)         external returns uint256   envfree;
-    function delegatee(address)                    external returns address   envfree;
     function nonces(address)                       external returns (uint256) envfree;
     function DOMAIN_SEPARATOR()                    external returns (bytes32) envfree;
-    function upgradeToAndCall(address, bytes)      external => NONDET DELETE;
 }
-
-/*
-┌─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
-│ Ghost & hooks: sum of all balances                                                                                  │
-└─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
-*/
-ghost mathint sumOfBalances {
-    init_state axiom sumOfBalances == 0;
-}
-
-// Slot is ERC20Storage._balances slot
-//hook Sload uint256 balance (slot 0x52c63247e1f47db19d5ce0460030c497f067ca4cebf71ba98eeadabe20bace00)[KEY address addr] {
-//    require sumOfBalances >= to_mathint(balance);
-//}
-
-//Slot is ERC20Storage._balances slot
-//hook Sstore (slot 0x52c63247e1f47db19d5ce0460030c497f067ca4cebf71ba98eeadabe20bace00)[KEY address addr] uint256 newValue (uint256 oldValue) {
-//   sumOfBalances = sumOfBalances - oldValue + newValue;
-//}
 
 /*
 ┌─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
@@ -44,9 +22,7 @@ ghost mathint sumOfBalances {
 └─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
 */
 
-invariant totalSupplyIsSumOfBalances()
-    to_mathint(totalSupply()) == sumOfBalances;
-
+use invariant totalSupplyIsSumOfBalances;
 
 /*
 ┌─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
@@ -54,8 +30,7 @@ invariant totalSupplyIsSumOfBalances()
 └─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
 */
 
-invariant zeroAddressNoBalance()
-    balanceOf(0) == 0;
+use invariant zeroAddressNoBalance;
 
 /*
 ┌─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐

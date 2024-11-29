@@ -1,6 +1,11 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 import "ERC20.spec";
 
+methods {
+    function delegatorFromSig(DelegationToken.Delegation, DelegationToken.Signature) external returns address envfree;
+    function delegationNonce(address) external returns uint256 envfree;
+}
+
 // Ghost variable to hold the sum of voting power.
 ghost mathint sumOfVotingPower {
     init_state axiom sumOfVotingPower == 0;
@@ -113,14 +118,41 @@ rule delegatingUpdatesVotingPower(env e, address newDelegatee) {
 
     address oldDelegatee = delegatee(e.msg.sender);
 
-    mathint delegatedVotingPowerBeforeOfNewDelegatee = delegatedVotingPower(newDelegatee);
+    mathint delegatedVotingPowerBefore = delegatedVotingPower(newDelegatee);
 
     delegate(e, newDelegatee);
 
     // Check that, if the delegatee changed and it's not the zero address then its voting power is greater than or equal to the delegator's balance, otherwise its voting power remains unchanged.
     if ((newDelegatee == 0) || (newDelegatee == oldDelegatee)) {
-        assert delegatedVotingPower(newDelegatee) == delegatedVotingPowerBeforeOfNewDelegatee;
+        assert delegatedVotingPower(newDelegatee) == delegatedVotingPowerBefore;
     } else {
-        assert delegatedVotingPower(newDelegatee) >= balanceOf(e.msg.sender);
+        assert delegatedVotingPower(newDelegatee) == delegatedVotingPowerBefore + balanceOf(e.msg.sender);
+    }
+}
+
+// Check that users can delegate their voting power.
+rule delegatingWithSigUpdatesVotingPower(env e, DelegationToken.Delegation delegation, DelegationToken.Signature signature) {
+    requireInvariant zeroAddressNoVotingPower();
+    assert isTotalSupplyGTEqSumOfVotingPower();
+
+    address delegator = delegatorFromSig(delegation, signature);
+
+    address oldDelegatee = delegatee(delegator);
+    mathint delegationNonceBefore = delegationNonce(delegator);
+
+    mathint delegatedVotingPowerBefore = delegatedVotingPower(delegation.delegatee);
+
+    delegateWithSig(e, delegation, signature);
+
+    // Check that the delegation's nonce matches the delegator's nonce.
+    assert delegation.nonce == delegationNonceBefore;
+    // Check that the current block timestamp is not later than the delegation's expiry timestamp.
+    assert e.block.timestamp <= delegation.expiry;
+
+    // Check that, if the delegatee changed and it's not the zero address then its voting power is greater than or equal to the delegator's balance, otherwise its voting power remains unchanged.
+    if ((delegation.delegatee == 0) || (delegation.delegatee == oldDelegatee)) {
+        assert delegatedVotingPower(delegation.delegatee) == delegatedVotingPowerBefore;
+    } else {
+        assert delegatedVotingPower(delegation.delegatee) == delegatedVotingPowerBefore + balanceOf(delegator);
     }
 }

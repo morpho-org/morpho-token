@@ -1,6 +1,6 @@
 diff -ruN DelegationToken.sol DelegationToken.sol
---- DelegationToken.sol	2024-11-14 11:00:56.877231237 +0100
-+++ DelegationToken.sol	2024-11-20 16:18:55.750677310 +0100
+--- DelegationToken.sol	2024-11-26 11:51:35.000000000 +0100
++++ DelegationToken.sol	2024-11-28 18:57:16.000000000 +0100
 @@ -4,14 +4,14 @@
  import {IDelegation, Signature, Delegation} from "./interfaces/IDelegation.sol";
  
@@ -48,21 +48,9 @@ diff -ruN DelegationToken.sol DelegationToken.sol
              }
          }
      }
-diff -ruN interfaces/IOptimismMintableERC20.sol interfaces/IOptimismMintableERC20.sol
---- interfaces/IOptimismMintableERC20.sol	2024-11-14 11:00:56.877231237 +0100
-+++ interfaces/IOptimismMintableERC20.sol	2024-11-20 16:30:24.300071161 +0100
-@@ -2,7 +2,7 @@
- pragma solidity >=0.5.0;
- 
- import {IERC165} from
--    "../../lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/utils/introspection/IERC165.sol";
-+    "../../../lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/utils/introspection/IERC165.sol";
- 
- /// @title IOptimismMintableERC20
- /// @author Morpho Association
 diff -ruN MorphoTokenEthereum.sol MorphoTokenEthereum.sol
---- MorphoTokenEthereum.sol	2024-11-14 11:00:56.877231237 +0100
-+++ MorphoTokenEthereum.sol	2024-11-20 13:29:38.986459880 +0100
+--- MorphoTokenEthereum.sol	2024-11-06 18:57:11.000000000 +0100
++++ MorphoTokenEthereum.sol	2024-11-26 11:45:12.000000000 +0100
 @@ -26,16 +26,19 @@
          __ERC20Permit_init(NAME);
          __Ownable_init(owner);
@@ -84,8 +72,8 @@ diff -ruN MorphoTokenEthereum.sol MorphoTokenEthereum.sol
      }
  }
 diff -ruN MorphoTokenOptimism.sol MorphoTokenOptimism.sol
---- MorphoTokenOptimism.sol	2024-11-14 11:00:56.877231237 +0100
-+++ MorphoTokenOptimism.sol	2024-11-20 16:19:11.314241653 +0100
+--- MorphoTokenOptimism.sol	2024-11-06 18:57:11.000000000 +0100
++++ MorphoTokenOptimism.sol	2024-11-21 11:29:06.000000000 +0100
 @@ -3,7 +3,7 @@
  
  import {IOptimismMintableERC20} from "./interfaces/IOptimismMintableERC20.sol";
@@ -110,3 +98,15 @@ diff -ruN MorphoTokenOptimism.sol MorphoTokenOptimism.sol
      }
  
      /// @notice ERC165 interface check function.
+diff -ruN interfaces/IOptimismMintableERC20.sol interfaces/IOptimismMintableERC20.sol
+--- interfaces/IOptimismMintableERC20.sol	2024-11-06 18:57:11.000000000 +0100
++++ interfaces/IOptimismMintableERC20.sol	2024-11-21 11:29:06.000000000 +0100
+@@ -2,7 +2,7 @@
+ pragma solidity >=0.5.0;
+ 
+ import {IERC165} from
+-    "../../lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/utils/introspection/IERC165.sol";
++    "../../../lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/utils/introspection/IERC165.sol";
+ 
+ /// @title IOptimismMintableERC20
+ /// @author Morpho Association

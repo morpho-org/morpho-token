@@ -3,9 +3,9 @@
 methods {
     function totalSupply() external returns uint256 envfree;
     function balanceOf(address) external returns uint256 envfree;
-    function delegatee(address) external returns address   envfree;
-    function delegatedVotingPower(address) external returns uint256   envfree;
-    function upgradeToAndCall(address, bytes)      external => NONDET DELETE;
+    function delegatee(address) external returns address envfree;
+    function delegatedVotingPower(address) external returns uint256 envfree;
+    function upgradeToAndCall(address, bytes) external => NONDET DELETE;
 }
 
 // Paramater for any address that is not the zero address.
@@ -24,12 +24,12 @@ ghost mapping(address => address) ghost_delegatee {
     init_state axiom forall address account. ghost_delegatee[account] == 0;
 }
 
-// Slot for DelegationTokenStorage._delegatee.
+// Slot is DelegationTokenStorage._delegatee.
 hook Sload address delegatee (slot 0x669be2f4ee1b0b5f3858e4135f31064efe8fa923b09bf21bf538f64f2c3e1100)[KEY address account] {
     require ghost_delegatee[account] == delegatee;
 }
 
-// Slot for DelegationTokenStorage._delegatee.
+// Slot is DelegationTokenStorage._delegatee.
 hook Sstore (slot 0x669be2f4ee1b0b5f3858e4135f31064efe8fa923b09bf21bf538f64f2c3e1100)[KEY address account] address delegatee (address delegateeOld) {
     // Update partial sums for x > to_mathint(account)
     // Track delegation changes from the parameterized address.

@@ -33,16 +33,6 @@ invariant zeroAddressNoVotingPower()
     delegatee(0x0) == 0x0 && delegatedVotingPower(0x0) == 0
     { preserved with (env e) { require e.msg.sender != 0; } }
 
-function isTotalSupplyGTEqSumOfVotingPower() returns bool {
-    requireInvariant totalSupplyIsSumOfVirtualVotingPower();
-    return totalSupply() >= sumOfVotingPower;
-}
-
-// Check that the total supply of tokens is greater than or equal to the sum of voting power.
-rule totalSupplyGTEqSumOfVotingPower {
-    assert isTotalSupplyGTEqSumOfVotingPower();
-}
-
 // Check that initially zero votes are delegated to parameterized address A.
 invariant sumOfVotesStartsAtZero()
     sumsOfVotes[0] == 0;
@@ -98,19 +88,40 @@ invariant delegatedLTEqDelegateeVP()
         }
     }
 
+
+definition totalSupplyIsSumOfVirtualVotingPowerProp() returns bool =
+    to_mathint(totalSupply()) == sumOfVotingPower + currentContract._zeroVirtualVotingPower;
+
 // Check that the voting power plus the virtual voting power of address zero is equal to the total supply of tokens.
-invariant totalSupplyIsSumOfVirtualVotingPower()
-    to_mathint(totalSupply()) == sumOfVotingPower + currentContract._zeroVirtualVotingPower
-    {
-      preserved {
-          // Safe requires because the proxy contract should be initialized right after construction.
-          require totalSupply() == 0;
-          require sumOfVotingPower == 0;
-          require forall address a. ghost_balances[a] == 0;
-          requireInvariant totalSupplyIsSumOfBalances();
-          requireInvariant zeroAddressNoVotingPower();
-      }
+rule totalSupplyIsSumOfVirtualVotingPower(env e, method f, calldataarg args) {
+    requireInvariant totalSupplyIsSumOfBalances();
+    requireInvariant zeroAddressNoVotingPower();
+
+    // Sig 0xc4d66de8 is initialize(address) (Optimism).
+    // Sig 0x485cc955 is initialize(address, address) (Ethereum).
+    if (f.selector == 0xc4d66de8 || f.selector == 0x485cc955) {
+         // Safe requires because the proxy contract should be initialized right after construction.
+         require totalSupply() == 0;
+         require sumOfVotingPower == 0;
+         require forall address a. ghost_balances[a] == 0;
     }
+
+    require totalSupplyIsSumOfVirtualVotingPowerProp();
+
+    f(e, args);
+
+    assert totalSupplyIsSumOfVirtualVotingPowerProp();
+}
+
+function isTotalSupplyGTEqSumOfVotingPower() returns bool {
+    require totalSupplyIsSumOfVirtualVotingPowerProp();
+    return totalSupply() >= sumOfVotingPower;
+}
+
+// Check that the total supply of tokens is greater than or equal to the sum of voting power.
+rule totalSupplyGTEqSumOfVotingPower {
+    assert isTotalSupplyGTEqSumOfVotingPower();
+}
 
 // Check that users can delegate their voting power.
 rule delegatingUpdatesVotingPower(env e, address newDelegatee) {

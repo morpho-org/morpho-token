@@ -88,6 +88,7 @@ invariant delegatedLTEqDelegateeVP()
         }
     }
 
+// Check that the voting power plus the virtual voting power of address zero is equal to the total supply of tokens.
 invariant totalSupplyIsSumOfVirtualVotingPower()
     to_mathint(totalSupply()) ==  sumOfVotingPower + currentContract._zeroVirtualVotingPower
     {

@@ -19,22 +19,31 @@ invariant zeroAddressNoVotingPower()
     delegatee(0x0) == 0x0 && delegatedVotingPower(0x0) == 0
     { preserved with (env e) { require e.msg.sender != 0; } }
 
-// Check that the voting power plus the virtual voting power of address zero is equal to the total supply of tokens.
-invariant totalSupplyIsSumOfVirtualVotingPower()
-    to_mathint(totalSupply()) == sumOfVotingPower + currentContract._zeroVirtualVotingPower
-    {
-      preserved {
-          // Safe requires because the proxy contract should be initialized right after construction.
-          require totalSupply() == 0;
-          require sumOfVotingPower == 0;
+definition totalSupplyIsSumOfVirtualVotingPowerProp() returns bool =
+    to_mathint(totalSupply()) == sumOfVotingPower + currentContract._zeroVirtualVotingPower;
 
-          requireInvariant totalSupplyIsSumOfBalances();
-          requireInvariant zeroAddressNoVotingPower();
-      }
+// Check that the voting power plus the virtual voting power of address zero is equal to the total supply of tokens.
+rule totalSupplyIsSumOfVirtualVotingPower(env e, method f, calldataarg args) {
+    requireInvariant totalSupplyIsSumOfBalances();
+    requireInvariant zeroAddressNoVotingPower();
+
+    // Sig 0xc4d66de8 is initialize(address) (Optimism).
+    // Sig 0x485cc955 is initialize(address, address) (Ethereum).
+    if (f.selector == 0xc4d66de8 || f.selector == 0x485cc955) {
+         // Safe requires because the proxy contract should be initialized right after construction.
+         require totalSupply() == 0;
+         require sumOfVotingPower == 0;
     }
 
+    require totalSupplyIsSumOfVirtualVotingPowerProp();
+
+    f(e, args);
+
+    assert totalSupplyIsSumOfVirtualVotingPowerProp();
+}
+
 function isTotalSupplyGTEqSumOfVotingPower() returns bool {
-    requireInvariant totalSupplyIsSumOfVirtualVotingPower();
+    require totalSupplyIsSumOfVirtualVotingPowerProp();
     return totalSupply() >= sumOfVotingPower;
 }
 

@@ -22,7 +22,15 @@ methods {
 └─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
 */
 
+use invariant sumOfBalancesStartsAtZero;
+
+use invariant sumOfBalancesGrowsCorrectly;
+
+use invariant sumOfBalancesMonotone;
+
 use invariant totalSupplyIsSumOfBalances;
+
+use rule twoBalancesCannotExceedTotalSupply;
 
 /*
 ┌─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
@@ -73,6 +81,7 @@ rule transfer(env e) {
     requireInvariant totalSupplyIsSumOfBalances();
     require nonpayable(e);
 
+
     address holder = e.msg.sender;
     address recipient;
     address other;
@@ -84,6 +93,9 @@ rule transfer(env e) {
     uint256 recipientBalanceBefore = balanceOf(recipient);
     uint256 recipientVotingPowerBefore = delegatedVotingPower(delegatee(recipient));
     uint256 otherBalanceBefore     = balanceOf(other);
+
+    // Safe require as it's proven by rule twoBalancesCannotExceedTotalSupply
+    require balanceOf(holder)+balanceOf(recipient) <= totalSupply();
 
     // run transaction
     transfer@withrevert(e, recipient, amount);
@@ -125,6 +137,9 @@ rule transferFrom(env e) {
     uint256 recipientBalanceBefore = balanceOf(recipient);
     uint256 recipientVotingPowerBefore = delegatedVotingPower(delegatee(recipient));
     uint256 otherBalanceBefore     = balanceOf(other);
+
+    // Safe require as it's proven by rule twoBalancesCannotExceedTotalSupply
+    require balanceOf(holder)+balanceOf(recipient) <= totalSupply();
 
     // run transaction
     transferFrom@withrevert(e, holder, recipient, amount);

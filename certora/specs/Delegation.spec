@@ -106,6 +106,7 @@ invariant totalSupplyIsSumOfVirtualVotingPower()
           // Safe requires because the proxy contract should be initialized right after construction.
           require totalSupply() == 0;
           require sumOfVotingPower == 0;
+          require forall address a. ghost_balances[a] == 0;
           requireInvariant totalSupplyIsSumOfBalances();
           requireInvariant zeroAddressNoVotingPower();
       }

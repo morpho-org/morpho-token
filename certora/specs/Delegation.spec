@@ -88,33 +88,28 @@ invariant delegatedLTEqDelegateeVP()
         }
     }
 
-
-definition totalSupplyIsSumOfVirtualVotingPowerProp() returns bool =
-    to_mathint(totalSupply()) == sumOfVotingPower + currentContract._zeroVirtualVotingPower;
-
-// Check that the voting power plus the virtual voting power of address zero is equal to the total supply of tokens.
-rule totalSupplyIsSumOfVirtualVotingPower(env e, method f, calldataarg args) {
-    requireInvariant totalSupplyIsSumOfBalances();
-    requireInvariant zeroAddressNoVotingPower();
-    requireInvariant balancesLTEqTotalSupply();
-
-    // Sig 0xc4d66de8 is initialize(address) (Optimism).
-    // Sig 0x485cc955 is initialize(address, address) (Ethereum).
-    if (f.selector == 0xc4d66de8 || f.selector == 0x485cc955) {
-         // Safe requires because the proxy contract should be initialized right after construction.
-         require totalSupply() == 0;
-         require sumOfVotingPower == 0;
+invariant totalSupplyIsSumOfVirtualVotingPower()
+    to_mathint(totalSupply()) ==  sumOfVotingPower + currentContract._zeroVirtualVotingPower
+    {
+        preserved MorphoTokenOptimismHarness.initialize(address _) with (env e) {
+            // Safe requires because the proxy contract should be initialized right after construction.g
+            require totalSupply() == 0;
+            require sumOfVotingPower == 0;
+        }
+        preserved MorphoTokenEthereumHarness.initialize(address _, address _) with (env e) {
+            // Safe requires because the proxy contract should be initialized right after construction.
+            require totalSupply() == 0;
+            require sumOfVotingPower == 0;
+        }
+        preserved {
+            requireInvariant totalSupplyIsSumOfBalances();
+            requireInvariant zeroAddressNoVotingPower();
+            requireInvariant balancesLTEqTotalSupply();
+        }
     }
-    //require forall address a. ghost_balances[a] <= sumOfBalances[2^160];
-    require totalSupplyIsSumOfVirtualVotingPowerProp();
-
-    f(e, args);
-
-    assert totalSupplyIsSumOfVirtualVotingPowerProp();
-}
 
 function isTotalSupplyGTEqSumOfVotingPower() returns bool {
-    require totalSupplyIsSumOfVirtualVotingPowerProp();
+    requireInvariant totalSupplyIsSumOfVirtualVotingPower();
     return totalSupply() >= sumOfVotingPower;
 }
 

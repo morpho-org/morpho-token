@@ -32,6 +32,8 @@ use invariant totalSupplyIsSumOfBalances;
 
 use rule twoBalancesCannotExceedTotalSupply;
 
+use invariant balancesLTEqTotalSupply;
+
 /*
 ┌─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
 │ Invariant: balance of address(0) is 0                                                                               │

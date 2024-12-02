@@ -96,6 +96,7 @@ definition totalSupplyIsSumOfVirtualVotingPowerProp() returns bool =
 rule totalSupplyIsSumOfVirtualVotingPower(env e, method f, calldataarg args) {
     requireInvariant totalSupplyIsSumOfBalances();
     requireInvariant zeroAddressNoVotingPower();
+    requireInvariant balancesLTEqTotalSupply();
 
     // Sig 0xc4d66de8 is initialize(address) (Optimism).
     // Sig 0x485cc955 is initialize(address, address) (Ethereum).
@@ -103,9 +104,8 @@ rule totalSupplyIsSumOfVirtualVotingPower(env e, method f, calldataarg args) {
          // Safe requires because the proxy contract should be initialized right after construction.
          require totalSupply() == 0;
          require sumOfVotingPower == 0;
-         require forall address a. ghost_balances[a] == 0;
     }
-
+    //require forall address a. ghost_balances[a] <= sumOfBalances[2^160];
     require totalSupplyIsSumOfVirtualVotingPowerProp();
 
     f(e, args);

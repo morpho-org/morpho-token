@@ -18,7 +18,9 @@ jobs:
         conf:
           - DelegationEthereum
           - DelegationOptimism
+          - ERC20InvariantsEthereum
           - ERC20Ethereum
+          - ERC20InvriantsOptimism
           - ERC20Optimism
           - ExternalCallsEthereum
           - ExternalCallsOptimism

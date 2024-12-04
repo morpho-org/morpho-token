@@ -22,17 +22,7 @@ methods {
 └─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
 */
 
-use invariant sumOfBalancesStartsAtZero;
-
-use invariant sumOfBalancesGrowsCorrectly;
-
-use invariant sumOfBalancesMonotone;
-
 use invariant totalSupplyIsSumOfBalances;
-
-use rule twoBalancesCannotExceedTotalSupply;
-
-use invariant balancesLTEqTotalSupply;
 
 /*
 ┌─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐

@@ -21,10 +21,10 @@ invariant zeroAddressNoVotingPower()
 
 // Check that the voting power plus the virtual voting power of address zero is equal to the total supply of tokens.
 invariant totalSupplyIsSumOfVirtualVotingPower()
-    to_mathint(totalSupply()) ==  sumOfVotingPower + currentContract._zeroVirtualVotingPower
+    to_mathint(totalSupply()) == sumOfVotingPower + currentContract._zeroVirtualVotingPower
     {
         preserved MorphoTokenOptimismHarness.initialize(address _) with (env e) {
-            // Safe requires because the proxy contract should be initialized right after construction.g
+            // Safe requires because the proxy contract should be initialized right after construction.
             require totalSupply() == 0;
             require sumOfVotingPower == 0;
         }

@@ -4,6 +4,12 @@ This folder contains the [CVL](https://docs.certora.com/en/latest/docs/cvl/index
 
 ## Getting started
 
+The verification is performed on modified source files, which can generated with the command:
+
+```
+make -C certora munged
+```
+
 This project depends on [Solidity](https://soliditylang.org/) which is required for running the verification.
 The compiler binary should be available in the path:
 
@@ -28,6 +34,10 @@ This is checked in [`ExternalCalls.spec`](specs/ExternalCalls.spec).
 
 This is checked in [`ERC20.spec`](specs/ERC20.spec).
 
+### Delegation Correctness
+
+This is checked in [`Delegation.spec`](specs/Delegation.spec).
+
 ## Verification architecture
 
 ### Folders and file structure
@@ -35,7 +45,9 @@ This is checked in [`ERC20.spec`](specs/ERC20.spec).
 The [`certora/specs`](specs) folder contains the following files:
 
 - [`ExternalCalls.spec`](specs/ExternalCalls.spec) checks that the Morpho token implementation is reentrancy safe by ensuring that no function is making and external calls and, that the implementation is immutable as it doesn't perform any delegate call;
-- [`ERC20.spec`](specs/ERC20.spec) ensure that the Morpho token is compliant with the [ERC20](https://eips.ethereum.org/EIPS/eip-20) specification.
-
+- [`ERC20.spec`](specs/ERC20.spec) ensure that the Morpho token is compliant with the [ERC20](https://eips.ethereum.org/EIPS/eip-20) specification;
+- [`Delegation.spec`](specs/Delegation.spec) checks the logic for voting power delegation.
 
 The [`certora/confs`](confs) folder contains a configuration file for each corresponding specification file for both the Ethereum and the Optimism version.
+
+The [`certora/Makefile`](Makefile) is used to track and perform the required modifications on source files.

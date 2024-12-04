@@ -12,18 +12,18 @@ ghost mathint sumOfVotingPower {
 }
 
 // Ghost copy of DelegationTokenStorage._delegatedVotingPower.
-ghost mapping(address => uint256) ghost_delegatedVotingPower {
-    init_state axiom forall address account. ghost_delegatedVotingPower[account] == 0;
+ghost mapping(address => uint256) ghostDelegatedVotingPower {
+    init_state axiom forall address account. ghostDelegatedVotingPower[account] == 0;
 }
 
 hook Sload uint256 votingPower (slot 0x669be2f4ee1b0b5f3858e4135f31064efe8fa923b09bf21bf538f64f2c3e1101)[KEY address account] {
-    require ghost_delegatedVotingPower[account] == votingPower;
+    require ghostDelegatedVotingPower[account] == votingPower;
 }
 
 // Slot is DelegationTokenStorage._delegatedVotingPower.
 hook Sstore (slot 0x669be2f4ee1b0b5f3858e4135f31064efe8fa923b09bf21bf538f64f2c3e1101)[KEY address account] uint256 votingPower (uint256 votingPowerOld) {
     // Update DelegationTokenStorage._delegatedVotingPower
-    ghost_delegatedVotingPower[account] = votingPower;
+    ghostDelegatedVotingPower[account] = votingPower;
     // Track changes of total voting power.
     sumOfVotingPower = sumOfVotingPower - votingPowerOld + votingPower;
 }
@@ -39,7 +39,7 @@ invariant sumOfVotesStartsAtZero()
 
 invariant sumOfVotesGrowsCorrectly()
     forall address account. sumsOfVotes[to_mathint(account) + 1] ==
-    sumsOfVotes[to_mathint(account)] + (ghost_delegatee[account] == A ? ghost_balances[account] : 0) ;
+    sumsOfVotes[to_mathint(account)] + (ghostDelegatee[account] == A ? ghostBalances[account] : 0) ;
 
 invariant sumOfVotesMonotone()
     forall mathint i. forall mathint j. i <= j => sumsOfVotes[i] <= sumsOfVotes[j]
@@ -51,8 +51,8 @@ invariant sumOfVotesMonotone()
     }
 
 invariant delegatedLTEqPartialSum()
-    forall address account. ghost_delegatee[account] == A =>
-      ghost_balances[account] <= sumsOfVotes[to_mathint(account)+1]
+    forall address account. ghostDelegatee[account] == A =>
+      ghostBalances[account] <= sumsOfVotes[to_mathint(account)+1]
     {
         preserved {
             requireInvariant sumOfVotesStartsAtZero();
@@ -63,7 +63,7 @@ invariant delegatedLTEqPartialSum()
 
 
 invariant sumOfVotesIsDelegatedToA()
-    sumsOfVotes[2^160] == ghost_delegatedVotingPower[A]
+    sumsOfVotes[2^160] == ghostDelegatedVotingPower[A]
     {
         preserved {
             requireInvariant zeroAddressNoVotingPower();
@@ -75,8 +75,8 @@ invariant sumOfVotesIsDelegatedToA()
 
 invariant delegatedLTEqDelegateeVP()
     forall address account.
-      ghost_delegatee[account] == A =>
-      ghost_balances[account] <= ghost_delegatedVotingPower[A]
+      ghostDelegatee[account] == A =>
+      ghostBalances[account] <= ghostDelegatedVotingPower[A]
     {
         preserved with (env e){
             requireInvariant zeroAddressNoVotingPower();

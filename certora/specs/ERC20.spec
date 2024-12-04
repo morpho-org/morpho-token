@@ -97,7 +97,7 @@ rule transfer(env e) {
     uint256 otherBalanceBefore     = balanceOf(other);
 
     // Safe require as it's proven by the rule twoBalancesCannotExceedTotalSupply.
-    require balanceOf(holder) + balanceOf(recipient) <= totalSupply();
+    if (holder != recipient) { require balanceOf(holder) + balanceOf(recipient) <= totalSupply(); }
 
     // run transaction
     transfer@withrevert(e, recipient, amount);
@@ -141,7 +141,7 @@ rule transferFrom(env e) {
     uint256 otherBalanceBefore     = balanceOf(other);
 
     // Safe require as it's proven by the rule twoBalancesCannotExceedTotalSupply.
-    require balanceOf(holder) + balanceOf(recipient) <= totalSupply();
+    if ( holder != recipient ) { require balanceOf(holder) + balanceOf(recipient) <= totalSupply(); }
 
     // run transaction
     transferFrom@withrevert(e, holder, recipient, amount);

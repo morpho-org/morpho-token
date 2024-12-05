@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 pragma solidity 0.8.27;
 
-import {DelegationToken, Signature, Delegation} from "../munged/DelegationToken.sol";
+import {DelegationToken, Signature, Delegation} from "../../munged/DelegationToken.sol";
 import {ECDSA} from
     "../../lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/utils/cryptography/ECDSA.sol";
 

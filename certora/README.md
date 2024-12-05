@@ -30,7 +30,7 @@ Note: the compiled contracts may include loops related to handling strings from 
 
 This is checked in [`ExternalCalls.spec`](specs/ExternalCalls.spec).
 
-### ERC20 Compliance
+### ERC20 Compliance and Correctness
 
 This is checked in [`ERC20.spec`](specs/ERC20.spec) and [`ERC20Invariants.spec`](specs/ERC20Invariants.spec) .
 

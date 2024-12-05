@@ -1,12 +1,12 @@
 import "ERC20.spec";
 
-ghost mathint sumOfVotingPower {
-    init_state axiom sumOfVotingPower == 0;
+methods {
+    function delegatorFromSig(DelegationToken.Delegation, DelegationToken.Signature) external returns address envfree;
+    function delegationNonce(address) external returns uint256 envfree;
 }
 
-// Slot for DelegationTokenStorage._delegatedVotingPower
-hook Sload uint256 votingPower (slot 0x669be2f4ee1b0b5f3858e4135f31064efe8fa923b09bf21bf538f64f2c3e1101)[KEY address addr] {
-    require sumOfVotingPower >= to_mathint(votingPower);
+ghost mathint sumOfVotingPower {
+    init_state axiom sumOfVotingPower == 0;
 }
 
 // Slot for DelegationTokenStorage._delegatedVotingPower
@@ -17,45 +17,80 @@ hook Sstore (slot 0x669be2f4ee1b0b5f3858e4135f31064efe8fa923b09bf21bf538f64f2c3e
 // Check that zero address has no voting power assuming that zero address can't make transactions.
 invariant zeroAddressNoVotingPower()
     delegatee(0x0) == 0x0 && delegatedVotingPower(0x0) == 0
-    filtered {
-      // Ignore upgrades.
-      f-> f.selector != sig:upgradeToAndCall(address, bytes).selector
-    }
     { preserved with (env e) { require e.msg.sender != 0; } }
 
-// Check that the voting power is never greater than the total supply of tokens.
-invariant totalSupplyLTEqSumOfVotingPower()
+// Check that the voting power plus the virtual voting power of address zero is equal to the total supply of tokens.
+invariant totalSupplyIsSumOfVirtualVotingPower()
     to_mathint(totalSupply()) == sumOfVotingPower + currentContract._zeroVirtualVotingPower
-    filtered {
-      // Ignore upgrades.
-      f-> f.selector != sig:upgradeToAndCall(address, bytes).selector
-    }
     {
-      preserved  with (env e) {
-          requireInvariant totalSupplyIsSumOfBalances();
-          requireInvariant zeroAddressNoVotingPower();
-      }
+        preserved MorphoTokenOptimismHarness.initialize(address _) with (env e) {
+            // Safe requires because the proxy contract should be initialized right after construction.
+            require totalSupply() == 0;
+            require sumOfVotingPower == 0;
+        }
+        preserved MorphoTokenEthereumHarness.initialize(address _, address _) with (env e) {
+            // Safe requires because the proxy contract should be initialized right after construction.
+            require totalSupply() == 0;
+            require sumOfVotingPower == 0;
+        }
+        preserved {
+            requireInvariant totalSupplyIsSumOfBalances();
+            requireInvariant zeroAddressNoVotingPower();
+        }
     }
 
-// Check that user can restore their voting power by delegating to zero address then delgating back to themselves.
-rule delgatingSelfConsistent {
-    requireInvariant totalSupplyLTEqSumOfVotingPower();
-    env e;
-    address user = e.msg.sender;
+function isTotalSupplyGTEqSumOfVotingPower() returns bool {
+    requireInvariant totalSupplyIsSumOfVirtualVotingPower();
+    return totalSupply() >= sumOfVotingPower;
+}
 
-    // Safe require as the user can't possibly be zero.
-    require user != 0;
+// Check that the total supply of tokens is greater than or equal to the sum of voting power.
+rule totalSupplyGTEqSumOfVotingPower {
+    assert isTotalSupplyGTEqSumOfVotingPower();
+}
 
-    // Ensure that user has delegated to zero address.
-    require delegatee(user) == 0;
+// Check that users can delegate their voting power.
+rule delegatingUpdatesVotingPower(env e, address newDelegatee) {
+    requireInvariant zeroAddressNoVotingPower();
+    assert isTotalSupplyGTEqSumOfVotingPower();
 
-    mathint sumOfVotingPowerBefore = sumOfVotingPower  + currentContract._zeroVirtualVotingPower;
-    mathint delegatedBefore = delegatedVotingPower(user);
+    address oldDelegatee = delegatee(e.msg.sender);
 
-    delegate(e, user);
+    mathint delegatedVotingPowerBefore = delegatedVotingPower(newDelegatee);
 
-    // Check that no extra voting power hasn't been created.
-    assert sumOfVotingPowerBefore == sumOfVotingPower  + currentContract._zeroVirtualVotingPower;
-    // Check that the voting power has been restored.
-    assert delegatedVotingPower(user) == balanceOf(user) + delegatedBefore;
+    delegate(e, newDelegatee);
+
+    // Check that, if the delegatee changed and it's not the zero address then its voting power is greater than or equal to the delegator's balance, otherwise its voting power remains unchanged.
+    if ((newDelegatee == 0) || (newDelegatee == oldDelegatee)) {
+        assert delegatedVotingPower(newDelegatee) == delegatedVotingPowerBefore;
+    } else {
+        assert delegatedVotingPower(newDelegatee) == delegatedVotingPowerBefore + balanceOf(e.msg.sender);
+    }
+}
+
+// Check that users can delegate their voting power.
+rule delegatingWithSigUpdatesVotingPower(env e, DelegationToken.Delegation delegation, DelegationToken.Signature signature) {
+    requireInvariant zeroAddressNoVotingPower();
+    assert isTotalSupplyGTEqSumOfVotingPower();
+
+    address delegator = delegatorFromSig(delegation, signature);
+
+    address oldDelegatee = delegatee(delegator);
+    mathint delegationNonceBefore = delegationNonce(delegator);
+
+    mathint delegatedVotingPowerBefore = delegatedVotingPower(delegation.delegatee);
+
+    delegateWithSig(e, delegation, signature);
+
+    // Check that the delegation's nonce matches the delegator's nonce.
+    assert delegation.nonce == delegationNonceBefore;
+    // Check that the current block timestamp is not later than the delegation's expiry timestamp.
+    assert e.block.timestamp <= delegation.expiry;
+
+    // Check that, if the delegatee changed and it's not the zero address then its voting power is greater than or equal to the delegator's balance, otherwise its voting power remains unchanged.
+    if ((delegation.delegatee == 0) || (delegation.delegatee == oldDelegatee)) {
+        assert delegatedVotingPower(delegation.delegatee) == delegatedVotingPowerBefore;
+    } else {
+        assert delegatedVotingPower(delegation.delegatee) == delegatedVotingPowerBefore + balanceOf(delegator);
+    }
 }

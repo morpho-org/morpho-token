@@ -1,40 +1,17 @@
 diff -ruN DelegationToken.sol DelegationToken.sol
---- DelegationToken.sol	2024-11-06 18:57:11.000000000 +0100
-+++ DelegationToken.sol	2024-11-08 16:22:14.000000000 +0100
-@@ -1,17 +1,17 @@
- // SPDX-License-Identifier: GPL-2.0-or-later
- pragma solidity ^0.8.27;
- 
--import {IDelegation, Signature, Delegation} from "./interfaces/IDelegation.sol";
-+import {IDelegation, Signature, Delegation} from "../../src/interfaces/IDelegation.sol";
- 
- import {ERC20PermitUpgradeable} from
--    "../lib/openzeppelin-contracts-upgradeable/contracts/token/ERC20/extensions/ERC20PermitUpgradeable.sol";
-+    "../../lib/openzeppelin-contracts-upgradeable/contracts/token/ERC20/extensions/ERC20PermitUpgradeable.sol";
- import {ECDSA} from
--    "../lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/utils/cryptography/ECDSA.sol";
-+    "../../lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/utils/cryptography/ECDSA.sol";
- import {Ownable2StepUpgradeable} from
--    "../lib/openzeppelin-contracts-upgradeable/contracts/access/Ownable2StepUpgradeable.sol";
--import {UUPSUpgradeable} from "../lib/openzeppelin-contracts-upgradeable/contracts/proxy/utils/UUPSUpgradeable.sol";
-+    "../../lib/openzeppelin-contracts-upgradeable/contracts/access/Ownable2StepUpgradeable.sol";
-+import {UUPSUpgradeable} from "../../lib/openzeppelin-contracts-upgradeable/contracts/proxy/utils/UUPSUpgradeable.sol";
- import {ERC1967Utils} from
--    "../lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/proxy/ERC1967/ERC1967Utils.sol";
-+    "../../lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/proxy/ERC1967/ERC1967Utils.sol";
- 
- /// @title DelegationToken
- /// @author Morpho Association
-@@ -44,6 +44,8 @@
+--- DelegationToken.sol	2024-11-19 09:16:52.491545137 +0100
++++ DelegationToken.sol	2024-12-04 18:39:10.493804864 +0100
+@@ -44,6 +44,9 @@
          mapping(address => uint256) _delegationNonce;
      }
  
++    // A ghost variable to track the theoretical voting power of address zero.
 +    uint256 _zeroVirtualVotingPower = 0;
 +
      /* ERRORS */
  
      /// @notice The signature used has expired.
-@@ -148,12 +150,16 @@
+@@ -148,12 +151,16 @@
                  uint256 newValue = oldValue - amount;
                  $._delegatedVotingPower[from] = newValue;
                  emit DelegatedVotingPowerChanged(from, oldValue, newValue);
@@ -52,14 +29,12 @@ diff -ruN DelegationToken.sol DelegationToken.sol
          }
      }
 diff -ruN MorphoTokenEthereum.sol MorphoTokenEthereum.sol
---- MorphoTokenEthereum.sol	2024-11-06 18:57:11.000000000 +0100
-+++ MorphoTokenEthereum.sol	2024-11-08 16:34:08.000000000 +0100
-@@ -25,17 +25,20 @@
-         __ERC20_init(NAME, SYMBOL);
+--- MorphoTokenEthereum.sol	2024-11-08 00:23:18.514227368 +0100
++++ MorphoTokenEthereum.sol	2024-12-04 18:39:10.493804864 +0100
+@@ -26,16 +26,19 @@
          __ERC20Permit_init(NAME);
          __Ownable_init(owner);
--
-+        require(totalSupply() == 0);
+ 
 +        _zeroVirtualVotingPower = 1_000_000_000e18;
          _mint(wrapper, 1_000_000_000e18); // Mint 1B to the wrapper contract.
      }
@@ -77,20 +52,8 @@ diff -ruN MorphoTokenEthereum.sol MorphoTokenEthereum.sol
      }
  }
 diff -ruN MorphoTokenOptimism.sol MorphoTokenOptimism.sol
---- MorphoTokenOptimism.sol	2024-11-06 18:57:11.000000000 +0100
-+++ MorphoTokenOptimism.sol	2024-11-08 16:33:51.000000000 +0100
-@@ -1,9 +1,9 @@
- // SPDX-License-Identifier: GPL-2.0-or-later
- pragma solidity 0.8.27;
- 
--import {IOptimismMintableERC20} from "./interfaces/IOptimismMintableERC20.sol";
-+import {IOptimismMintableERC20} from "../../src/interfaces/IOptimismMintableERC20.sol";
- import {IERC165} from
--    "../lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/utils/introspection/IERC165.sol";
-+    "../../lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/utils/introspection/IERC165.sol";
- 
- import {DelegationToken} from "./DelegationToken.sol";
- 
+--- MorphoTokenOptimism.sol	2024-11-08 00:23:18.514227368 +0100
++++ MorphoTokenOptimism.sol	2024-12-04 18:39:10.493804864 +0100
 @@ -69,12 +69,14 @@
  
      /// @dev Allows the StandardBridge on this network to mint tokens.

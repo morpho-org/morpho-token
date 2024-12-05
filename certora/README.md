@@ -1,8 +1,8 @@
-# Morpho Token Contract Formal Verification
+# Morpho token contract formal verification
 
 This folder contains the [CVL](https://docs.certora.com/en/latest/docs/cvl/index.html) specification and verification setup for the [MorphoTokenEthereum](../src/MorphoTokenEthereum.sol) and  [MorphoTokenOptimism](../src/MorphoTokenOptimism.sol) contracts.
 
-## Getting Started
+## Getting started
 
 The verification is performed on modified source files, which can generated with the command:
 
@@ -21,15 +21,14 @@ Please ensure that `CERTORAKEY` is set up in your environment.
 
 ## Overview
 
-These Morpho token contracts replace the legacy version and add support for delegation of voting power, upgradeability and cross-chain interactions.
+These Morpho token is an ERC20 token with support for delegation of voting power, upgradeability and cross-chain interactions.
+Despite the contract being upgradeable, we verify however that the implementation doesn't perform delegate calls, which implies that the implementation is immutable.
 
-### Reentrancy
+Note: the compiled contracts may include loops related to handling strings from the EIP712, for this reason the verification is carried with the option `optimistic_loop` set to `true` in order to avoid related counterexamples.
 
-This is checked in [`Reentrancy.spec`](specs/Reentrancy.spec).
+### External calls
 
-### Immutability
-
-This is checked in [`Immutability.spec`](specs/Immutability.spec).
+This is checked in [`ExternalCalls.spec`](specs/ExternalCalls.spec).
 
 ### ERC20 Compliance
 
@@ -45,11 +44,10 @@ This is checked in [`Delegation.spec`](specs/Delegation.spec).
 
 The [`certora/specs`](specs) folder contains the following files:
 
-- [`Reentrancy.spec`](specs/Reentrancy.spec) checks that Morpho token contracts are reentrancy safe by ensuring that no function is making external call;
-- [`Immutability.spec`](specs/Immutability.spec) checks that Morpho token implementation contract is immutable because it doesn't perform any delegate call other than to the upgrade function;
-- [`ERC20.spec`](specs/ERC20.spec) ensures that the Morpho token is compliant with the [ERC20](https://eips.ethereum.org/EIPS/eip-20) specification, we also check Morpho token `burn` and `mint` functions in [`MintBurnEthereum`](specs/MintBurnEthereum.spec) and [`MintBurnOptimism`](specs/MintBurnOptimism.spec) ;
-- [`Delegation.spec`](specs/Delegation.spec) checks the logic for voting power delegation is correct.
+- [`ExternalCalls.spec`](specs/ExternalCalls.spec) checks that the Morpho token implementation is reentrancy safe by ensuring that no function is making and external calls and, that the implementation is immutable as it doesn't perform any delegate call;
+- [`ERC20.spec`](specs/ERC20.spec) ensures that the Morpho token is compliant with the [ERC20](https://eips.ethereum.org/EIPS/eip-20) specification, we also check Morpho token `burn` and `mint` functions in [`MintBurnEthereum`](specs/MintBurnEthereum.spec) and [`MintBurnOptimism`](specs/MintBurnOptimism.spec);
+- [`Delegation.spec`](specs/Delegation.spec) checks the logic for voting power delegation.
 
 The [`certora/confs`](confs) folder contains a configuration file for each corresponding specification file for both the Ethereum and the Optimism version.
 
-The [`certora/Makefile`](Makefile)  is used to track and perform the required modifications on source files.
+The [`certora/Makefile`](Makefile) is used to track and perform the required modifications on source files.

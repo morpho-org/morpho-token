@@ -20,12 +20,10 @@ jobs:
           - DelegationOptimism
           - ERC20Ethereum
           - ERC20Optimism
-          - ImmutabilityEthereum
-          - ImmutabilityOptimism
+          - ExternalCallsEthereum
+          - ExternalCallsOptimism
           - MintBurnEthereum
           - MintBurnOptimism
-          - ReentrancyEthereum
-          - ReentrancyOptimism
 
     steps:
       - uses: actions/checkout@v4

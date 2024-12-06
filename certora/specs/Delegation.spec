@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-2.0-or-later
 import "ERC20.spec";
 
 methods {
@@ -5,19 +6,95 @@ methods {
     function delegationNonce(address) external returns uint256 envfree;
 }
 
+// Ghost variable to hold the sum of voting power.
+// To reason exhaustively on the value of of delegated voting power we proceed to compute the partial sum of balances for each possible address.
+// We call the partial sum of votes to parameter A up to an addrress a, to sum of delegated votes to parameter A for all addresses within the range [0..a[.
+// Formally, we write ∀ a:address, sumsOfVotesDelegatedToA[a] = Σ balanceOf(i), where the sum ranges over addresses i such that i < a and delegatee(i) = A, provided that the address zero holds no voting power and that it never performs transactions.
+// With this approach, we are able to write and check more abstract properties about the computation of the total delegated voting power using universal quantifiers.
+// From this follows the property such that, ∀ a:address, delegatee(a) = A ⇒ balanceOf(a) ≤ delegatedVotingPower(A).
+// In particular, we have the equality sumsOfVotesDelegatedToA[2^160] = delegatedVotingPower(A).
+// Finally, we reason by parametricity to observe since we have ∀ a:address, delegatee(a) = A ⇒ balanceOf(a) ≤ delegatedVotingPower(A).
+// We also have ∀ A:address, ∀ a:address, A ≠ 0 ∧ delegatee(a) = A ⇒ balanceOf(a) ≤ delegatedVotingPower(A), which is what we want to show.
 ghost mathint sumOfVotingPower {
     init_state axiom sumOfVotingPower == 0;
 }
 
-// Slot for DelegationTokenStorage._delegatedVotingPower
-hook Sstore (slot 0x669be2f4ee1b0b5f3858e4135f31064efe8fa923b09bf21bf538f64f2c3e1101)[KEY address addr] uint256 newValue (uint256 oldValue) {
-    sumOfVotingPower = sumOfVotingPower - oldValue + newValue;
+// Ghost copy of DelegationTokenStorage._delegatedVotingPower.
+ghost mapping(address => uint256) ghostDelegatedVotingPower {
+    init_state axiom forall address account. ghostDelegatedVotingPower[account] == 0;
+}
+
+hook Sload uint256 votingPower (slot 0x669be2f4ee1b0b5f3858e4135f31064efe8fa923b09bf21bf538f64f2c3e1101)[KEY address account] {
+    require ghostDelegatedVotingPower[account] == votingPower;
+}
+
+// Slot is DelegationTokenStorage._delegatedVotingPower.
+hook Sstore (slot 0x669be2f4ee1b0b5f3858e4135f31064efe8fa923b09bf21bf538f64f2c3e1101)[KEY address account] uint256 votingPower (uint256 votingPowerOld) {
+    // Update DelegationTokenStorage._delegatedVotingPower
+    ghostDelegatedVotingPower[account] = votingPower;
+    // Track changes of total voting power.
+    sumOfVotingPower = sumOfVotingPower - votingPowerOld + votingPower;
 }
 
 // Check that zero address has no voting power assuming that zero address can't make transactions.
 invariant zeroAddressNoVotingPower()
     delegatee(0x0) == 0x0 && delegatedVotingPower(0x0) == 0
     { preserved with (env e) { require e.msg.sender != 0; } }
+
+// Check that initially zero votes are delegated to parameterized address A.
+invariant sumOfVotesStartsAtZero()
+    sumsOfVotesDelegatedToA[0] == 0;
+
+invariant sumOfVotesGrowsCorrectly()
+    forall address account. sumsOfVotesDelegatedToA[to_mathint(account) + 1] ==
+    sumsOfVotesDelegatedToA[to_mathint(account)] + (ghostDelegatee[account] == A ? ghostBalances[account] : 0) ;
+
+invariant sumOfVotesMonotone()
+    forall mathint i. forall mathint j. i <= j => sumsOfVotesDelegatedToA[i] <= sumsOfVotesDelegatedToA[j]
+    {
+        preserved {
+            requireInvariant sumOfVotesStartsAtZero();
+            requireInvariant sumOfVotesGrowsCorrectly();
+        }
+    }
+
+invariant delegatedLTEqPartialSum()
+    forall address account. ghostDelegatee[account] == A =>
+      ghostBalances[account] <= sumsOfVotesDelegatedToA[to_mathint(account)+1]
+    {
+        preserved {
+            requireInvariant sumOfVotesStartsAtZero();
+            requireInvariant sumOfVotesGrowsCorrectly();
+            requireInvariant sumOfVotesMonotone();
+        }
+    }
+
+
+invariant sumOfVotesIsDelegatedToA()
+    sumsOfVotesDelegatedToA[2^160] == ghostDelegatedVotingPower[A]
+    {
+        preserved {
+            requireInvariant zeroAddressNoVotingPower();
+            requireInvariant sumOfVotesStartsAtZero();
+            requireInvariant sumOfVotesGrowsCorrectly();
+            requireInvariant sumOfVotesMonotone();
+        }
+    }
+
+invariant delegatedLTEqDelegateeVP()
+    forall address account.
+      ghostDelegatee[account] == A =>
+      ghostBalances[account] <= ghostDelegatedVotingPower[A]
+    {
+        preserved with (env e){
+            requireInvariant zeroAddressNoVotingPower();
+            requireInvariant sumOfVotesStartsAtZero();
+            requireInvariant sumOfVotesGrowsCorrectly();
+            requireInvariant sumOfVotesMonotone();
+            requireInvariant delegatedLTEqPartialSum();
+            requireInvariant sumOfVotesIsDelegatedToA();
+        }
+    }
 
 // Check that the voting power plus the virtual voting power of address zero is equal to the total supply of tokens.
 invariant totalSupplyIsSumOfVirtualVotingPower()
@@ -36,6 +113,7 @@ invariant totalSupplyIsSumOfVirtualVotingPower()
         preserved {
             requireInvariant totalSupplyIsSumOfBalances();
             requireInvariant zeroAddressNoVotingPower();
+            requireInvariant balancesLTEqTotalSupply();
         }
     }
 

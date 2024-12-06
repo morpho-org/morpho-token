@@ -1,0 +1,71 @@
+diff -ruN DelegationToken.sol DelegationToken.sol
+--- DelegationToken.sol	2024-11-19 09:16:52.491545137 +0100
++++ DelegationToken.sol	2024-12-04 18:39:10.493804864 +0100
+@@ -44,6 +44,9 @@
+         mapping(address => uint256) _delegationNonce;
+     }
+ 
++    // A ghost variable to track the theoretical voting power of address zero.
++    uint256 _zeroVirtualVotingPower = 0;
++
+     /* ERRORS */
+ 
+     /// @notice The signature used has expired.
+@@ -148,12 +151,16 @@
+                 uint256 newValue = oldValue - amount;
+                 $._delegatedVotingPower[from] = newValue;
+                 emit DelegatedVotingPowerChanged(from, oldValue, newValue);
++            } else {
++                _zeroVirtualVotingPower -= amount;
+             }
+             if (to != address(0)) {
+                 uint256 oldValue = $._delegatedVotingPower[to];
+                 uint256 newValue = oldValue + amount;
+                 $._delegatedVotingPower[to] = newValue;
+                 emit DelegatedVotingPowerChanged(to, oldValue, newValue);
++            } else {
++                _zeroVirtualVotingPower += amount;
+             }
+         }
+     }
+diff -ruN MorphoTokenEthereum.sol MorphoTokenEthereum.sol
+--- MorphoTokenEthereum.sol	2024-11-08 00:23:18.514227368 +0100
++++ MorphoTokenEthereum.sol	2024-12-04 18:39:10.493804864 +0100
+@@ -26,16 +26,19 @@
+         __ERC20Permit_init(NAME);
+         __Ownable_init(owner);
+ 
++        _zeroVirtualVotingPower = 1_000_000_000e18;
+         _mint(wrapper, 1_000_000_000e18); // Mint 1B to the wrapper contract.
+     }
+ 
+     /// @notice Mints tokens.
+     function mint(address to, uint256 amount) external onlyOwner {
++        _zeroVirtualVotingPower += amount;
+         _mint(to, amount);
+     }
+ 
+     /// @notice Burns sender's tokens.
+     function burn(uint256 amount) external {
+         _burn(_msgSender(), amount);
++        _zeroVirtualVotingPower -= amount;
+     }
+ }
+diff -ruN MorphoTokenOptimism.sol MorphoTokenOptimism.sol
+--- MorphoTokenOptimism.sol	2024-11-08 00:23:18.514227368 +0100
++++ MorphoTokenOptimism.sol	2024-12-04 18:39:10.493804864 +0100
+@@ -69,12 +69,14 @@
+ 
+     /// @dev Allows the StandardBridge on this network to mint tokens.
+     function mint(address to, uint256 amount) external onlyBridge {
++        _zeroVirtualVotingPower += amount;
+         _mint(to, amount);
+     }
+ 
+     /// @dev Allows the StandardBridge on this network to burn tokens.
+     function burn(address from, uint256 amount) external onlyBridge {
+         _burn(from, amount);
++        _zeroVirtualVotingPower -= amount;
+     }
+ 
+     /// @notice ERC165 interface check function.

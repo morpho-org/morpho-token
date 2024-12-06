@@ -15,8 +15,8 @@ persistent ghost address A {
 
 // Partial sum of delegated votes to parameterized address A.
 // sumOfvotes[x] = \sum_{i=0}^{x-1} balances[i] when delegatee[i] == A;
-ghost mapping(mathint => mathint) sumsOfVotes {
-    init_state axiom forall mathint account. sumsOfVotes[account] == 0;
+ghost mapping(mathint => mathint) sumsOfVotesDelegatedToA {
+    init_state axiom forall mathint account. sumsOfVotesDelegatedToA[account] == 0;
 }
 
 // Ghost copy of DelegationTokenStorage._delegatee for quantification.
@@ -35,21 +35,27 @@ hook Sstore (slot 0x669be2f4ee1b0b5f3858e4135f31064efe8fa923b09bf21bf538f64f2c3e
     // Track delegation changes from the parameterized address.
     if (delegateeOld == A && delegatee != A) {
         require changeOfAccountVotesForA == - ghostBalances[account];
-    // Track delegation changes to the pramaeterized address.
+    // Track delegation changes to the prameterized address.
     } else if (delegateeOld != A && delegatee == A) {
         require changeOfAccountVotesForA == ghostBalances[account];
     } else {
         require changeOfAccountVotesForA == 0;
     }
     // Update partial sums for x > to_mathint(account)
-    havoc sumsOfVotes assuming
-        forall mathint x. sumsOfVotes@new[x] ==
-        sumsOfVotes@old[x] + (to_mathint(account) < x ? changeOfAccountVotesForA : 0);
+    havoc sumsOfVotesDelegatedToA assuming
+        forall mathint x. sumsOfVotesDelegatedToA@new[x] ==
+        sumsOfVotesDelegatedToA@old[x] + (to_mathint(account) < x ? changeOfAccountVotesForA : 0);
     // Update ghost copy of DelegationTokenStorage._delegatee.
     ghostDelegatee[account] = delegatee;
 }
 
 // Ghost variable to hold the sum of balances.
+// To reason exhaustively on the value of the sum of balances we proceed to compute the partial sum of balances for each possible address.
+// We call the partial sum of balances up to an addrress a, to sum of balances for all addresses within the range [0..a[.
+// Formally, we write ∀ a:address → sumOfBalances[succ a] = Σᵢ₌₀ᵃ balanceOf(i), provided that the address zero holds no token and that it never performs transactions.
+// With this approach, we are able to write and check more abstract properties about the computation of the total supply of tokens using universal quantifiers.
+// From this follows the property such that, ∀ a:address, balanceOf(a) ≤ totalSupply(), which can be proven using the fact the sumOfBalances is monotonic and that the sum of balances grows steadily on each successive address.
+// In particular we have the equality, sumOfBalances[2^160] = totalSupply() and we are able to to show that the sum of two different balances is lesser than or equal to the total supply.
 ghost mapping(mathint => mathint) sumOfBalances {
     init_state axiom forall mathint addr. sumOfBalances[addr] == 0;
 }
@@ -74,9 +80,9 @@ hook Sstore (slot 0x52c63247e1f47db19d5ce0460030c497f067ca4cebf71ba98eeadabe20ba
     // Update partial sums of votes delegated to the parameterized address, for x > to_mathint(account)
     // Track balance changes when the delegatee is the parameterized address.
     if (ghostDelegatee[account] == A) {
-        havoc sumsOfVotes assuming
-            forall mathint x. sumsOfVotes@new[x] ==
-                sumsOfVotes@old[x] + (to_mathint(account) < x ? newValue - oldValue : 0);
+        havoc sumsOfVotesDelegatedToA assuming
+            forall mathint x. sumsOfVotesDelegatedToA@new[x] ==
+                sumsOfVotesDelegatedToA@old[x] + (to_mathint(account) < x ? newValue - oldValue : 0);
     }
     // Update ghost copy of ERC20Storage._balances.
     ghostBalances[account] = newValue;

@@ -30,9 +30,9 @@ Note: the compiled contracts may include loops related to handling strings from 
 
 This is checked in [`ExternalCalls.spec`](specs/ExternalCalls.spec).
 
-### ERC20 Compliance
+### ERC20 Compliance and Correctness
 
-This is checked in [`ERC20.spec`](specs/ERC20.spec), [`MintBurnEthereum.spec`](specs/MintBurnEthereum.spec) and [`MintBurnOptimism.spec`](specs/MintBurnOptimism.spec).
+This is checked in [`ERC20.spec`](specs/ERC20.spec), [`ERC20Invariants.spec`](specs/ERC20Invariants.spec), [`MintBurnEthereum.spec`](specs/MintBurnEthereum.spec) and [`MintBurnOptimism.spec`](specs/MintBurnOptimism.spec).
 
 ### Delegation Correctness
 
@@ -45,6 +45,7 @@ This is checked in [`Delegation.spec`](specs/Delegation.spec).
 The [`certora/specs`](specs) folder contains the following files:
 
 - [`ExternalCalls.spec`](specs/ExternalCalls.spec) checks that the Morpho token implementation is reentrancy safe by ensuring that no function is making and external calls and, that the implementation is immutable as it doesn't perform any delegate call;
+- [`ERC20Invariants.spec`](specs/ERC20Invariants.spec) common hooks and invariants to be shared in different specs;
 - [`ERC20.spec`](specs/ERC20.spec) ensures that the Morpho token is compliant with the [ERC20](https://eips.ethereum.org/EIPS/eip-20) specification, we also check Morpho token `burn` and `mint` functions in [`MintBurnEthereum`](specs/MintBurnEthereum.spec) and [`MintBurnOptimism`](specs/MintBurnOptimism.spec);
 - [`Delegation.spec`](specs/Delegation.spec) checks the logic for voting power delegation.
 

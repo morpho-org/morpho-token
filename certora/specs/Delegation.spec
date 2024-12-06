@@ -9,12 +9,12 @@ methods {
 // Ghost variable to hold the sum of voting power.
 // To reason exhaustively on the value of of delegated voting power we proceed to compute the partial sum of balances for each possible address.
 // We call the partial sum of votes to parameter A up to an addrress a, to sum of delegated votes to parameter A for all addresses within the range [0..a[.
-// Formally, we write ∀ a:address → sumsOfVotesDelegatedToA[succ a] = Σᵢ₌₀ᵃ delegatee(a) = A ⇒ balanceOf(i), provided that the address zero holds no voting power and that it never performs transactions.
+// Formally, we write ∀ a:address, sumsOfVotesDelegatedToA[a] = Σ balanceOf(i), where the sum ranges over addresses i such that i < a and delegatee(i) = A, provided that the address zero holds no voting power and that it never performs transactions.
 // With this approach, we are able to write and check more abstract properties about the computation of the total delegated voting power using universal quantifiers.
-// From this follows the property such that, ∀ a:address, delegatee(a) = A ⇒ balanceOf(a) ≤ delegatedVotingPower(A), which can be proven using the fact the sumsOfVotesDelegatedToA is monotonic and that the sum of voting power delegated to A grows steadily on each successive address.
+// From this follows the property such that, ∀ a:address, delegatee(a) = A ⇒ balanceOf(a) ≤ delegatedVotingPower(A).
 // In particular, we have the equality sumsOfVotesDelegatedToA[2^160] = delegatedVotingPower(A).
-// Finally, we reason by parametricity to observe since we have ∀ a:address, delegatee(a) = A ⇒ balanceOf(a) ≤ delegatedVotingPower(A)∀ a:address, delegatee(a) = A ⇒ balanceOf(a) ≤ delegatedVotingPower(A),
-// we also have ∀ A : address, ∀ a:address, A ≠ 0 ∧ delegatee(a) = A ⇒ balanceOf(a) ≤ delegatedVotingPower(A), which is what we want to show.
+// Finally, we reason by parametricity to observe since we have ∀ a:address, delegatee(a) = A ⇒ balanceOf(a) ≤ delegatedVotingPower(A).
+// We also have ∀ A:address, ∀ a:address, A ≠ 0 ∧ delegatee(a) = A ⇒ balanceOf(a) ≤ delegatedVotingPower(A), which is what we want to show.
 ghost mathint sumOfVotingPower {
     init_state axiom sumOfVotingPower == 0;
 }

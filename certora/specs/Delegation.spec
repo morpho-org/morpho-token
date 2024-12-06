@@ -7,6 +7,14 @@ methods {
 }
 
 // Ghost variable to hold the sum of voting power.
+// To reason exhaustively on the value of of delegated voting power we proceed to compute the partial sum of balances for each possible address.
+// We call the partial sum of votes to parameter A up to an addrress a, to sum of delegated votes to parameter A for all addresses within the range [0..a[.
+// Formally, we write ∀ a:address → sumsOfVotesDelegatedToA[succ a] = Σᵢ₌₀ᵃ delegatee(a) = A ⇒ balanceOf(i), provided that the address zero holds no voting power and that it never performs transactions.
+// With this approach, we are able to write and check more abstract properties about the computation of the total delegated voting power using universal quantifiers.
+// From this follows the property such that, ∀ a:address, delegatee(a) = A ⇒ balanceOf(a) ≤ delegatedVotingPower(A), which can be proven using the fact the sumsOfVotesDelegatedToA is monotonic and that the sum of voting power delegated to A grows steadily on each successive address.
+// In particular, we have the equality sumsOfVotesDelegatedToA[2^160] = delegatedVotingPower(A).
+// Finally, we reason by parametricity to observe since we have ∀ a:address, delegatee(a) = A ⇒ balanceOf(a) ≤ delegatedVotingPower(A)∀ a:address, delegatee(a) = A ⇒ balanceOf(a) ≤ delegatedVotingPower(A),
+// we also have ∀ A : address, ∀ a:address, A ≠ 0 ∧ delegatee(a) = A ⇒ balanceOf(a) ≤ delegatedVotingPower(A), which is what we want to show.
 ghost mathint sumOfVotingPower {
     init_state axiom sumOfVotingPower == 0;
 }
@@ -35,14 +43,14 @@ invariant zeroAddressNoVotingPower()
 
 // Check that initially zero votes are delegated to parameterized address A.
 invariant sumOfVotesStartsAtZero()
-    sumsOfVotes[0] == 0;
+    sumsOfVotesDelegatedToA[0] == 0;
 
 invariant sumOfVotesGrowsCorrectly()
-    forall address account. sumsOfVotes[to_mathint(account) + 1] ==
-    sumsOfVotes[to_mathint(account)] + (ghostDelegatee[account] == A ? ghostBalances[account] : 0) ;
+    forall address account. sumsOfVotesDelegatedToA[to_mathint(account) + 1] ==
+    sumsOfVotesDelegatedToA[to_mathint(account)] + (ghostDelegatee[account] == A ? ghostBalances[account] : 0) ;
 
 invariant sumOfVotesMonotone()
-    forall mathint i. forall mathint j. i <= j => sumsOfVotes[i] <= sumsOfVotes[j]
+    forall mathint i. forall mathint j. i <= j => sumsOfVotesDelegatedToA[i] <= sumsOfVotesDelegatedToA[j]
     {
         preserved {
             requireInvariant sumOfVotesStartsAtZero();
@@ -52,7 +60,7 @@ invariant sumOfVotesMonotone()
 
 invariant delegatedLTEqPartialSum()
     forall address account. ghostDelegatee[account] == A =>
-      ghostBalances[account] <= sumsOfVotes[to_mathint(account)+1]
+      ghostBalances[account] <= sumsOfVotesDelegatedToA[to_mathint(account)+1]
     {
         preserved {
             requireInvariant sumOfVotesStartsAtZero();
@@ -63,7 +71,7 @@ invariant delegatedLTEqPartialSum()
 
 
 invariant sumOfVotesIsDelegatedToA()
-    sumsOfVotes[2^160] == ghostDelegatedVotingPower[A]
+    sumsOfVotesDelegatedToA[2^160] == ghostDelegatedVotingPower[A]
     {
         preserved {
             requireInvariant zeroAddressNoVotingPower();

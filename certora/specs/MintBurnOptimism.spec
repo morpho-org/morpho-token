@@ -9,6 +9,8 @@ rule onlyAuthorizedCanTransfer(env e, method f) filtered {
     f-> f.selector != sig:upgradeToAndCall(address, bytes).selector
 } {
     requireInvariant totalSupplyIsSumOfBalances();
+    requireInvariant balancesLTEqTotalSupply();
+    requireInvariant twoBalancesLTEqTotalSupply();
 
     calldataarg args;
     address account;
@@ -36,6 +38,7 @@ rule noChangeTotalSupply(env e, method f) filtered {
     f-> f.selector != sig:upgradeToAndCall(address, bytes).selector
 } {
     requireInvariant totalSupplyIsSumOfBalances();
+    requireInvariant balancesLTEqTotalSupply();
 
     calldataarg args;
 
@@ -54,6 +57,7 @@ rule noChangeTotalSupply(env e, method f) filtered {
 */
 rule mint(env e) {
     requireInvariant totalSupplyIsSumOfBalances();
+    requireInvariant balancesLTEqTotalSupply();
     assert isTotalSupplyGTEqSumOfVotingPower();
     requireInvariant zeroAddressNoVotingPower();
     require nonpayable(e);
@@ -95,7 +99,7 @@ rule mint(env e) {
 └─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
 */
 rule burn(env e) {
-    requireInvariant totalSupplyIsSumOfBalances();
+    requireInvariant balancesLTEqTotalSupply();
     assert isTotalSupplyGTEqSumOfVotingPower();
     requireInvariant zeroAddressNoVotingPower();
     require nonpayable(e);

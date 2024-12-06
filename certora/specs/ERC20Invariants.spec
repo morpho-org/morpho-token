@@ -120,6 +120,19 @@ invariant balancesLTEqTotalSupply()
         }
     }
 
+invariant twoBalancesLTEqTotalSupply()
+    forall address a. forall address b. a != b => ghostBalances[a] + ghostBalances[b] <= sumOfBalances[2^160]
+    {
+        preserved {
+            requireInvariant balancesLTEqTotalSupply();
+            requireInvariant sumOfBalancesStartsAtZero();
+            requireInvariant sumOfBalancesGrowsCorrectly();
+            requireInvariant sumOfBalancesMonotone();
+            requireInvariant totalSupplyIsSumOfBalances();
+        }
+    }
+
+
 rule twoBalancesCannotExceedTotalSupply(address accountA, address accountB) {
     requireInvariant sumOfBalancesStartsAtZero();
     requireInvariant sumOfBalancesGrowsCorrectly();

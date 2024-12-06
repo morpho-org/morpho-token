@@ -52,9 +52,9 @@ hook Sstore (slot 0x669be2f4ee1b0b5f3858e4135f31064efe8fa923b09bf21bf538f64f2c3e
 // Ghost variable to hold the sum of balances.
 // To reason exhaustively on the value of the sum of balances we proceed to compute the partial sum of balances for each possible address.
 // We call the partial sum of balances up to an addrress a, to sum of balances for all addresses within the range [0..a[.
-// Formally, we write ∀ a:address → sumOfBalances[succ a] = Σᵢ₌₀ᵃ balanceOf(i), provided that the address zero holds no token and that it never performs transactions.
+// Formally, we write ∀ a:address, sumOfBalances[a] = Σ balanceOf(i) where the sum ranges over addresses i < a, provided that the address zero holds no token and that it never performs transactions.
 // With this approach, we are able to write and check more abstract properties about the computation of the total supply of tokens using universal quantifiers.
-// From this follows the property such that, ∀ a:address, balanceOf(a) ≤ totalSupply(), which can be proven using the fact the sumOfBalances is monotonic and that the sum of balances grows steadily on each successive address.
+// From this follows the property such that, ∀ a:address, balanceOf(a) ≤ totalSupply().
 // In particular we have the equality, sumOfBalances[2^160] = totalSupply() and we are able to to show that the sum of two different balances is lesser than or equal to the total supply.
 ghost mapping(mathint => mathint) sumOfBalances {
     init_state axiom forall mathint addr. sumOfBalances[addr] == 0;

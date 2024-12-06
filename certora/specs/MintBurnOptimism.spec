@@ -5,9 +5,7 @@ import "Delegation.spec";
 │ Rules: only the token holder or an approved third party can reduce an account's balance                             │
 └─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
 */
-rule onlyAuthorizedCanTransfer(env e, method f) filtered {
-    f-> f.selector != sig:upgradeToAndCall(address, bytes).selector
-} {
+rule onlyAuthorizedCanTransfer(env e, method f) {
     requireInvariant totalSupplyIsSumOfBalances();
     requireInvariant balancesLTEqTotalSupply();
     requireInvariant twoBalancesLTEqTotalSupply();
@@ -25,7 +23,7 @@ rule onlyAuthorizedCanTransfer(env e, method f) filtered {
     ) => (
         f.selector == sig:burn(address, uint256).selector ||
         e.msg.sender == account ||
-        balanceBefore - balanceAfter <= to_mathint(allowanceBefore)
+        f.selector == sig:transferFrom(address, address, uint256).selector && balanceBefore - balanceAfter <= to_mathint(allowanceBefore)
     );
 }
 
@@ -34,9 +32,7 @@ rule onlyAuthorizedCanTransfer(env e, method f) filtered {
 │ Rules: only mint and burn can change total supply                                                                   │
 └─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
 */
-rule noChangeTotalSupply(env e, method f) filtered {
-    f-> f.selector != sig:upgradeToAndCall(address, bytes).selector
-} {
+rule noChangeTotalSupply(env e, method f) {
     requireInvariant totalSupplyIsSumOfBalances();
     requireInvariant balancesLTEqTotalSupply();
 

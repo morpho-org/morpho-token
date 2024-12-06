@@ -138,20 +138,6 @@ invariant twoBalancesLTEqTotalSupply()
         }
     }
 
-
-rule twoBalancesCannotExceedTotalSupply(address accountA, address accountB) {
-    requireInvariant sumOfBalancesStartsAtZero();
-    requireInvariant sumOfBalancesGrowsCorrectly();
-    requireInvariant sumOfBalancesMonotone();
-    requireInvariant totalSupplyIsSumOfBalances();
-    uint256 balanceA = balanceOf(accountA);
-    uint256 balanceB = balanceOf(accountB);
-
-    assert accountA != accountB =>
-        balanceA + balanceB <= to_mathint(totalSupply());
-    satisfy(accountA != accountB && balanceA > 0 && balanceB > 0);
-}
-
 // Check that zero address's balance is equal to zero.
 invariant zeroAddressNoBalance()
     balanceOf(0) == 0;

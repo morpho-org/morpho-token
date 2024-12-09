@@ -12,7 +12,7 @@ rule mintRevertConditions(env e, address to, uint256 amount) {
     mathint totalSupplyBefore = totalSupply();
     uint256 toVotingPowerBefore = delegatedVotingPower(delegatee(to));
 
-    // Safe require as zero address can't possibly delegate voting power which is verified in zeroAddressNoVotingPower .
+    // Safe require as zero address can't possibly delegate voting power which is verified in zeroAddressNoVotingPower.
     require delegatee(0) == 0;
 
     // Safe require as it is verified in totalSupplyGTEqSumOfVotingPower.
@@ -27,7 +27,7 @@ rule burnRevertConditions(env e, address from, uint256 amount) {
     uint256 balanceOfFromBefore = balanceOf(from);
     uint256 fromVotingPowerBefore = delegatedVotingPower(delegatee(from));
 
-    // Safe require as zero address can't possibly delegate voting power.
+    // Safe require as zero address can't possibly delegate voting power which is verified in zeroAddressNoVotingPower.
     require delegatee(0) == 0;
 
     // Safe require as it is verified in delegatedLTEqDelegateeVP.

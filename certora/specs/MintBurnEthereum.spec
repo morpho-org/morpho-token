@@ -1,3 +1,5 @@
+// This is spec is taken from the Open Zeppelin repositories at https://github.com/OpenZeppelin/openzeppelin-contracts/blob/448efeea6640bbbc09373f03fbc9c88e280147ba/certora/specs/ERC20.spec, and patched to support the DelegationToken.
+
 import "Delegation.spec";
 
 /*
@@ -31,10 +33,11 @@ rule onlyAuthorizedCanTransfer(env e, method f) {
 │ Rules: only mint and burn can change total supply                                                                   │
 └─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
 */
-rule noChangeTotalSupply(env e, method f) {
+rule noChangeTotalSupply(env e) {
     requireInvariant totalSupplyIsSumOfBalances();
     requireInvariant balancesLTEqTotalSupply();
 
+    method f;
     calldataarg args;
 
     uint256 totalSupplyBefore = totalSupply();

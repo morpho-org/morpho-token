@@ -14,11 +14,11 @@ rule mintRevertConditions(env e, address to, uint256 amount) {
     uint256 balanceOfSenderBefore = balanceOf(e.msg.sender);
     uint256 toVotingPowerBefore = delegatedVotingPower(delegatee(to));
 
-    // Safe require as zero address can't possibly delegate voting power.
+    // Safe require as zero address can't possibly delegate voting power which is verified in zeroAddressNoVotingPower .
     require delegatee(0) == 0;
 
-    // Safe require because if the delegatee is not zero the recipient's delegatee's voting power is lesser than or equal to the total supply of tokens
-    require delegatee(to) != 0 => toVotingPowerBefore <= totalSupply();
+    // Safe require as it is verified in totalSupplyGTEqSumOfVotingPower.
+    require toVotingPowerBefore <= totalSupply();
 
     mint@withrevert(e, to, amount);
     assert lastReverted <=> e.msg.sender != owner() || to == 0 || e.msg.value != 0 || totalSupplyBefore + amount > max_uint256;
@@ -29,11 +29,11 @@ rule burnRevertConditions(env e, uint256 amount) {
     uint256 balanceOfSenderBefore = balanceOf(e.msg.sender);
     uint256 delegateeVotingPowerBefore = delegatedVotingPower(delegatee(e.msg.sender));
 
-    // Safe require as zero address can't possibly delegate voting power.
+    // Safe require as zero address can't possibly delegate voting power which is verified in zeroAddressNoVotingPower .
     require delegatee(0) == 0;
 
-    // Safe require because a holder's balance is added to the delegatee's voting power upon delegation.
-    require delegatee(e.msg.sender) != 0 => delegateeVotingPowerBefore >= balanceOfSenderBefore;
+    // Safe require as it is verified in delegatedLTEqDelegateeVP.
+    require delegateeVotingPowerBefore >= balanceOfSenderBefore;
 
     burn@withrevert(e, amount);
     assert lastReverted <=> e.msg.sender == 0 || balanceOfSenderBefore < amount || e.msg.value != 0;

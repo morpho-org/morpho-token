@@ -34,6 +34,33 @@ use invariant zeroAddressNoBalance;
 
 /*
 ┌─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│ Rules: only the token holder or an approved third party can reduce an account's balance                             │
+└─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+*/
+rule onlyAuthorizedCanTransfer(env e) {
+    requireInvariant totalSupplyIsSumOfBalances();
+    requireInvariant balancesLTEqTotalSupply();
+    requireInvariant twoBalancesLTEqTotalSupply();
+
+    method f;
+    calldataarg args;
+    address account;
+
+    uint256 allowanceBefore = allowance(account, e.msg.sender);
+    uint256 balanceBefore   = balanceOf(account);
+    f(e, args);
+    uint256 balanceAfter    = balanceOf(account);
+
+    assert (
+        balanceAfter < balanceBefore
+    ) => (
+        e.msg.sender == account ||
+        f.selector == sig:transferFrom(address, address, uint256).selector && balanceBefore - balanceAfter <= to_mathint(allowanceBefore)
+    );
+}
+
+/*
+┌─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
 │ Rules: only the token holder (or a permit) can increase allowance. The spender can decrease it by using it          │
 └─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
 */

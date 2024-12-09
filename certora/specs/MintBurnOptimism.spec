@@ -1,41 +1,17 @@
+// This is spec is taken from the Open Zeppelin repositories at https://github.com/OpenZeppelin/openzeppelin-contracts/blob/448efeea6640bbbc09373f03fbc9c88e280147ba/certora/specs/ERC20.spec, and patched to support the DelegationToken.
+
 import "Delegation.spec";
-
-/*
-┌─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
-│ Rules: only the token holder or an approved third party can reduce an account's balance                             │
-└─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
-*/
-rule onlyAuthorizedCanTransfer(env e, method f) {
-    requireInvariant totalSupplyIsSumOfBalances();
-    requireInvariant balancesLTEqTotalSupply();
-    requireInvariant twoBalancesLTEqTotalSupply();
-
-    calldataarg args;
-    address account;
-
-    uint256 allowanceBefore = allowance(account, e.msg.sender);
-    uint256 balanceBefore   = balanceOf(account);
-    f(e, args);
-    uint256 balanceAfter    = balanceOf(account);
-
-    assert (
-        balanceAfter < balanceBefore
-    ) => (
-        f.selector == sig:burn(address, uint256).selector ||
-        e.msg.sender == account ||
-        f.selector == sig:transferFrom(address, address, uint256).selector && balanceBefore - balanceAfter <= to_mathint(allowanceBefore)
-    );
-}
 
 /*
 ┌─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
 │ Rules: only mint and burn can change total supply                                                                   │
 └─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
 */
-rule noChangeTotalSupply(env e, method f) {
+rule noChangeTotalSupply(env e) {
     requireInvariant totalSupplyIsSumOfBalances();
     requireInvariant balancesLTEqTotalSupply();
 
+    method f;
     calldataarg args;
 
     uint256 totalSupplyBefore = totalSupply();
@@ -119,7 +95,7 @@ rule burn(env e) {
 
     // check outcome
     if (lastReverted) {
-           assert e.msg.sender == 0x0 ||  fromBalanceBefore < amount || fromVotingPowerBefore < amount
+           assert e.msg.sender == 0x0 || fromBalanceBefore < amount || fromVotingPowerBefore < amount
                || e.msg.sender != currentContract.bridge;
     } else {
         // updates balance and totalSupply

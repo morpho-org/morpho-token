@@ -6,16 +6,14 @@ methods {
     function delegationNonce(address) external returns uint256 envfree;
 }
 
-// To reason exhaustively on the value of of delegated voting power we proceed to compute the partial sum of delegated votes to parametre A for each possible address.
-// We call the partial sum of votes to parameter A up to an addrress a, to sum of delegated votes to parameter A for all addresses within the range [0..a[.
-// Formally, we write ∀ a:address, sumsOfVotesDelegatedToA[a] = Σ balanceOf(i), where the sum ranges over addresses i such that i < a and delegatee(i) = A, provided that the address zero holds no voting power and that it never performs transactions.
-// With this approach, we are able to write and check more abstract properties about the computation of the total delegated voting power using universal quantifiers.
-// From this follows the property such that, ∀ a:address, delegatee(a) = A ⇒ balanceOf(a) ≤ delegatedVotingPower(A).
-// In particular, we have the equality sumsOfVotesDelegatedToA[2^160] = delegatedVotingPower(A).
-// Finally, we reason by parametricity to observe since we have ∀ a:address, delegatee(a) = A ⇒ balanceOf(a) ≤ delegatedVotingPower(A).
-// We also have ∀ A:address, ∀ a:address, A ≠ 0 ∧ delegatee(a) = A ⇒ balanceOf(a) ≤ delegatedVotingPower(A), which is what we want to show.
-
 // Ghost variable to hold the sum of voting power.
+// To reason exhaustively on the value of the sum of voting power we proceed to compute the partial sum of voting power for each possible address.
+// We call the partial sum of balances up to an addrress a, to sum of balances for all addresses within the range [0..a[.
+// Formally, we write ∀ a:address, sumOfVotes[a] = Σ delegatedVotingPower(i) where the sum ranges over addresses i < a, provided that the address zero holds no token and that it never performs transactions.
+// With this approach, we are able to write and check more abstract properties about the computation of the total supply of tokens using universal quantifiers.
+// From this follows the property such that, ∀ a:address, delegatedVotingpower(a) ≤ total sum of votes.
+// In particular we have the equality, sumOfVotes[2^160] + _zeroVirtualVotingPower = totalSupply() from which we can deduce that the sum of voting power is lesser than or equal to the totalSupply();
+// and we are able to to show that the sum of two different balances is lesser than or equal to the total sum of votes.
 ghost mapping (mathint => mathint) sumOfVotes {
     init_state axiom forall mathint account. sumOfVotes[account] == 0;
 }

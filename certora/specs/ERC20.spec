@@ -71,6 +71,7 @@ rule onlyHolderOrSpenderCanChangeAllowance(env e, method f){
 */
 rule transfer(env e) {
     requireInvariant totalSupplyIsSumOfBalances();
+    requireInvariant twoBalancesLTEqTotalSupply();
     require nonpayable(e);
 
 
@@ -85,9 +86,6 @@ rule transfer(env e) {
     uint256 recipientBalanceBefore = balanceOf(recipient);
     uint256 recipientVotingPowerBefore = delegatedVotingPower(delegatee(recipient));
     uint256 otherBalanceBefore     = balanceOf(other);
-
-    // Safe require as it's proven by the rule twoBalancesCannotExceedTotalSupply.
-    require holder != recipient => balanceOf(holder) + balanceOf(recipient) <= totalSupply();
 
     // run transaction
     transfer@withrevert(e, recipient, amount);
@@ -114,6 +112,7 @@ rule transfer(env e) {
 */
 rule transferFrom(env e) {
     requireInvariant totalSupplyIsSumOfBalances();
+    requireInvariant twoBalancesLTEqTotalSupply();
     require nonpayable(e);
 
     address spender = e.msg.sender;
@@ -129,9 +128,6 @@ rule transferFrom(env e) {
     uint256 recipientBalanceBefore = balanceOf(recipient);
     uint256 recipientVotingPowerBefore = delegatedVotingPower(delegatee(recipient));
     uint256 otherBalanceBefore     = balanceOf(other);
-
-    // Safe require as it's proven by the rule twoBalancesCannotExceedTotalSupply.
-    require holder != recipient => balanceOf(holder) + balanceOf(recipient) <= totalSupply();
 
     // run transaction
     transferFrom@withrevert(e, holder, recipient, amount);

@@ -70,7 +70,7 @@ rule mint(env e) {
     uint256 otherBalanceBefore = balanceOf(other);
     uint256 totalSupplyBefore  = totalSupply();
 
-    // Safe require thats avoid absurd counter-examples.
+    // Safe require thats follows from delegatedVotingPowerLTEqTotalVotingPower.
     require toVotingPowerBefore <= sumOfVotingPower;
 
     // run transaction
@@ -113,7 +113,7 @@ rule burn(env e) {
     uint256 otherBalanceBefore = balanceOf(other);
     uint256 totalSupplyBefore  = totalSupply();
 
-    // Safe require that avoids absurd counter-examples.
+    // Safe require that follows from delegatedVotingPowerLTEqTotalVotingPower. 
     require fromVotingPowerBefore <= sumOfVotingPower;
 
     // run transaction

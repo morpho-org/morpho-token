@@ -16,7 +16,7 @@ rule transferRevertConditions(env e, address to, uint256 amount) {
 
     // Safe require as it is verified in delegatedLTEqDelegateeVP.
     require senderVotingPowerBefore >= balanceOfSenderBefore;
-    // Safe require because if delegatees are different the recipient's voting power excludes the holder's balance.
+    // Safe require that follows from sumOfTwoDelegatedVPLTEqTotalVP(), delegatedLTEqDelegateeVP() and totalSupplyIsSumOfVirtualVotingPower().
     require delegatee(to) != delegatee(e.msg.sender) => recipientVotingPowerBefore <= totalSupply() - balanceOfSenderBefore;
 
     transfer@withrevert(e, to, amount);
@@ -33,7 +33,7 @@ rule transferFromRevertConditions(env e, address from, address to, uint256 amoun
     // Safe require as it is verified in delegatedLTEqDelegateeVP.
     require holderVotingPowerBefore >= balanceOfHolderBefore;
 
-    // Safe require because if delegatees are different the recipient's voting power excludes the holder's balance.
+    // Safe require that follows from  sumOfTwoDelegatedVPLTEqTotalVP(), delegatedLTEqDelegateeVP() and totalSupplyIsSumOfVirtualVotingPower().
     require delegatee(to) != delegatee(from) => recipientVotingPowerBefore <= totalSupply() - balanceOfHolderBefore;
 
     transferFrom@withrevert(e, from, to, amount);

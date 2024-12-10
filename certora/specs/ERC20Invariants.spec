@@ -14,7 +14,7 @@ persistent ghost address A {
 }
 
 // Ghost variable to hold the sum of delegated votes to parameterized address A.
-// To reason exhaustively on the value of of delegated voting power we proceed to compute the partial sum of delegated votes to parametre A for each possible address.
+// To reason exhaustively on the value of of delegated voting power we proceed to compute the partial sum of delegated votes to parameter A for each possible address.
 // We call the partial sum of votes to parameter A up to an addrress a, to sum of delegated votes to parameter A for all addresses within the range [0..a[.
 // Formally, we write ∀ a:address, sumsOfVotesDelegatedToA[a] = Σ balanceOf(i), where the sum ranges over addresses i such that i < a and delegatee(i) = A, provided that the address zero holds no voting power and that it never performs transactions.
 // With this approach, we are able to write and check more abstract properties about the computation of the total delegated voting power using universal quantifiers.

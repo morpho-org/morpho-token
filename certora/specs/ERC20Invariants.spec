@@ -13,7 +13,16 @@ persistent ghost address A {
     axiom A != 0;
 }
 
-// Partial sum of delegated votes to parameterized address A.
+// Ghost variable to hold the sum of delegated votes to parameterized address A.
+// To reason exhaustively on the value of of delegated voting power we proceed to compute the partial sum of delegated votes to parameter A for each possible address.
+// We call the partial sum of votes to parameter A up to an addrress a, to sum of delegated votes to parameter A for all addresses within the range [0..a[.
+// Formally, we write ∀ a:address, sumsOfVotesDelegatedToA[a] = Σ balanceOf(i), where the sum ranges over addresses i such that i < a and delegatee(i) = A, provided that the address zero holds no voting power and that it never performs transactions.
+// With this approach, we are able to write and check more abstract properties about the computation of the total delegated voting power using universal quantifiers.
+// From this follows the property such that, ∀ a:address, delegatee(a) = A ⇒ balanceOf(a) ≤ delegatedVotingPower(A).
+// In particular, we have the equality sumsOfVotesDelegatedToA[2^160] = delegatedVotingPower(A).
+// Finally, we reason by parametricity to observe since we have ∀ a:address, delegatee(a) = A ⇒ balanceOf(a) ≤ delegatedVotingPower(A).
+// We also have ∀ A:address, ∀ a:address, A ≠ 0 ∧ delegatee(a) = A ⇒ balanceOf(a) ≤ delegatedVotingPower(A), which is what we want to show.
+
 // sumOfvotes[x] = \sum_{i=0}^{x-1} balances[i] when delegatee[i] == A;
 ghost mapping(mathint => mathint) sumsOfVotesDelegatedToA {
     init_state axiom forall mathint account. sumsOfVotesDelegatedToA[account] == 0;

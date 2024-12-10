@@ -26,6 +26,10 @@ jobs:
           - ExternalCallsOptimism
           - MintBurnEthereum
           - MintBurnOptimism
+          - RevertsERC20Ethereum
+          - RevertsERC20Optimism
+          - RevertsMintBurnEthereum
+          - RevertsMintBurnOptimism
 
     steps:
       - uses: actions/checkout@v4

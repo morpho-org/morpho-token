@@ -7,16 +7,14 @@ methods {
 }
 
 // Ghost variable to hold the sum of voting power.
-// To reason exhaustively on the value of of delegated voting power we proceed to compute the partial sum of balances for each possible address.
-// We call the partial sum of votes to parameter A up to an addrress a, to sum of delegated votes to parameter A for all addresses within the range [0..a[.
-// Formally, we write ∀ a:address, sumsOfVotesDelegatedToA[a] = Σ balanceOf(i), where the sum ranges over addresses i such that i < a and delegatee(i) = A, provided that the address zero holds no voting power and that it never performs transactions.
-// With this approach, we are able to write and check more abstract properties about the computation of the total delegated voting power using universal quantifiers.
-// From this follows the property such that, ∀ a:address, delegatee(a) = A ⇒ balanceOf(a) ≤ delegatedVotingPower(A).
-// In particular, we have the equality sumsOfVotesDelegatedToA[2^160] = delegatedVotingPower(A).
-// Finally, we reason by parametricity to observe since we have ∀ a:address, delegatee(a) = A ⇒ balanceOf(a) ≤ delegatedVotingPower(A).
-// We also have ∀ A:address, ∀ a:address, A ≠ 0 ∧ delegatee(a) = A ⇒ balanceOf(a) ≤ delegatedVotingPower(A), which is what we want to show.
-ghost mathint sumOfVotingPower {
-    init_state axiom sumOfVotingPower == 0;
+// To reason exhaustively on the value of the sum of voting power we proceed to compute the partial sum of voting power for each possible address.
+// We call the partial sum of balances up to an addrress a, to sum of balances for all addresses within the range [0..a[.
+// Formally, we write ∀ a:address, sumOfVotes[a] = Σ delegatedVotingPower(i) where the sum ranges over addresses i < a, provided that the address zero holds no token and that it never performs transactions.
+// With this approach, we are able to write and check more abstract properties about the computation of the total voting power using universal quantifiers.
+// From this follows the property such that, ∀ a:address, delegatedVotingpower(a) ≤ total sum of votes.
+// In particular, we are able to to show that the sum voting powers of two different accounts is lesser than or equal to the total sum of votes.
+ghost mapping (mathint => mathint) sumOfVotes {
+    init_state axiom forall mathint account. sumOfVotes[account] == 0;
 }
 
 // Ghost copy of DelegationTokenStorage._delegatedVotingPower.
@@ -32,8 +30,10 @@ hook Sload uint256 votingPower (slot 0x669be2f4ee1b0b5f3858e4135f31064efe8fa923b
 hook Sstore (slot 0x669be2f4ee1b0b5f3858e4135f31064efe8fa923b09bf21bf538f64f2c3e1101)[KEY address account] uint256 votingPower (uint256 votingPowerOld) {
     // Update DelegationTokenStorage._delegatedVotingPower
     ghostDelegatedVotingPower[account] = votingPower;
-    // Track changes of total voting power.
-    sumOfVotingPower = sumOfVotingPower - votingPowerOld + votingPower;
+    // Track balance changes in sum of votes.
+    havoc sumOfVotes assuming
+        forall mathint x. sumOfVotes@new[x] ==
+            sumOfVotes@old[x] + (to_mathint(account) < x ? votingPower - votingPowerOld : 0);
 }
 
 // Check that zero address has no voting power assuming that zero address can't make transactions.
@@ -42,19 +42,19 @@ invariant zeroAddressNoVotingPower()
     { preserved with (env e) { require e.msg.sender != 0; } }
 
 // Check that initially zero votes are delegated to parameterized address A.
-invariant sumOfVotesStartsAtZero()
+invariant sumOfVotesDelegatedToAStartsAtZero()
     sumsOfVotesDelegatedToA[0] == 0;
 
-invariant sumOfVotesGrowsCorrectly()
+invariant sumOfVotesDelegatedToAGrowsCorrectly()
     forall address account. sumsOfVotesDelegatedToA[to_mathint(account) + 1] ==
     sumsOfVotesDelegatedToA[to_mathint(account)] + (ghostDelegatee[account] == A ? ghostBalances[account] : 0) ;
 
-invariant sumOfVotesMonotone()
+invariant sumOfVotesDelegatedToAMonotone()
     forall mathint i. forall mathint j. i <= j => sumsOfVotesDelegatedToA[i] <= sumsOfVotesDelegatedToA[j]
     {
         preserved {
-            requireInvariant sumOfVotesStartsAtZero();
-            requireInvariant sumOfVotesGrowsCorrectly();
+            requireInvariant sumOfVotesDelegatedToAStartsAtZero();
+            requireInvariant sumOfVotesDelegatedToAGrowsCorrectly();
         }
     }
 
@@ -63,21 +63,21 @@ invariant delegatedLTEqPartialSum()
       ghostBalances[account] <= sumsOfVotesDelegatedToA[to_mathint(account)+1]
     {
         preserved {
-            requireInvariant sumOfVotesStartsAtZero();
-            requireInvariant sumOfVotesGrowsCorrectly();
-            requireInvariant sumOfVotesMonotone();
+            requireInvariant sumOfVotesDelegatedToAStartsAtZero();
+            requireInvariant sumOfVotesDelegatedToAGrowsCorrectly();
+            requireInvariant sumOfVotesDelegatedToAMonotone();
         }
     }
 
 
-invariant sumOfVotesIsDelegatedToA()
+invariant sumOfVotesDelegatedToAIsDelegatedToA()
     sumsOfVotesDelegatedToA[2^160] == ghostDelegatedVotingPower[A]
     {
         preserved {
             requireInvariant zeroAddressNoVotingPower();
-            requireInvariant sumOfVotesStartsAtZero();
-            requireInvariant sumOfVotesGrowsCorrectly();
-            requireInvariant sumOfVotesMonotone();
+            requireInvariant sumOfVotesDelegatedToAStartsAtZero();
+            requireInvariant sumOfVotesDelegatedToAGrowsCorrectly();
+            requireInvariant sumOfVotesDelegatedToAMonotone();
         }
     }
 
@@ -88,38 +88,81 @@ invariant delegatedLTEqDelegateeVP()
     {
         preserved with (env e){
             requireInvariant zeroAddressNoVotingPower();
+            requireInvariant sumOfVotesDelegatedToAStartsAtZero();
+            requireInvariant sumOfVotesDelegatedToAGrowsCorrectly();
+            requireInvariant sumOfVotesDelegatedToAMonotone();
+            requireInvariant delegatedLTEqPartialSum();
+            requireInvariant sumOfVotesDelegatedToAIsDelegatedToA();
+        }
+    }
+
+invariant sumOfVotesStartsAtZero()
+    sumOfVotes[0] == 0;
+
+invariant sumOfVotesGrowsCorrectly()
+    forall address addr. sumOfVotes[to_mathint(addr) + 1] ==
+      sumOfVotes[to_mathint(addr)] + ghostDelegatedVotingPower[addr];
+
+invariant sumOfVotesMonotone()
+    forall mathint i. forall mathint j. i <= j => sumOfVotes[i] <= sumOfVotes[j]
+    {
+        preserved {
             requireInvariant sumOfVotesStartsAtZero();
             requireInvariant sumOfVotesGrowsCorrectly();
-            requireInvariant sumOfVotesMonotone();
-            requireInvariant delegatedLTEqPartialSum();
-            requireInvariant sumOfVotesIsDelegatedToA();
         }
     }
 
 // Check that the voting power plus the virtual voting power of address zero is equal to the total supply of tokens.
 invariant totalSupplyIsSumOfVirtualVotingPower()
-    to_mathint(totalSupply()) == sumOfVotingPower + currentContract._zeroVirtualVotingPower
+    sumOfVotes[2^160] + currentContract._zeroVirtualVotingPower == to_mathint(totalSupply())
     {
+        preserved {
+            requireInvariant sumOfBalancesStartsAtZero();
+            requireInvariant sumOfBalancesGrowsCorrectly();
+            requireInvariant sumOfBalancesMonotone();
+            requireInvariant totalSupplyIsSumOfBalances();
+            requireInvariant zeroAddressNoVotingPower();
+            requireInvariant balancesLTEqTotalSupply();
+
+        }
         preserved MorphoTokenOptimismHarness.initialize(address _) with (env e) {
-            // Safe requires because the proxy contract should be initialized right after construction.
+            // Safe require because the proxy contract should be initialized right after construction.
             require totalSupply() == 0;
-            require sumOfVotingPower == 0;
         }
         preserved MorphoTokenEthereumHarness.initialize(address _, address _) with (env e) {
             // Safe requires because the proxy contract should be initialized right after construction.
             require totalSupply() == 0;
-            require sumOfVotingPower == 0;
-        }
-        preserved {
-            requireInvariant totalSupplyIsSumOfBalances();
-            requireInvariant zeroAddressNoVotingPower();
-            requireInvariant balancesLTEqTotalSupply();
+            require forall mathint account. sumOfVotes[account] == 0;
         }
     }
 
+invariant delegatedVotingPowerLTEqTotalVotingPower()
+    forall address a. ghostDelegatedVotingPower[a] <= sumOfVotes[2^160]
+    {
+        preserved {
+            requireInvariant sumOfVotesStartsAtZero();
+            requireInvariant sumOfVotesGrowsCorrectly();
+            requireInvariant sumOfVotesMonotone();
+            requireInvariant totalSupplyIsSumOfVirtualVotingPower();
+        }
+    }
+
+invariant sumOfTwoDelegatedVPLTEqTotalVP()
+    forall address a. forall address b. a != b => ghostDelegatedVotingPower[a] + ghostDelegatedVotingPower[b] <= sumOfVotes[2^160]
+    {
+        preserved {
+            requireInvariant delegatedVotingPowerLTEqTotalVotingPower();
+            requireInvariant sumOfVotesStartsAtZero();
+            requireInvariant sumOfVotesGrowsCorrectly();
+            requireInvariant sumOfVotesMonotone();
+            requireInvariant totalSupplyIsSumOfVirtualVotingPower();
+        }
+    }
+
+
 function isTotalSupplyGTEqSumOfVotingPower() returns bool {
     requireInvariant totalSupplyIsSumOfVirtualVotingPower();
-    return totalSupply() >= sumOfVotingPower;
+    return totalSupply() >= sumOfVotes[2^160];
 }
 
 // Check that the total supply of tokens is greater than or equal to the sum of voting power.

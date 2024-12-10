@@ -56,6 +56,7 @@ rule noChangeTotalSupply(env e) {
 rule mint(env e) {
     requireInvariant totalSupplyIsSumOfBalances();
     requireInvariant balancesLTEqTotalSupply();
+    requireInvariant delegatedVotingPowerLTEqTotalVotingPower();
     assert isTotalSupplyGTEqSumOfVotingPower();
     requireInvariant zeroAddressNoVotingPower();
     require nonpayable(e);
@@ -69,9 +70,6 @@ rule mint(env e) {
     uint256 toVotingPowerBefore = delegatedVotingPower(delegatee(to));
     uint256 otherBalanceBefore = balanceOf(other);
     uint256 totalSupplyBefore  = totalSupply();
-
-    // Safe require thats follows from delegatedVotingPowerLTEqTotalVotingPower.
-    require toVotingPowerBefore <= sumOfVotingPower;
 
     // run transaction
     mint@withrevert(e, to, amount);
@@ -100,6 +98,7 @@ rule burn(env e) {
     requireInvariant balancesLTEqTotalSupply();
     assert isTotalSupplyGTEqSumOfVotingPower();
     requireInvariant zeroAddressNoVotingPower();
+    requireInvariant delegatedVotingPowerLTEqTotalVotingPower();
     require nonpayable(e);
 
     address from;
@@ -112,9 +111,6 @@ rule burn(env e) {
     uint256 toVotingPowerBefore = delegatedVotingPower(delegatee(0x0));
     uint256 otherBalanceBefore = balanceOf(other);
     uint256 totalSupplyBefore  = totalSupply();
-
-    // Safe require that follows from delegatedVotingPowerLTEqTotalVotingPower. 
-    require fromVotingPowerBefore <= sumOfVotingPower;
 
     // run transaction
     burn@withrevert(e, amount);

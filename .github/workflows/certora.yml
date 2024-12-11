@@ -24,6 +24,8 @@ jobs:
           - ERC20Optimism
           - ExternalCallsEthereum
           - ExternalCallsOptimism
+          - MintBurnEthereum
+          - MintBurnOptimism
           - RevertsERC20Ethereum
           - RevertsERC20Optimism
           - RevertsMintBurnEthereum

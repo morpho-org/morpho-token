@@ -110,12 +110,17 @@ rule burn(env e) {
     uint256 otherBalanceBefore = balanceOf(other);
     uint256 totalSupplyBefore  = totalSupply();
 
+    // Safe require as zeroVirtualVotingPower represents the virtual sum of votes delegated to zero.
+    require delegatee(from) == 0 => fromBalanceBefore <= currentContract._zeroVirtualVotingPower;
+    // Safe require as it is verified in delegatedLTEqDelegateeVP.
+    require delegatee(from) != 0 => fromBalanceBefore <= fromVotingPowerBefore;
+
     // run transaction
     burn@withrevert(e, amount);
 
     // check outcome
     if (lastReverted) {
-        assert e.msg.sender == 0x0 ||  fromBalanceBefore < amount || fromVotingPowerBefore < amount ;
+        assert e.msg.sender == 0x0 || fromBalanceBefore < amount;
     } else {
         // updates balance and totalSupply
         assert to_mathint(balanceOf(from)) == fromBalanceBefore - amount;

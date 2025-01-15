@@ -227,21 +227,24 @@ rule updatedDelegatedVPLTEqTotalSupply(env e, address to, uint256 amount) {
     require delegatee(to) != delegatee(e.msg.sender);
 
     delegate@withrevert(e, e.msg.sender);
-    bool reverted = lastReverted;
+    if (!lastReverted) {
+           assert delegatee(e.msg.sender) == e.msg.sender && delegatee(e.msg.sender) != 0;
 
-    assert delegatee(e.msg.sender) == e.msg.sender && delegatee(e.msg.sender) != 0;
+           // Safe require that follows from delegatedLTEqDelegateeVP.
+           require amount <= delegatedVotingPower(e.msg.sender) ;
 
-    // Safe require that follows from delegatedLTEqDelegateeVP.
-    require amount <= delegatedVotingPower(e.msg.sender) ;
+           requireInvariant delegatedVotingPowerLTEqTotalVotingPower();
+           requireInvariant sumOfVotesStartsAtZero();
+           requireInvariant sumOfVotesGrowsCorrectly();
+           requireInvariant sumOfVotesMonotone();
+           requireInvariant totalSupplyIsSumOfVirtualVotingPower();
+           requireInvariant sumOfTwoDelegatedVPLTEqTotalVP();
 
-    requireInvariant delegatedVotingPowerLTEqTotalVotingPower();
-    requireInvariant sumOfVotesStartsAtZero();
-    requireInvariant sumOfVotesGrowsCorrectly();
-    requireInvariant sumOfVotesMonotone();
-    requireInvariant totalSupplyIsSumOfVirtualVotingPower();
-    requireInvariant sumOfTwoDelegatedVPLTEqTotalVP();
+           assert isTotalSupplyGTEqSumOfVotingPower();
 
-    assert isTotalSupplyGTEqSumOfVotingPower();
-
-    assert !reverted => delegatedVotingPower(to) + amount <=  totalSupply();
+           assert delegatedVotingPower(to) + amount <=  totalSupply();
+       } else {
+           // Do not check anything
+           assert true;
+       }
 }

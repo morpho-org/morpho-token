@@ -159,7 +159,6 @@ invariant sumOfTwoDelegatedVPLTEqTotalVP()
         }
     }
 
-
 function isTotalSupplyGTEqSumOfVotingPower() returns bool {
     requireInvariant totalSupplyIsSumOfVirtualVotingPower();
     return totalSupply() >= sumOfVotes[2^160];
@@ -214,4 +213,34 @@ rule delegatingWithSigUpdatesVotingPower(env e, DelegationToken.Delegation deleg
     } else {
         assert delegatedVotingPower(delegation.delegatee) == delegatedVotingPowerBefore + balanceOf(delegator);
     }
+}
+
+// Check that the delegated voting power of a delegatee after an update is lesser than or equal to the total supply of tokens.
+rule updatedDelegatedVPLTEqTotalSupply(env e, address to, uint256 amount) {
+    // Safe require as implementation woud revert.
+    require amount <= balanceOf(e.msg.sender);
+
+    // Safe rquire as zero address can't initiate transactions.
+    require e.msg.sender != 0;
+
+    // Safe require as since we consider only updates.
+    require delegatee(to) != delegatee(e.msg.sender);
+
+    delegate(e, e.msg.sender);
+
+    assert delegatee(e.msg.sender) == e.msg.sender && delegatee(e.msg.sender) != 0;
+
+    // Safe require that follows from delegatedLTEqDelegateeVP.
+    require amount <= delegatedVotingPower(e.msg.sender) ;
+
+    requireInvariant delegatedVotingPowerLTEqTotalVotingPower();
+    requireInvariant sumOfVotesStartsAtZero();
+    requireInvariant sumOfVotesGrowsCorrectly();
+    requireInvariant sumOfVotesMonotone();
+    requireInvariant totalSupplyIsSumOfVirtualVotingPower();
+    requireInvariant sumOfTwoDelegatedVPLTEqTotalVP();
+
+    assert isTotalSupplyGTEqSumOfVotingPower();
+
+    assert delegatedVotingPower(to) + amount <=  totalSupply();
 }

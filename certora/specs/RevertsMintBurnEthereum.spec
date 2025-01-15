@@ -33,7 +33,7 @@ rule burnRevertConditions(env e, uint256 amount) {
     require delegatee(0) == 0;
 
     // Safe require as it is verified in delegatedLTEqDelegateeVP.
-    require delegateeVotingPowerBefore >= balanceOfSenderBefore;
+    require delegatee(e.msg.sender) != 0 => delegateeVotingPowerBefore >= balanceOfSenderBefore;
 
     burn@withrevert(e, amount);
     assert lastReverted <=> e.msg.sender == 0 || balanceOfSenderBefore < amount || e.msg.value != 0;

@@ -215,36 +215,37 @@ rule delegatingWithSigUpdatesVotingPower(env e, DelegationToken.Delegation deleg
     }
 }
 
-// Check that the delegated voting power of a delegatee after an update is lesser than or equal to the total supply of tokens.
+// Check that the delegated voting power of a delegatee after a transfer is lesser than or equal to the total supply of tokens.
 rule updatedDelegatedVPLTEqTotalSupply(env e, address to, uint256 amount) {
-    // Safe require as implementation woud revert.
+    // Safe require as the ERC20 implementation woud revert.
     require amount <= balanceOf(e.msg.sender);
 
-    // Safe rquire as zero address can't initiate transactions.
+    // Safe require as zero address can't initiate transactions.
     require e.msg.sender != 0;
 
     // Safe require as since we consider only updates.
     require delegatee(to) != delegatee(e.msg.sender);
 
     delegate@withrevert(e, e.msg.sender);
-    if (!lastReverted) {
-           assert delegatee(e.msg.sender) == e.msg.sender && delegatee(e.msg.sender) != 0;
 
-           // Safe require that follows from delegatedLTEqDelegateeVP.
-           require amount <= delegatedVotingPower(e.msg.sender) ;
+    // Show that delegate doesn't always revert.
+    bool reverted = lastReverted;
+    satisfy !reverted;
+    require !reverted;
 
-           requireInvariant delegatedVotingPowerLTEqTotalVotingPower();
-           requireInvariant sumOfVotesStartsAtZero();
-           requireInvariant sumOfVotesGrowsCorrectly();
-           requireInvariant sumOfVotesMonotone();
-           requireInvariant totalSupplyIsSumOfVirtualVotingPower();
-           requireInvariant sumOfTwoDelegatedVPLTEqTotalVP();
+    assert delegatee(e.msg.sender) == e.msg.sender && delegatee(e.msg.sender) != 0;
 
-           assert isTotalSupplyGTEqSumOfVotingPower();
+    // Safe require that follows from delegatedLTEqDelegateeVP.
+    require amount <= delegatedVotingPower(e.msg.sender) ;
 
-           assert delegatedVotingPower(to) + amount <=  totalSupply();
-       } else {
-           // Do not check anything
-           assert true;
-       }
+    requireInvariant delegatedVotingPowerLTEqTotalVotingPower();
+    requireInvariant sumOfVotesStartsAtZero();
+    requireInvariant sumOfVotesGrowsCorrectly();
+    requireInvariant sumOfVotesMonotone();
+    requireInvariant totalSupplyIsSumOfVirtualVotingPower();
+    requireInvariant sumOfTwoDelegatedVPLTEqTotalVP();
+
+    assert isTotalSupplyGTEqSumOfVotingPower();
+
+    assert delegatedVotingPower(to) + amount <=  totalSupply();
 }

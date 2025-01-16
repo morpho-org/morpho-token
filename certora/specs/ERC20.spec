@@ -88,9 +88,9 @@ rule transfer(env e) {
     uint256 otherBalanceBefore     = balanceOf(other);
 
     // Safe require as it is verified in delegatedLTEqDelegateeVP.
-    require holderBalanceBefore <= holderVotingPowerBefore;
+    require delegatee(holder) != 0 => holderBalanceBefore <= holderVotingPowerBefore;
     // Safe require as it is verified in totalSupplyGTEqSumOfVotingPower.
-    require delegatee(holder) != delegatee(recipient) => holderBalanceBefore + recipientVotingPowerBefore <= totalSupply();
+    require delegatee(holder) != delegatee(recipient) => recipientVotingPowerBefore + holderBalanceBefore <= totalSupply();
 
     // run transaction
     transfer@withrevert(e, recipient, amount);
@@ -133,9 +133,9 @@ rule transferFrom(env e) {
     uint256 otherBalanceBefore     = balanceOf(other);
 
     // Safe require as it is verified in delegatedLTEqDelegateeVP.
-    require holderBalanceBefore <= holderVotingPowerBefore;
+    require delegatee(holder) != 0 => holderBalanceBefore <= holderVotingPowerBefore;
     // Safe require as it is verified in totalSupplyGTEqSumOfVotingPower.
-    require delegatee(holder) != delegatee(recipient) => holderBalanceBefore + recipientVotingPowerBefore <= totalSupply();
+    require delegatee(holder) != delegatee(recipient) => recipientVotingPowerBefore + holderBalanceBefore <= totalSupply();
 
     // run transaction
     transferFrom@withrevert(e, holder, recipient, amount);

@@ -217,34 +217,27 @@ rule delegatingWithSigUpdatesVotingPower(env e, DelegationToken.Delegation deleg
 
 // Check that the updated voting power of a delegatee after a transfer is lesser than or equal to the total supply of tokens.
 rule updatedDelegatedVPLTEqTotalSupply(env e, address to, uint256 amount) {
-    // Safe require as the ERC20 implementation woud revert.
-    require amount <= balanceOf(e.msg.sender);
-
-    // Safe require as zero address can't initiate transactions.
-    require e.msg.sender != 0;
-    // Safe require as transfers are non-payable functions.
     require e.msg.value == 0;
+    require e.msg.sender != 0;
 
-    // Safe require as since we consider only updates.
+    require amount <= balanceOf(e.msg.sender);
     require delegatee(to) != delegatee(e.msg.sender);
 
     requireInvariant sumOfTwoDelegatedVPLTEqTotalVP();
     assert isTotalSupplyGTEqSumOfVotingPower();
 
-    // Safe require as zeroVirtualVotingPower accounts for the delegated votes to address zero.
+    // This require avoids an impossible revert as zeroVirtualVotingPower operations comme from munging.
     require delegatee(e.msg.sender) == 0 => currentContract._zeroVirtualVotingPower >= balanceOf(e.msg.sender);
 
-    // Safe require as it is proven by delegatedLTEqDelegateeVP.
-    // The invariant itself can't be required as it's using a parameterized variable.
+    // This invariant can't be required as it's using a parameterized variable.
+    // But it is proven by delegatedLTEqDelegateeVP.
     require delegatee(e.msg.sender) != 0 => delegatedVotingPower(delegatee(e.msg.sender)) >= balanceOf(e.msg.sender);
 
     delegate@withrevert(e, e.msg.sender);
+
     assert(!lastReverted);
 
-    assert delegatee(e.msg.sender) == e.msg.sender && delegatee(e.msg.sender) != 0;
-
-    // Safe require that follows from delegatedLTEqDelegateeVP.
-    require amount <= delegatedVotingPower(e.msg.sender) ;
+    assert delegatee(e.msg.sender) == e.msg.sender;
 
     assert delegatedVotingPower(to) + amount <=  totalSupply();
 }

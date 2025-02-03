@@ -229,6 +229,8 @@ rule updatedDelegatedVPLTEqTotalSupply(env e, address to, uint256 amount) {
     // This require avoids an impossible revert as zeroVirtualVotingPower operations comme from munging.
     require delegatee(e.msg.sender) == 0 => currentContract._zeroVirtualVotingPower >= balanceOf(e.msg.sender);
 
+    uint256 delegatedVotingPowerDelegateeToBefore = delegatedVotingPower(delegatee(to));
+
     // This invariant can't be required as it's using a parameterized variable.
     // But it is proven by delegatedLTEqDelegateeVP.
     require delegatee(e.msg.sender) != 0 => delegatedVotingPower(delegatee(e.msg.sender)) >= balanceOf(e.msg.sender);
@@ -239,5 +241,5 @@ rule updatedDelegatedVPLTEqTotalSupply(env e, address to, uint256 amount) {
 
     assert delegatee(e.msg.sender) == e.msg.sender;
 
-    assert delegatedVotingPower(to) + amount <=  totalSupply();
+    assert delegatedVotingPowerDelegateeToBefore + amount <=  totalSupply();
 }

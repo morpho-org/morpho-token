@@ -220,7 +220,6 @@ rule updatedDelegatedVPLTEqTotalSupply(address from, address to) {
     uint256 balanceOfFromBefore = balanceOf(from);
     uint256 delegatedVotingPowerDelegateeToBefore = delegatedVotingPower(delegatee(to));
     uint256 totalSupplyBefore = totalSupply();
-    env e;
 
     requireInvariant sumOfTwoDelegatedVPLTEqTotalVP();
     assert isTotalSupplyGTEqSumOfVotingPower();
@@ -235,6 +234,7 @@ rule updatedDelegatedVPLTEqTotalSupply(address from, address to) {
 
     require delegatee(from) != 0 => delegatedVotingPower(delegatee(from)) >= balanceOfFromBefore;
 
+    env e;
     // Safe require-statements to perform a ghost call to delegate(from).
     require e.msg.value == 0;
     require e.msg.sender == from;

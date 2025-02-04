@@ -222,28 +222,25 @@ rule updatedDelegatedVPLTEqTotalSupply(address from, address to) {
     uint256 totalSupplyBefore = totalSupply();
     env e;
 
-    require e.msg.value == 0;
-    require e.msg.sender == from;
+    requireInvariant sumOfTwoDelegatedVPLTEqTotalVP();
+    assert isTotalSupplyGTEqSumOfVotingPower();
 
+    // Safe require-statements that introduce the premises of the goal formula, from != 0 => delegatee(to) != delegatee(from) => delegatedVotingPower(delegateee(to)) + balanceOf(from) <= totalSupply().
     require from != 0;
     require delegatee(to) != delegatee(from);
 
-    requireInvariant sumOfTwoDelegatedVPLTEqTotalVP();
-    assert isTotalSupplyGTEqSumOfVotingPower();
 
     // This require avoids an impossible revert as zeroVirtualVotingPower operations comme from munging.
     require delegatee(from) == 0 => currentContract._zeroVirtualVotingPower >=  balanceOfFromBefore;
 
-
-    // This invariant can't be required as it's using a parameterized variable.
-    // But it is proven by delegatedLTEqDelegateeVP.
     require delegatee(from) != 0 => delegatedVotingPower(delegatee(from)) >= balanceOfFromBefore;
 
+    // Safe require-statements to perform a ghost call to delegate(from).
+    require e.msg.value == 0;
+    require e.msg.sender == from;
     delegate@withrevert(e, from);
 
-    assert(!lastReverted);
-
-    assert delegatee(from) == from;
+    assert !lastReverted;
 
     assert delegatedVotingPowerDelegateeToBefore + balanceOfFromBefore <= totalSupplyBefore;
 }

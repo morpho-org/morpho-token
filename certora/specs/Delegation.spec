@@ -216,28 +216,28 @@ rule delegatingWithSigUpdatesVotingPower(env e, DelegationToken.Delegation deleg
 }
 
 // Check that the updated voting power of a delegatee after a transfer is lesser than or equal to the total supply of tokens.
-rule updatedDelegatedVPLTEqTotalSupply(address from, address to, uint256 amount) {
-    require from != 0;
-
+rule updatedDelegatedVPLTEqTotalSupply(address from, address to) {
+    uint256 balanceOfFromBefore = balanceOf(from);
+    uint256 delegatedVotingPowerDelegateeToBefore = delegatedVotingPower(delegatee(to));
+    uint256 totalSupplyBefore = totalSupply();
     env e;
+
     require e.msg.value == 0;
     require e.msg.sender == from;
 
-    require amount <= balanceOf(from);
+    require from != 0;
     require delegatee(to) != delegatee(from);
 
     requireInvariant sumOfTwoDelegatedVPLTEqTotalVP();
     assert isTotalSupplyGTEqSumOfVotingPower();
 
     // This require avoids an impossible revert as zeroVirtualVotingPower operations comme from munging.
-    require delegatee(from) == 0 => currentContract._zeroVirtualVotingPower >= balanceOf(from);
+    require delegatee(from) == 0 => currentContract._zeroVirtualVotingPower >=  balanceOfFromBefore;
 
-    uint256 delegatedVotingPowerDelegateeToBefore = delegatedVotingPower(delegatee(to));
-    uint256 totalSupplyBefore = totalSupply();
 
     // This invariant can't be required as it's using a parameterized variable.
     // But it is proven by delegatedLTEqDelegateeVP.
-    require delegatee(from) != 0 => delegatedVotingPower(delegatee(from)) >= balanceOf(from);
+    require delegatee(from) != 0 => delegatedVotingPower(delegatee(from)) >= balanceOfFromBefore;
 
     delegate@withrevert(e, from);
 
@@ -245,5 +245,5 @@ rule updatedDelegatedVPLTEqTotalSupply(address from, address to, uint256 amount)
 
     assert delegatee(from) == from;
 
-    assert delegatedVotingPowerDelegateeToBefore + amount <= totalSupplyBefore;
+    assert delegatedVotingPowerDelegateeToBefore + balanceOfFromBefore <= totalSupplyBefore;
 }

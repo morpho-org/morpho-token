@@ -22,8 +22,7 @@ rule transferRevertConditions(env e, address to, uint256 amount) {
     // Safe require as it proven in rule updatedDelegatedVPLTEqTotalSupply.
     require
       e.msg.sender != 0 =>
-      amount <= balanceOfSenderBefore =>
-      delegatee(to) != delegatee(e.msg.sender) => recipientVotingPowerBefore + amount <= totalSupply();
+      delegatee(to) != delegatee(e.msg.sender) => recipientVotingPowerBefore + balanceOfSenderBefore <= totalSupply();
 
     transfer@withrevert(e, to, amount);
     assert lastReverted <=> e.msg.sender == 0 || to == 0 || balanceOfSenderBefore < amount || e.msg.value != 0;
@@ -44,8 +43,7 @@ rule transferFromRevertConditions(env e, address from, address to, uint256 amoun
     // Safe require as it proven in rule updatedDelegatedVPLTEqTotalSupply.
     require
       from != 0 =>
-      amount <= balanceOfHolderBefore =>
-      delegatee(to) != delegatee(from) => recipientVotingPowerBefore + amount <= totalSupply();
+      delegatee(to) != delegatee(from) => recipientVotingPowerBefore +  balanceOfHolderBefore <= totalSupply();
 
     transferFrom@withrevert(e, from, to, amount);
 

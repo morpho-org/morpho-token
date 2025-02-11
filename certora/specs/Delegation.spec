@@ -224,12 +224,12 @@ rule updatedDelegatedVPLTEqTotalSupply(address from, address to) {
     requireInvariant sumOfTwoDelegatedVPLTEqTotalVP();
     assert isTotalSupplyGTEqSumOfVotingPower();
 
-    // Safe require-statements that introduce the premises of the goal formula, from != 0 => delegatee(to) != delegatee(from) => delegatedVotingPower(delegateee(to)) + balanceOf(from) <= totalSupply().
+    // Safe require-statements that introduce the premises of the goal formula, from != 0 => delegatee(to) != delegatee(from) => delegatedVotingPower(delegatee(to)) + balanceOf(from) <= totalSupply().
     require from != 0;
     require delegatee(to) != delegatee(from);
 
 
-    // This require avoids an impossible revert as zeroVirtualVotingPower operations comme from munging.
+    // This require avoids an impossible revert as zeroVirtualVotingPower operations come from munging.
     require delegatee(from) == 0 => currentContract._zeroVirtualVotingPower >=  balanceOfFromBefore;
 
     require delegatee(from) != 0 => delegatedVotingPower(delegatee(from)) >= balanceOfFromBefore;

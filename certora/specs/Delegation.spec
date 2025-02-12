@@ -221,7 +221,7 @@ rule updatedDelegatedVPLTEqTotalSupply(address from, address to) {
     assert isTotalSupplyGTEqSumOfVotingPower();
 
     // Safe require as _zeroVirtualVotingPower is the (virtual) voting power of address zero.
-    require delegatee(from) == 0 => currentContract._zeroVirtualVotingPower >=  balanceOf(from);
+    require delegatee(from) == 0 => currentContract._zeroVirtualVotingPower >= balanceOf(from);
 
     // Safe require as it is proven in delegatedLTEqDelegateeVP.
     require delegatee(from) != 0 => delegatedVotingPower(delegatee(from)) >= balanceOf(from);

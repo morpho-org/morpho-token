@@ -1,20 +1,16 @@
-name: CI
+name: Foundry
 
 on:
   push:
+    branches:
+      - main
   pull_request:
   workflow_dispatch:
 
-env:
-  FOUNDRY_PROFILE: ci
-
 jobs:
   check:
-    strategy:
-      fail-fast: true
-
-    name: Foundry project
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
         with:
@@ -44,4 +40,4 @@ jobs:
           forge test -vvv
         id: test
         env:
-          ALCHEMY_KEY: ${{ secrets.ALCHEMY_KEY }}
+          ALCHEMY_KEY: ${{ secrets.PROTOCOL_ALCHEMY_KEY }}

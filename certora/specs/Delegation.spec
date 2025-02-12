@@ -215,32 +215,16 @@ rule delegatingWithSigUpdatesVotingPower(env e, DelegationToken.Delegation deleg
     }
 }
 
-// Check that the updated voting power of a delegatee after a transfer is lesser than or equal to the total supply of tokens.
+// Check that the delegated voting power, updated with the balance of another account, is smaller than the total supply.
 rule updatedDelegatedVPLTEqTotalSupply(address from, address to) {
-    uint256 balanceOfFromBefore = balanceOf(from);
-    uint256 delegatedVotingPowerDelegateeToBefore = delegatedVotingPower(delegatee(to));
-    uint256 totalSupplyBefore = totalSupply();
-
     requireInvariant sumOfTwoDelegatedVPLTEqTotalVP();
     assert isTotalSupplyGTEqSumOfVotingPower();
 
-    // Safe require-statements that introduce the premises of the goal formula, from != 0 => delegatee(to) != delegatee(from) => delegatedVotingPower(delegatee(to)) + balanceOf(from) <= totalSupply().
-    require from != 0;
-    require delegatee(to) != delegatee(from);
+    // Safe require as _zeroVirtualVotingPower is the (virtual) voting power of address zero.
+    require delegatee(from) == 0 => currentContract._zeroVirtualVotingPower >=  balanceOf(from);
 
+    // Safe require as it is proven in delegatedLTEqDelegateeVP.
+    require delegatee(from) != 0 => delegatedVotingPower(delegatee(from)) >= balanceOf(from);
 
-    // This require avoids an impossible revert as zeroVirtualVotingPower operations come from munging.
-    require delegatee(from) == 0 => currentContract._zeroVirtualVotingPower >=  balanceOfFromBefore;
-
-    require delegatee(from) != 0 => delegatedVotingPower(delegatee(from)) >= balanceOfFromBefore;
-
-    env e;
-    // Safe require-statements to perform a ghost call to delegate(from).
-    require e.msg.value == 0;
-    require e.msg.sender == from;
-    delegate@withrevert(e, from);
-
-    assert !lastReverted;
-
-    assert delegatedVotingPowerDelegateeToBefore + balanceOfFromBefore <= totalSupplyBefore;
+    assert delegatee(to) != delegatee(from) => delegatedVotingPower(delegatee(to)) + balanceOf(from) <= totalSupply();
 }

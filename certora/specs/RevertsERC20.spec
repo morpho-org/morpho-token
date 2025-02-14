@@ -15,9 +15,14 @@ rule transferRevertConditions(env e, address to, uint256 amount) {
     uint256 recipientVotingPowerBefore = delegatedVotingPower(delegatee(to));
 
     // Safe require as it is verified in delegatedLTEqDelegateeVP.
-    require senderVotingPowerBefore >= balanceOfSenderBefore;
-    // Safe require that follows from sumOfTwoDelegatedVPLTEqTotalVP() and totalSupplyIsSumOfVirtualVotingPower().
-    require delegatee(to) != delegatee(e.msg.sender) => recipientVotingPowerBefore + senderVotingPowerBefore <= totalSupply();
+    require delegatee(e.msg.sender) != 0 => senderVotingPowerBefore >= balanceOfSenderBefore;
+    // Safe require as it is verified in sumOfTwoDelegatedVPLTEqTotalVP.
+    require senderVotingPowerBefore + recipientVotingPowerBefore <= totalSupply();
+
+    // Safe require as it proven in rule updatedDelegatedVPLTEqTotalSupply.
+    require
+      e.msg.sender != 0 =>
+      delegatee(to) != delegatee(e.msg.sender) => recipientVotingPowerBefore + balanceOfSenderBefore <= totalSupply();
 
     transfer@withrevert(e, to, amount);
     assert lastReverted <=> e.msg.sender == 0 || to == 0 || balanceOfSenderBefore < amount || e.msg.value != 0;
@@ -31,16 +36,21 @@ rule transferFromRevertConditions(env e, address from, address to, uint256 amoun
     uint256 recipientVotingPowerBefore = delegatedVotingPower(delegatee(to));
 
     // Safe require as it is verified in delegatedLTEqDelegateeVP.
-    require holderVotingPowerBefore >= balanceOfHolderBefore;
-    // Safe require that follows from sumOfTwoDelegatedVPLTEqTotalVP() and totalSupplyIsSumOfVirtualVotingPower().
-    require delegatee(to) != delegatee(from) => recipientVotingPowerBefore + holderVotingPowerBefore <= totalSupply();
+    require delegatee(from) != 0 => holderVotingPowerBefore >= balanceOfHolderBefore;
+    // Safe require as it is verified in sumOfTwoDelegatedVPLTEqTotalVP.
+    require holderVotingPowerBefore + recipientVotingPowerBefore <= totalSupply();
+
+    // Safe require as it proven in rule updatedDelegatedVPLTEqTotalSupply.
+    require
+      from != 0 =>
+      delegatee(to) != delegatee(from) => recipientVotingPowerBefore +  balanceOfHolderBefore <= totalSupply();
 
     transferFrom@withrevert(e, from, to, amount);
 
     bool generalRevertConditions = from == 0 || to == 0 || balanceOfHolderBefore < amount || e.msg.value != 0;
 
     if (allowanceOfSenderBefore != max_uint256) {
-        assert lastReverted <=>  e.msg.sender == 0 || allowanceOfSenderBefore < amount || generalRevertConditions;
+        assert lastReverted <=> e.msg.sender == 0 || allowanceOfSenderBefore < amount || generalRevertConditions;
     } else {
         assert lastReverted <=> generalRevertConditions;
     }

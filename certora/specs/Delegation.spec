@@ -159,7 +159,6 @@ invariant sumOfTwoDelegatedVPLTEqTotalVP()
         }
     }
 
-
 function isTotalSupplyGTEqSumOfVotingPower() returns bool {
     requireInvariant totalSupplyIsSumOfVirtualVotingPower();
     return totalSupply() >= sumOfVotes[2^160];
@@ -214,4 +213,34 @@ rule delegatingWithSigUpdatesVotingPower(env e, DelegationToken.Delegation deleg
     } else {
         assert delegatedVotingPower(delegation.delegatee) == delegatedVotingPowerBefore + balanceOf(delegator);
     }
+}
+
+// Check that the updated voting power of a delegatee after a transfer is lesser than or equal to the total supply of tokens.
+rule updatedDelegatedVPLTEqTotalSupply(address from, address to) {
+    uint256 balanceOfFromBefore = balanceOf(from);
+    uint256 delegatedVotingPowerDelegateeToBefore = delegatedVotingPower(delegatee(to));
+    uint256 totalSupplyBefore = totalSupply();
+
+    requireInvariant sumOfTwoDelegatedVPLTEqTotalVP();
+    assert isTotalSupplyGTEqSumOfVotingPower();
+
+    // Safe require-statements that introduce the premises of the goal formula, from != 0 => delegatee(to) != delegatee(from) => delegatedVotingPower(delegatee(to)) + balanceOf(from) <= totalSupply().
+    require from != 0;
+    require delegatee(to) != delegatee(from);
+
+
+    // This require avoids an impossible revert as zeroVirtualVotingPower operations come from munging.
+    require delegatee(from) == 0 => currentContract._zeroVirtualVotingPower >=  balanceOfFromBefore;
+
+    require delegatee(from) != 0 => delegatedVotingPower(delegatee(from)) >= balanceOfFromBefore;
+
+    env e;
+    // Safe require-statements to perform a ghost call to delegate(from).
+    require e.msg.value == 0;
+    require e.msg.sender == from;
+    delegate@withrevert(e, from);
+
+    assert !lastReverted;
+
+    assert delegatedVotingPowerDelegateeToBefore + balanceOfFromBefore <= totalSupplyBefore;
 }

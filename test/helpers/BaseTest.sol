@@ -4,8 +4,9 @@ pragma solidity ^0.8.0;
 import {Test} from "../../lib/forge-std/src/Test.sol";
 import {MorphoTokenEthereum} from "../../src/MorphoTokenEthereum.sol";
 import {Wrapper} from "../../src/Wrapper.sol";
-import {ERC1967Proxy} from
-    "../../lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/proxy/ERC1967/ERC1967Proxy.sol";
+import {
+    ERC1967Proxy
+} from "../../lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 import {UUPSUpgradeable} from "../../lib/openzeppelin-contracts-upgradeable/contracts/proxy/utils/UUPSUpgradeable.sol";
 
 // TODO: Test the following:

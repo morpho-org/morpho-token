@@ -4,14 +4,17 @@ pragma solidity ^0.8.0;
 import {Test, console} from "../lib/forge-std/src/Test.sol";
 import {MorphoTokenOptimism} from "../src/MorphoTokenOptimism.sol";
 import {DelegationToken} from "../src/DelegationToken.sol";
-import {ERC1967Proxy} from
-    "../lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/proxy/ERC1967/ERC1967Proxy.sol";
+import {
+    ERC1967Proxy
+} from "../lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 import {UUPSUpgradeable} from "../lib/openzeppelin-contracts-upgradeable/contracts/proxy/utils/UUPSUpgradeable.sol";
 import {OwnableUpgradeable} from "../lib/openzeppelin-contracts-upgradeable/contracts/access/OwnableUpgradeable.sol";
-import {IERC1967} from
-    "../lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/proxy/ERC1967/ERC1967Utils.sol";
-import {IERC20} from
-    "../lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
+import {
+    IERC1967
+} from "../lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/proxy/ERC1967/ERC1967Utils.sol";
+import {
+    IERC20
+} from "../lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 import {IOptimismMintableERC20, IERC165} from "../src/interfaces/IOptimismMintableERC20.sol";
 
 contract MorphoTokenOptimismTest is Test {

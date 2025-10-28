@@ -5,8 +5,9 @@ import "../lib/forge-std/src/Script.sol";
 import "../lib/forge-std/src/console.sol";
 
 import {MorphoTokenOptimism} from "../src/MorphoTokenOptimism.sol";
-import {ERC1967Proxy} from
-    "../lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/proxy/ERC1967/ERC1967Proxy.sol";
+import {
+    ERC1967Proxy
+} from "../lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 
 contract DeployMorphoTokenBase is Script {
     address public constant MORPHO_DAO = 0xcBa28b38103307Ec8dA98377ffF9816C164f9AFa;

@@ -1,8 +1,9 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 pragma solidity ^0.8.0;
 
-import {IERC5267} from
-    "../../lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/interfaces/IERC5267.sol";
+import {
+    IERC5267
+} from "../../lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/interfaces/IERC5267.sol";
 import {Delegation, Signature} from "../../src/DelegationToken.sol";
 
 struct Permit {
@@ -37,9 +38,10 @@ library SigUtils {
 
     function getPermitTypedDataHash(Permit memory permit, address contractAddress) internal view returns (bytes32) {
         (, string memory name, string memory version,,,,) = IERC5267(contractAddress).eip712Domain();
-        return keccak256(
-            bytes.concat("\x19\x01", domainSeparator(contractAddress, name, version), permitHashStruct(permit))
-        );
+        return
+            keccak256(
+                bytes.concat("\x19\x01", domainSeparator(contractAddress, name, version), permitHashStruct(permit))
+            );
     }
 
     function delegationHashStruct(Delegation memory delegation) internal pure returns (bytes32) {

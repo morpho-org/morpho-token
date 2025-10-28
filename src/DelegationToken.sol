@@ -3,15 +3,19 @@ pragma solidity ^0.8.27;
 
 import {IDelegation, Signature, Delegation} from "./interfaces/IDelegation.sol";
 
-import {ERC20PermitUpgradeable} from
-    "../lib/openzeppelin-contracts-upgradeable/contracts/token/ERC20/extensions/ERC20PermitUpgradeable.sol";
-import {ECDSA} from
-    "../lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/utils/cryptography/ECDSA.sol";
-import {Ownable2StepUpgradeable} from
-    "../lib/openzeppelin-contracts-upgradeable/contracts/access/Ownable2StepUpgradeable.sol";
+import {
+    ERC20PermitUpgradeable
+} from "../lib/openzeppelin-contracts-upgradeable/contracts/token/ERC20/extensions/ERC20PermitUpgradeable.sol";
+import {
+    ECDSA
+} from "../lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/utils/cryptography/ECDSA.sol";
+import {
+    Ownable2StepUpgradeable
+} from "../lib/openzeppelin-contracts-upgradeable/contracts/access/Ownable2StepUpgradeable.sol";
 import {UUPSUpgradeable} from "../lib/openzeppelin-contracts-upgradeable/contracts/proxy/utils/UUPSUpgradeable.sol";
-import {ERC1967Utils} from
-    "../lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/proxy/ERC1967/ERC1967Utils.sol";
+import {
+    ERC1967Utils
+} from "../lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/proxy/ERC1967/ERC1967Utils.sol";
 
 /// @title DelegationToken
 /// @author Morpho Association

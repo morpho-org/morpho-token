@@ -2,8 +2,9 @@
 pragma solidity 0.8.27;
 
 import {IOptimismMintableERC20} from "./interfaces/IOptimismMintableERC20.sol";
-import {IERC165} from
-    "../lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/utils/introspection/IERC165.sol";
+import {
+    IERC165
+} from "../lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/utils/introspection/IERC165.sol";
 
 import {DelegationToken} from "./DelegationToken.sol";
 

@@ -159,7 +159,6 @@ invariant sumOfTwoDelegatedVPLTEqTotalVP()
         }
     }
 
-
 function isTotalSupplyGTEqSumOfVotingPower() returns bool {
     requireInvariant totalSupplyIsSumOfVirtualVotingPower();
     return totalSupply() >= sumOfVotes[2^160];
@@ -214,4 +213,18 @@ rule delegatingWithSigUpdatesVotingPower(env e, DelegationToken.Delegation deleg
     } else {
         assert delegatedVotingPower(delegation.delegatee) == delegatedVotingPowerBefore + balanceOf(delegator);
     }
+}
+
+// Check that the delegated voting power, updated with the balance of another account, is smaller than the total supply.
+rule updatedDelegatedVPLTEqTotalSupply(address from, address to) {
+    requireInvariant sumOfTwoDelegatedVPLTEqTotalVP();
+    assert isTotalSupplyGTEqSumOfVotingPower();
+
+    // Safe require as _zeroVirtualVotingPower is the (virtual) voting power of address zero.
+    require delegatee(from) == 0 => currentContract._zeroVirtualVotingPower >= balanceOf(from);
+
+    // Safe require as it is proven in delegatedLTEqDelegateeVP.
+    require delegatee(from) != 0 => delegatedVotingPower(delegatee(from)) >= balanceOf(from);
+
+    assert delegatee(to) != delegatee(from) => delegatedVotingPower(delegatee(to)) + balanceOf(from) <= totalSupply();
 }

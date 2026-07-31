@@ -31,7 +31,7 @@ rule burnRevertConditions(env e, address from, uint256 amount) {
     require delegatee(0) == 0;
 
     // Safe require as it is verified in delegatedLTEqDelegateeVP.
-    require fromVotingPowerBefore >= balanceOfFromBefore;
+    require  delegatee(from) != 0 =>fromVotingPowerBefore >= balanceOfFromBefore;
 
     burn@withrevert(e, from, amount);
     assert lastReverted <=> e.msg.sender != currentContract.bridge || from == 0 || balanceOfFromBefore < amount ||  e.msg.value != 0;

@@ -143,7 +143,6 @@ invariant delegatedVotingPowerLTEqTotalVotingPower()
             requireInvariant sumOfVotesStartsAtZero();
             requireInvariant sumOfVotesGrowsCorrectly();
             requireInvariant sumOfVotesMonotone();
-            requireInvariant totalSupplyIsSumOfVirtualVotingPower();
         }
     }
 
@@ -151,11 +150,9 @@ invariant sumOfTwoDelegatedVPLTEqTotalVP()
     forall address a. forall address b. a != b => ghostDelegatedVotingPower[a] + ghostDelegatedVotingPower[b] <= sumOfVotes[2^160]
     {
         preserved {
-            requireInvariant delegatedVotingPowerLTEqTotalVotingPower();
             requireInvariant sumOfVotesStartsAtZero();
             requireInvariant sumOfVotesGrowsCorrectly();
             requireInvariant sumOfVotesMonotone();
-            requireInvariant totalSupplyIsSumOfVirtualVotingPower();
         }
     }
 
@@ -217,6 +214,9 @@ rule delegatingWithSigUpdatesVotingPower(env e, DelegationToken.Delegation deleg
 
 // Check that the delegated voting power, updated with the balance of another account, is smaller than the total supply.
 rule updatedDelegatedVPLTEqTotalSupply(address from, address to) {
+    requireInvariant sumOfVotesStartsAtZero();
+    requireInvariant sumOfVotesMonotone();
+    requireInvariant delegatedVotingPowerLTEqTotalVotingPower();
     requireInvariant sumOfTwoDelegatedVPLTEqTotalVP();
     assert isTotalSupplyGTEqSumOfVotingPower();
 

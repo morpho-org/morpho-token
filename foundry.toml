@@ -21,6 +21,9 @@ exclude_lints = [
     "unwrapped-modifier-logic",
     "mixed-case-variable",
     "screaming-snake-case-immutable",
+    # Existing implementation baseline; enabling CI must preserve audited bytecode.
+    "block-timestamp",
+    "reentrancy-events",
 ]
 
 [rpc_endpoints]

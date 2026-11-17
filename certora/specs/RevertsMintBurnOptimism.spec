@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 
 methods {
-    function totalSupply() external returns uint256 envfree;
-    function balanceOf(address) external returns uint256 envfree;
-    function delegatee(address) external returns address envfree;
-    function delegatedVotingPower(address) external returns uint256 envfree;
+    function totalSupply() external returns (uint256) envfree;
+    function balanceOf(address) external returns (uint256) envfree;
+    function delegatee(address) external returns (address) envfree;
+    function delegatedVotingPower(address) external returns (uint256) envfree;
 }
 
 // Check the revert conditions for the mint function.
@@ -31,8 +31,8 @@ rule burnRevertConditions(env e, address from, uint256 amount) {
     require delegatee(0) == 0;
 
     // Safe require as it is verified in delegatedLTEqDelegateeVP.
-    require  delegatee(from) != 0 =>fromVotingPowerBefore >= balanceOfFromBefore;
+    require delegatee(from) != 0 => fromVotingPowerBefore >= balanceOfFromBefore;
 
     burn@withrevert(e, from, amount);
-    assert lastReverted <=> e.msg.sender != currentContract.bridge || from == 0 || balanceOfFromBefore < amount ||  e.msg.value != 0;
+    assert lastReverted <=> e.msg.sender != currentContract.bridge || from == 0 || balanceOfFromBefore < amount || e.msg.value != 0;
 }

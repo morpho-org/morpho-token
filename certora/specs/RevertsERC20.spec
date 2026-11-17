@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 
 methods {
-    function totalSupply() external returns uint256 envfree;
-    function balanceOf(address) external returns uint256 envfree;
-    function allowance(address, address) external returns uint256 envfree;
-    function delegatee(address) external returns address envfree;
-    function delegatedVotingPower(address) external returns uint256 envfree;
+    function totalSupply() external returns (uint256) envfree;
+    function balanceOf(address) external returns (uint256) envfree;
+    function allowance(address, address) external returns (uint256) envfree;
+    function delegatee(address) external returns (address) envfree;
+    function delegatedVotingPower(address) external returns (uint256) envfree;
 }
 
 // Check the revert conditions for the transfer function.
@@ -18,8 +18,7 @@ rule transferRevertConditions(env e, address to, uint256 amount) {
     require delegatee(e.msg.sender) != 0 => senderVotingPowerBefore >= balanceOfSenderBefore;
 
     // Safe require as it proven in rule updatedDelegatedVPLTEqTotalSupply.
-    require
-      delegatee(to) != delegatee(e.msg.sender) => recipientVotingPowerBefore + balanceOfSenderBefore <= totalSupply();
+    require delegatee(to) != delegatee(e.msg.sender) => recipientVotingPowerBefore + balanceOfSenderBefore <= totalSupply();
 
     transfer@withrevert(e, to, amount);
     assert lastReverted <=> e.msg.sender == 0 || to == 0 || balanceOfSenderBefore < amount || e.msg.value != 0;
@@ -36,8 +35,7 @@ rule transferFromRevertConditions(env e, address from, address to, uint256 amoun
     require delegatee(from) != 0 => holderVotingPowerBefore >= balanceOfHolderBefore;
 
     // Safe require as it proven in rule updatedDelegatedVPLTEqTotalSupply.
-    require
-      delegatee(to) != delegatee(from) => recipientVotingPowerBefore +  balanceOfHolderBefore <= totalSupply();
+    require delegatee(to) != delegatee(from) => recipientVotingPowerBefore + balanceOfHolderBefore <= totalSupply();
 
     transferFrom@withrevert(e, from, to, amount);
 
@@ -48,7 +46,6 @@ rule transferFromRevertConditions(env e, address from, address to, uint256 amoun
     } else {
         assert lastReverted <=> generalRevertConditions;
     }
-
 }
 
 // Check the revert conditions for the approve function.

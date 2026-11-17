@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 
 methods {
-    function owner() external returns address envfree;
-    function totalSupply() external returns uint256 envfree;
-    function balanceOf(address) external returns uint256 envfree;
-    function delegatee(address) external returns address envfree;
-    function delegatedVotingPower(address) external returns uint256 envfree;
+    function owner() external returns (address) envfree;
+    function totalSupply() external returns (uint256) envfree;
+    function balanceOf(address) external returns (uint256) envfree;
+    function delegatee(address) external returns (address) envfree;
+    function delegatedVotingPower(address) external returns (uint256) envfree;
 }
 
 // Check the revert conditions for the burn function.

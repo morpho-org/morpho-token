@@ -16,17 +16,11 @@ rule onlyAuthorizedCanTransfer(env e, method f) {
     address account;
 
     uint256 allowanceBefore = allowance(account, e.msg.sender);
-    uint256 balanceBefore   = balanceOf(account);
+    uint256 balanceBefore = balanceOf(account);
     f(e, args);
-    uint256 balanceAfter    = balanceOf(account);
+    uint256 balanceAfter = balanceOf(account);
 
-    assert (
-        balanceAfter < balanceBefore
-    ) => (
-        f.selector == sig:burn(address, uint256).selector ||
-        e.msg.sender == account ||
-        f.selector == sig:transferFrom(address, address, uint256).selector && balanceBefore - balanceAfter <= to_mathint(allowanceBefore)
-    );
+    assert (balanceAfter < balanceBefore) => (f.selector == sig:burn(address, uint256).selector || e.msg.sender == account || f.selector == sig:transferFrom(address, address, uint256).selector && balanceBefore - balanceAfter <= to_mathint(allowanceBefore));
 }
 
 /*
@@ -67,21 +61,20 @@ rule mint(env e) {
     uint256 amount;
 
     // cache state
-    uint256 toBalanceBefore    = balanceOf(to);
+    uint256 toBalanceBefore = balanceOf(to);
     uint256 otherBalanceBefore = balanceOf(other);
-    uint256 totalSupplyBefore  = totalSupply();
+    uint256 totalSupplyBefore = totalSupply();
 
     // run transaction
     mint@withrevert(e, to, amount);
 
     // check outcome
     if (lastReverted) {
-        assert e.msg.sender != owner() || to == 0 || totalSupplyBefore + amount > max_uint256 ||
-            e.msg.sender != currentContract.bridge;
+        assert e.msg.sender != owner() || to == 0 || totalSupplyBefore + amount > max_uint256 || e.msg.sender != currentContract.bridge;
     } else {
         // updates balance and totalSupply
         assert e.msg.sender == currentContract.bridge;
-        assert to_mathint(balanceOf(to)) == toBalanceBefore   + amount;
+        assert to_mathint(balanceOf(to)) == toBalanceBefore + amount;
         assert to_mathint(totalSupply()) == totalSupplyBefore + amount;
 
         // no other balance is modified
@@ -105,20 +98,22 @@ rule burn(env e) {
     address other;
     uint256 amount;
     require from == e.msg.sender;
+
     // cache state
-    uint256 fromBalanceBefore  = balanceOf(from);
+    uint256 fromBalanceBefore = balanceOf(from);
     uint256 fromVotingPowerBefore = delegatedVotingPower(delegatee(from));
     uint256 toVotingPowerBefore = delegatedVotingPower(delegatee(0x0));
     uint256 otherBalanceBefore = balanceOf(other);
-    uint256 totalSupplyBefore  = totalSupply();
+    uint256 totalSupplyBefore = totalSupply();
 
     // Safe require as zeroVirtualVotingPower represents the virtual sum of votes delegated to zero.
     require delegatee(from) == 0 => fromBalanceBefore <= currentContract._zeroVirtualVotingPower;
+
     // Safe require as it is verified in delegatedLTEqDelegateeVP.
     require delegatee(from) != 0 => fromBalanceBefore <= fromVotingPowerBefore;
 
     // run transaction
-    burn@withrevert(e, from,  amount);
+    burn@withrevert(e, from, amount);
 
     // check outcome
     if (lastReverted) {
@@ -126,7 +121,7 @@ rule burn(env e) {
     } else {
         // updates balance and totalSupply
         assert to_mathint(balanceOf(from)) == fromBalanceBefore - amount;
-        assert to_mathint(totalSupply())   == totalSupplyBefore - amount;
+        assert to_mathint(totalSupply()) == totalSupplyBefore - amount;
 
         // no other balance is modified
         assert balanceOf(other) != otherBalanceBefore => other == from;

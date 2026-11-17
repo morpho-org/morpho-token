@@ -10,7 +10,6 @@ evm_version = "cancun"
 [profile.default.fuzz]
 runs = 256
 
-# Lint test/ as ordinary Solidity instead of applying Forge's test-only rule filter.
 [lint]
 exclude_lints = [
     "arbitrary-send-erc20",

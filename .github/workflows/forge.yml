@@ -52,7 +52,7 @@ jobs:
 
       - name: Run Forge fmt
         run: |
-          forge fmt --check
+          forge fmt src test script certora --check
         id: fmt
 
       - name: Run Forge build
@@ -68,4 +68,5 @@ jobs:
           forge test -vvv
         id: test
         env:
+          FOUNDRY_FUZZ_SEED: 0x${{ github.event.pull_request.base.sha || github.sha }}
           ALCHEMY_KEY: ${{ secrets.PROTOCOL_ALCHEMY_KEY }}

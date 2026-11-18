@@ -21,7 +21,7 @@ jobs:
           submodules: recursive
       - uses: foundry-rs/foundry-toolchain@dba66c27052e63476d886f22216e119ba7e615bf # v1.9.2
         with:
-          version: nightly # Catch upstream Foundry changes before the next stable release.
+          version: nightly
       - name: Prepare verification harness imports
         run: make -C certora munged
       - name: Lint contracts and verification harnesses
@@ -43,7 +43,7 @@ jobs:
       - name: Install Foundry
         uses: foundry-rs/foundry-toolchain@dba66c27052e63476d886f22216e119ba7e615bf # v1.9.2
         with:
-          version: nightly # Catch upstream Foundry changes before the next stable release.
+          version: nightly
 
       - name: Run Forge build
         run: |
@@ -65,7 +65,7 @@ jobs:
       - name: Install Foundry
         uses: foundry-rs/foundry-toolchain@dba66c27052e63476d886f22216e119ba7e615bf # v1.9.2
         with:
-          version: nightly # Catch upstream Foundry changes before the next stable release.
+          version: nightly
 
       - name: Run Forge fmt
         run: forge fmt src test script certora --check
@@ -84,7 +84,7 @@ jobs:
       - name: Install Foundry
         uses: foundry-rs/foundry-toolchain@dba66c27052e63476d886f22216e119ba7e615bf # v1.9.2
         with:
-          version: nightly # Catch upstream Foundry changes before the next stable release.
+          version: nightly
 
       - name: Run Forge tests
         run: |

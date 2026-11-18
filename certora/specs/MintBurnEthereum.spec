@@ -76,7 +76,7 @@ rule mint(env e) {
         assert e.msg.sender == owner();
         assert to_mathint(balanceOf(to)) == toBalanceBefore + amount;
         assert to_mathint(totalSupply()) == totalSupplyBefore + amount;
-
+    
         // no other balance is modified
         assert balanceOf(other) != otherBalanceBefore => other == to;
     }
@@ -122,7 +122,7 @@ rule burn(env e) {
         // updates balance and totalSupply
         assert to_mathint(balanceOf(from)) == fromBalanceBefore - amount;
         assert to_mathint(totalSupply()) == totalSupplyBefore - amount;
-
+    
         // no other balance is modified
         assert balanceOf(other) != otherBalanceBefore => other == from;
     }

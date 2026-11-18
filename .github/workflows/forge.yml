@@ -53,7 +53,26 @@ jobs:
       - name: Check foundry.lock matches submodule pins
         run: forge build --locked
 
-  check:
+  fmt:
+    permissions:
+      contents: read
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          submodules: recursive
+
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@dba66c27052e63476d886f22216e119ba7e615bf # v1.9.2
+        with:
+          version: nightly # Catch upstream Foundry changes before the next stable release.
+
+      - name: Run Forge fmt
+        run: forge fmt src test script certora --check
+
+  test:
     permissions:
       contents: read
     runs-on: ubuntu-latest
@@ -72,11 +91,6 @@ jobs:
       - name: Show Forge version
         run: |
           forge --version
-
-      - name: Run Forge fmt
-        run: |
-          forge fmt src test script certora --check
-        id: fmt
 
       - name: Run Forge tests
         run: |

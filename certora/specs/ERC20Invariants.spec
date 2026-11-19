@@ -33,6 +33,11 @@ ghost mapping(address => address) ghostDelegatee {
     init_state axiom forall address account. ghostDelegatee[account] == 0;
 }
 
+// Partial sum of balances delegated to zero over accounts in [0, x).
+ghost mapping(mathint => mathint) zeroVirtualVotingPower {
+    init_state axiom forall mathint x. zeroVirtualVotingPower[x] == 0;
+}
+
 // Slot is DelegationTokenStorage._delegatee.
 hook Sload address delegatee (slot 0x669be2f4ee1b0b5f3858e4135f31064efe8fa923b09bf21bf538f64f2c3e1100)[KEY address account] {
     require ghostDelegatee[account] == delegatee;
@@ -40,6 +45,11 @@ hook Sload address delegatee (slot 0x669be2f4ee1b0b5f3858e4135f31064efe8fa923b09
 
 // Slot is DelegationTokenStorage._delegatee.
 hook Sstore (slot 0x669be2f4ee1b0b5f3858e4135f31064efe8fa923b09bf21bf538f64f2c3e1100)[KEY address account] address delegatee (address delegateeOld) {
+    mathint changeOfZeroVotes = (delegatee == 0 ? ghostBalances[account] : 0)
+        - (delegateeOld == 0 ? ghostBalances[account] : 0);
+    havoc zeroVirtualVotingPower assuming
+        forall mathint x. zeroVirtualVotingPower@new[x] ==
+            zeroVirtualVotingPower@old[x] + (to_mathint(account) < x ? changeOfZeroVotes : 0);
     mathint changeOfAccountVotesForA;
     // Track delegation changes from the parameterized address.
     if (delegateeOld == A && delegatee != A) {
@@ -81,6 +91,11 @@ hook Sload uint256 balance (slot 0x52c63247e1f47db19d5ce0460030c497f067ca4cebf71
 
 // Slot is ERC20Storage._balances slot
 hook Sstore (slot 0x52c63247e1f47db19d5ce0460030c497f067ca4cebf71ba98eeadabe20bace00)[KEY address account] uint256 newValue (uint256 oldValue) {
+    if (ghostDelegatee[account] == 0) {
+        havoc zeroVirtualVotingPower assuming
+            forall mathint x. zeroVirtualVotingPower@new[x] ==
+                zeroVirtualVotingPower@old[x] + (to_mathint(account) < x ? newValue - oldValue : 0);
+    }
     // Update partial sum of balances, for x > to_mathint(account)
     // Track balance changes in balances.
     havoc sumOfBalances assuming
@@ -96,6 +111,22 @@ hook Sstore (slot 0x52c63247e1f47db19d5ce0460030c497f067ca4cebf71ba98eeadabe20ba
     // Update ghost copy of ERC20Storage._balances.
     ghostBalances[account] = newValue;
 }
+
+invariant zeroVirtualVotingPowerStartsAtZero()
+    zeroVirtualVotingPower[0] == 0;
+
+invariant zeroVirtualVotingPowerGrowsCorrectly()
+    forall address account. zeroVirtualVotingPower[to_mathint(account) + 1] ==
+        zeroVirtualVotingPower[to_mathint(account)] + (ghostDelegatee[account] == 0 ? ghostBalances[account] : 0);
+
+invariant zeroVirtualVotingPowerMonotone()
+    forall mathint i. forall mathint j. i <= j => zeroVirtualVotingPower[i] <= zeroVirtualVotingPower[j]
+    {
+        preserved {
+            requireInvariant zeroVirtualVotingPowerStartsAtZero();
+            requireInvariant zeroVirtualVotingPowerGrowsCorrectly();
+        }
+    }
 
 invariant sumOfBalancesStartsAtZero()
     sumOfBalances[0] == 0;

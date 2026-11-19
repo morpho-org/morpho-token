@@ -113,7 +113,7 @@ rule burn(env e) {
     uint256 totalSupplyBefore  = totalSupply();
 
     // Safe require as zeroVirtualVotingPower represents the virtual sum of votes delegated to zero.
-    require delegatee(from) == 0 => fromBalanceBefore <= currentContract._zeroVirtualVotingPower;
+    require delegatee(from) == 0 => fromBalanceBefore <= zeroVirtualVotingPower[2^160];
     // Safe require as it is verified in delegatedLTEqDelegateeVP.
     require delegatee(from) != 0 => fromBalanceBefore <= fromVotingPowerBefore;
 

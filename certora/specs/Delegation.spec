@@ -114,9 +114,10 @@ invariant sumOfVotesMonotone()
 
 // Check that the voting power plus the virtual voting power of address zero is equal to the total supply of tokens.
 invariant totalSupplyIsSumOfVirtualVotingPower()
-    sumOfVotes[2^160] + zeroVirtualVotingPower[2^160] == to_mathint(totalSupply())
+    sumOfVotes[2^160] + zeroVirtualVotingPower() == to_mathint(totalSupply())
     {
         preserved {
+            requireInvariant zeroVirtualVotingPowerMatchesBalances();
             requireInvariant sumOfBalancesStartsAtZero();
             requireInvariant sumOfBalancesGrowsCorrectly();
             requireInvariant sumOfBalancesMonotone();
@@ -161,8 +162,6 @@ invariant sumOfTwoDelegatedVPLTEqTotalVP()
 
 function isTotalSupplyGTEqSumOfVotingPower() returns bool {
     requireInvariant totalSupplyIsSumOfVirtualVotingPower();
-    requireInvariant zeroVirtualVotingPowerStartsAtZero();
-    requireInvariant zeroVirtualVotingPowerMonotone();
     return totalSupply() >= sumOfVotes[2^160];
 }
 
@@ -225,8 +224,9 @@ rule updatedDelegatedVPLTEqTotalSupply(address from, address to) {
     requireInvariant sumOfTwoDelegatedVPLTEqTotalVP();
     assert isTotalSupplyGTEqSumOfVotingPower();
 
-    // Safe require as zeroVirtualVotingPower is the (virtual) voting power of address zero.
-    require delegatee(from) == 0 => zeroVirtualVotingPower[2^160] >= balanceOf(from);
+    requireInvariant zeroVirtualVotingPowerMatchesBalances();
+    assert delegatee(from) == 0 => ghostZeroDelegateeBalances[from] == balanceOf(from);
+    assert delegatee(from) == 0 => zeroVirtualVotingPower() >= balanceOf(from);
 
     // Safe require as it is proven in delegatedLTEqDelegateeVP.
     require delegatee(from) != 0 => delegatedVotingPower(delegatee(from)) >= balanceOf(from);

@@ -5,7 +5,6 @@ This folder contains the [CVL](https://docs.certora.com/en/latest/docs/cvl/index
 ## Getting started
 
 The verification is performed directly on the contracts in [`src`](../src).
-Shared storage hooks in [`ERC20Invariants.spec`](specs/ERC20Invariants.spec) track the virtual voting power of address zero as the sum of balances whose delegatee is zero.
 
 This project depends on [Solidity](https://soliditylang.org/) which is required for running the verification.
 The compiler binary should be available in the path:

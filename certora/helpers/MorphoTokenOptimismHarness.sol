@@ -2,8 +2,7 @@
 pragma solidity 0.8.27;
 
 import {DelegationTokenHarness} from "./DelegationTokenHarness.sol";
-// forge-lint: disable-next-line(unaliased-plain-import) Certora harness, not deployed.
-import "../../munged/MorphoTokenOptimism.sol";
+import {MorphoTokenOptimism} from "../../munged/MorphoTokenOptimism.sol";
 
 contract MorphoTokenOptimismHarness is MorphoTokenOptimism, DelegationTokenHarness {
     constructor(address newRemoteToken, address newBridge) MorphoTokenOptimism(newRemoteToken, newBridge) {}

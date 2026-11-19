@@ -9,7 +9,7 @@ optimizer_runs = 999999
 evm_version = "cancun"
 
 [profile.default.fuzz]
-runs = 256
+runs = 2048
 
 [lint]
 exclude_lints = [

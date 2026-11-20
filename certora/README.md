@@ -4,8 +4,6 @@ This folder contains the [CVL](https://docs.certora.com/en/latest/docs/cvl/index
 
 ## Getting started
 
-The verification is performed directly on the contracts in [`src`](../src).
-
 This project depends on [Solidity](https://soliditylang.org/) which is required for running the verification.
 The compiler binary should be available in the path:
 

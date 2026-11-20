@@ -2,6 +2,6 @@
 pragma solidity 0.8.27;
 
 import {DelegationTokenHarness, Signature, Delegation} from "./DelegationTokenHarness.sol";
-import "../../munged/MorphoTokenEthereum.sol";
+import "../../src/MorphoTokenEthereum.sol";
 
 contract MorphoTokenEthereumHarness is MorphoTokenEthereum, DelegationTokenHarness {}

@@ -4,12 +4,6 @@ This folder contains the [CVL](https://docs.certora.com/en/latest/docs/cvl/index
 
 ## Getting started
 
-The verification is performed on modified source files, which can generated with the command:
-
-```
-make -C certora munged
-```
-
 This project depends on [Solidity](https://soliditylang.org/) which is required for running the verification.
 The compiler binary should be available in the path:
 
@@ -55,5 +49,3 @@ The [`certora/specs`](specs) folder contains the following files:
 - [`RevertsERC20.spec`](specs/RevertsERC20.spec), [`RevertsMintBurnEthereum.spec`](specs/RevertsMintBurnEthereum.spec) and [`RevertsMintBurnOptimism.spec`](specs/RevertsMintBurnOptimism.spec) check that conditions for reverts and inputs are correctly validated.
 
 The [`certora/confs`](confs) folder contains a configuration file for each corresponding specification file for both the Ethereum and the Optimism version.
-
-The [`certora/Makefile`](Makefile) is used to track and perform the required modifications on source files.

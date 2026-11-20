@@ -33,6 +33,14 @@ ghost mapping(address => address) ghostDelegatee {
     init_state axiom forall address account. ghostDelegatee[account] == 0;
 }
 
+ghost mapping(address => uint256) ghostZeroDelegateeBalances {
+    init_state axiom forall address account. ghostZeroDelegateeBalances[account] == 0;
+    init_state axiom (usum address account. ghostZeroDelegateeBalances[account]) == 0;
+}
+
+definition zeroVirtualVotingPower() returns mathint =
+    usum address account. ghostZeroDelegateeBalances[account];
+
 // Slot is DelegationTokenStorage._delegatee.
 hook Sload address delegatee (slot 0x669be2f4ee1b0b5f3858e4135f31064efe8fa923b09bf21bf538f64f2c3e1100)[KEY address account] {
     require ghostDelegatee[account] == delegatee;
@@ -40,6 +48,7 @@ hook Sload address delegatee (slot 0x669be2f4ee1b0b5f3858e4135f31064efe8fa923b09
 
 // Slot is DelegationTokenStorage._delegatee.
 hook Sstore (slot 0x669be2f4ee1b0b5f3858e4135f31064efe8fa923b09bf21bf538f64f2c3e1100)[KEY address account] address delegatee (address delegateeOld) {
+    ghostZeroDelegateeBalances[account] = delegatee == 0 ? ghostBalances[account] : 0;
     mathint changeOfAccountVotesForA;
     // Track delegation changes from the parameterized address.
     if (delegateeOld == A && delegatee != A) {
@@ -81,6 +90,7 @@ hook Sload uint256 balance (slot 0x52c63247e1f47db19d5ce0460030c497f067ca4cebf71
 
 // Slot is ERC20Storage._balances slot
 hook Sstore (slot 0x52c63247e1f47db19d5ce0460030c497f067ca4cebf71ba98eeadabe20bace00)[KEY address account] uint256 newValue (uint256 oldValue) {
+    ghostZeroDelegateeBalances[account] = ghostDelegatee[account] == 0 ? newValue : 0;
     // Update partial sum of balances, for x > to_mathint(account)
     // Track balance changes in balances.
     havoc sumOfBalances assuming
@@ -96,6 +106,10 @@ hook Sstore (slot 0x52c63247e1f47db19d5ce0460030c497f067ca4cebf71ba98eeadabe20ba
     // Update ghost copy of ERC20Storage._balances.
     ghostBalances[account] = newValue;
 }
+
+invariant zeroVirtualVotingPowerMatchesBalances()
+    forall address account. ghostZeroDelegateeBalances[account] ==
+        (ghostDelegatee[account] == 0 ? ghostBalances[account] : 0);
 
 invariant sumOfBalancesStartsAtZero()
     sumOfBalances[0] == 0;

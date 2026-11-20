@@ -114,9 +114,10 @@ invariant sumOfVotesMonotone()
 
 // Check that the voting power plus the virtual voting power of address zero is equal to the total supply of tokens.
 invariant totalSupplyIsSumOfVirtualVotingPower()
-    sumOfVotes[2^160] + currentContract._zeroVirtualVotingPower == to_mathint(totalSupply())
+    sumOfVotes[2^160] + zeroVirtualVotingPower() == to_mathint(totalSupply())
     {
         preserved {
+            requireInvariant zeroVirtualVotingPowerMatchesBalances();
             requireInvariant sumOfBalancesStartsAtZero();
             requireInvariant sumOfBalancesGrowsCorrectly();
             requireInvariant sumOfBalancesMonotone();
@@ -130,6 +131,9 @@ invariant totalSupplyIsSumOfVirtualVotingPower()
             require totalSupply() == 0;
         }
         preserved MorphoTokenEthereumHarness.initialize(address _, address _) with (env e) {
+            requireInvariant zeroAddressNoVotingPower();
+            requireInvariant totalSupplyIsSumOfBalances();
+            requireInvariant balancesLTEqTotalSupply();
             // Safe requires because the proxy contract should be initialized right after construction.
             require totalSupply() == 0;
             require forall mathint account. sumOfVotes[account] == 0;
@@ -220,8 +224,9 @@ rule updatedDelegatedVPLTEqTotalSupply(address from, address to) {
     requireInvariant sumOfTwoDelegatedVPLTEqTotalVP();
     assert isTotalSupplyGTEqSumOfVotingPower();
 
-    // Safe require as _zeroVirtualVotingPower is the (virtual) voting power of address zero.
-    require delegatee(from) == 0 => currentContract._zeroVirtualVotingPower >= balanceOf(from);
+    requireInvariant zeroVirtualVotingPowerMatchesBalances();
+    assert delegatee(from) == 0 => ghostZeroDelegateeBalances[from] == balanceOf(from);
+    assert delegatee(from) == 0 => zeroVirtualVotingPower() >= balanceOf(from);
 
     // Safe require as it is proven in delegatedLTEqDelegateeVP.
     require delegatee(from) != 0 => delegatedVotingPower(delegatee(from)) >= balanceOf(from);

@@ -2,7 +2,7 @@
 pragma solidity 0.8.27;
 
 import {DelegationTokenHarness} from "./DelegationTokenHarness.sol";
-import {MorphoTokenOptimism} from "../../munged/MorphoTokenOptimism.sol";
+import {MorphoTokenOptimism} from "../../src/MorphoTokenOptimism.sol";
 
 contract MorphoTokenOptimismHarness is MorphoTokenOptimism, DelegationTokenHarness {
     constructor(address newRemoteToken, address newBridge) MorphoTokenOptimism(newRemoteToken, newBridge) {}

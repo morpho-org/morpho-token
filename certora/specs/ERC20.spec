@@ -4,16 +4,17 @@
 import "ERC20Invariants.spec";
 
 definition nonpayable(env e) returns bool = e.msg.value == 0;
+
 definition nonzerosender(env e) returns bool = e.msg.sender != 0;
 
 methods {
-    function name()                                external returns (string)  envfree;
-    function symbol()                              external returns (string)  envfree;
-    function decimals()                            external returns (uint8)   envfree;
-    function allowance(address,address)            external returns (uint256) envfree;
-    function owner()                               external returns address   envfree;
-    function nonces(address)                       external returns (uint256) envfree;
-    function DOMAIN_SEPARATOR()                    external returns (bytes32) envfree;
+    function name() external returns (string) envfree;
+    function symbol() external returns (string) envfree;
+    function decimals() external returns (uint8) envfree;
+    function allowance(address, address) external returns (uint256) envfree;
+    function owner() external returns (address) envfree;
+    function nonces(address) external returns (uint256) envfree;
+    function DOMAIN_SEPARATOR() external returns (bytes32) envfree;
 }
 
 /*
@@ -37,7 +38,7 @@ use invariant zeroAddressNoBalance;
 │ Rules: only the token holder (or a permit) can increase allowance. The spender can decrease it by using it          │
 └─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
 */
-rule onlyHolderOrSpenderCanChangeAllowance(env e, method f){
+rule onlyHolderOrSpenderCanChangeAllowance(env e, method f) {
     requireInvariant totalSupplyIsSumOfBalances();
 
     calldataarg args;
@@ -48,20 +49,9 @@ rule onlyHolderOrSpenderCanChangeAllowance(env e, method f){
     f(e, args);
     uint256 allowanceAfter = allowance(holder, spender);
 
-    assert (
-        allowanceAfter > allowanceBefore
-    ) => (
-        (f.selector == sig:approve(address,uint256).selector           && e.msg.sender == holder) ||
-        (f.selector == sig:permit(address,address,uint256,uint256,uint8,bytes32,bytes32).selector)
-    );
+    assert (allowanceAfter > allowanceBefore) => ((f.selector == sig:approve(address, uint256).selector && e.msg.sender == holder) || (f.selector == sig:permit(address, address, uint256, uint256, uint8, bytes32, bytes32).selector));
 
-    assert (
-        allowanceAfter < allowanceBefore
-    ) => (
-        (f.selector == sig:transferFrom(address,address,uint256).selector && e.msg.sender == spender) ||
-        (f.selector == sig:approve(address,uint256).selector              && e.msg.sender == holder ) ||
-        (f.selector == sig:permit(address,address,uint256,uint256,uint8,bytes32,bytes32).selector)
-    );
+    assert (allowanceAfter < allowanceBefore) => ((f.selector == sig:transferFrom(address, address, uint256).selector && e.msg.sender == spender) || (f.selector == sig:approve(address, uint256).selector && e.msg.sender == holder) || (f.selector == sig:permit(address, address, uint256, uint256, uint8, bytes32, bytes32).selector));
 }
 
 /*
@@ -74,21 +64,21 @@ rule transfer(env e) {
     requireInvariant twoBalancesLTEqTotalSupply();
     require nonpayable(e);
 
-
     address holder = e.msg.sender;
     address recipient;
     address other;
     uint256 amount;
 
     // cache state
-    uint256 holderBalanceBefore    = balanceOf(holder);
+    uint256 holderBalanceBefore = balanceOf(holder);
     uint256 holderVotingPowerBefore = delegatedVotingPower(delegatee(holder));
     uint256 recipientBalanceBefore = balanceOf(recipient);
     uint256 recipientVotingPowerBefore = delegatedVotingPower(delegatee(recipient));
-    uint256 otherBalanceBefore     = balanceOf(other);
+    uint256 otherBalanceBefore = balanceOf(other);
 
     // Safe require as it is verified in delegatedLTEqDelegateeVP.
     require delegatee(holder) != 0 => holderBalanceBefore <= holderVotingPowerBefore;
+
     // Safe require as it is verified in totalSupplyGTEqSumOfVotingPower.
     require delegatee(holder) != delegatee(recipient) => recipientVotingPowerBefore + holderBalanceBefore <= totalSupply();
 
@@ -100,9 +90,9 @@ rule transfer(env e) {
         assert holder == 0 || recipient == 0 || amount > holderBalanceBefore;
     } else {
         // balances of holder and recipient are updated
-        assert to_mathint(balanceOf(holder))    == holderBalanceBefore    - (holder == recipient ? 0 : amount);
+        assert to_mathint(balanceOf(holder)) == holderBalanceBefore - (holder == recipient ? 0 : amount);
         assert to_mathint(balanceOf(recipient)) == recipientBalanceBefore + (holder == recipient ? 0 : amount);
-
+    
         // no other balance is modified
         assert balanceOf(other) != otherBalanceBefore => (other == holder || other == recipient);
     }
@@ -125,15 +115,16 @@ rule transferFrom(env e) {
     uint256 amount;
 
     // cache state
-    uint256 allowanceBefore        = allowance(holder, spender);
-    uint256 holderBalanceBefore    = balanceOf(holder);
+    uint256 allowanceBefore = allowance(holder, spender);
+    uint256 holderBalanceBefore = balanceOf(holder);
     uint256 holderVotingPowerBefore = delegatedVotingPower(delegatee(holder));
     uint256 recipientBalanceBefore = balanceOf(recipient);
     uint256 recipientVotingPowerBefore = delegatedVotingPower(delegatee(recipient));
-    uint256 otherBalanceBefore     = balanceOf(other);
+    uint256 otherBalanceBefore = balanceOf(other);
 
     // Safe require as it is verified in delegatedLTEqDelegateeVP.
     require delegatee(holder) != 0 => holderBalanceBefore <= holderVotingPowerBefore;
+
     // Safe require as it is verified in totalSupplyGTEqSumOfVotingPower.
     require delegatee(holder) != delegatee(recipient) => recipientVotingPowerBefore + holderBalanceBefore <= totalSupply();
 
@@ -145,13 +136,13 @@ rule transferFrom(env e) {
         assert holder == 0 || recipient == 0 || spender == 0 || amount > holderBalanceBefore || amount > allowanceBefore;
     } else {
         // allowance is valid & updated
-        assert allowanceBefore            >= amount;
+        assert allowanceBefore >= amount;
         assert to_mathint(allowance(holder, spender)) == (allowanceBefore == max_uint256 ? max_uint256 : allowanceBefore - amount);
-
+    
         // balances of holder and recipient are updated
-        assert to_mathint(balanceOf(holder))    == holderBalanceBefore    - (holder == recipient ? 0 : amount);
+        assert to_mathint(balanceOf(holder)) == holderBalanceBefore - (holder == recipient ? 0 : amount);
         assert to_mathint(balanceOf(recipient)) == recipientBalanceBefore + (holder == recipient ? 0 : amount);
-
+    
         // no other balance is modified
         assert balanceOf(other) != otherBalanceBefore => (other == holder || other == recipient);
     }
@@ -183,7 +174,7 @@ rule approve(env e) {
     } else {
         // allowance is updated
         assert allowance(holder, spender) == amount;
-
+    
         // other allowances are untouched
         assert allowance(otherHolder, otherSpender) != otherAllowanceBefore => (otherHolder == holder && otherSpender == spender);
     }
@@ -210,12 +201,12 @@ rule permit(env e) {
     address account3;
 
     // cache state
-    uint256 nonceBefore          = nonces(holder);
-    uint256 otherNonceBefore     = nonces(account1);
+    uint256 nonceBefore = nonces(holder);
+    uint256 otherNonceBefore = nonces(account1);
     uint256 otherAllowanceBefore = allowance(account2, account3);
 
     // sanity: nonce overflow, which possible in theory, is assumed to be impossible in practice
-    require nonceBefore      < max_uint256;
+    require nonceBefore < max_uint256;
     require otherNonceBefore < max_uint256;
 
     // run transaction
@@ -229,12 +220,12 @@ rule permit(env e) {
         // allowance and nonce are updated
         assert allowance(holder, spender) == amount;
         assert to_mathint(nonces(holder)) == nonceBefore + 1;
-
+    
         // deadline was respected
         assert deadline >= e.block.timestamp;
-
+    
         // no other allowance or nonce is modified
-        assert nonces(account1)              != otherNonceBefore     => account1 == holder;
+        assert nonces(account1) != otherNonceBefore => account1 == holder;
         assert allowance(account2, account3) != otherAllowanceBefore => (account2 == holder && account3 == spender);
     }
 }

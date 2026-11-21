@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 
 // True when a CALL has been placed.
-persistent ghost bool hasExternalCall  {
+persistent ghost bool hasExternalCall {
     init_state axiom hasExternalCall == false;
 }
 
@@ -11,7 +11,7 @@ persistent ghost bool hasDelegateCall {
 }
 
 hook CALL(uint g, address addr, uint value, uint argsOffset, uint argsLength, uint retOffset, uint retLength) uint rc {
-        hasExternalCall = true;
+    hasExternalCall = true;
 }
 
 hook DELEGATECALL(uint g, address addr, uint argsOffset, uint argsLength, uint retOffset, uint retLength) uint rc {
@@ -20,11 +20,9 @@ hook DELEGATECALL(uint g, address addr, uint argsOffset, uint argsLength, uint r
 
 // Check that the contract is reentrant safe as it makes no external call.
 invariant reentrancySafe()
-  !hasExternalCall;
+    !hasExternalCall;
 
 // Check that the contract makes no delegate call, except during an upgrade when doing a setup call to the new implementation.
 invariant noDelegateCalls()
-  !hasDelegateCall
-  filtered {
-      f -> f.selector != sig:upgradeToAndCall(address, bytes).selector
-  }
+    !hasDelegateCall
+    filtered { f -> f.selector != sig:upgradeToAndCall(address, bytes).selector }

@@ -2,8 +2,9 @@
 pragma solidity 0.8.27;
 
 import {DelegationToken, Signature, Delegation} from "../../src/DelegationToken.sol";
-import {ECDSA} from
-    "../../lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/utils/cryptography/ECDSA.sol";
+import {
+    ECDSA
+} from "../../lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/utils/cryptography/ECDSA.sol";
 
 contract DelegationTokenHarness is DelegationToken {
     function delegatorFromSig(Delegation calldata delegation, Signature calldata signature)

@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 
 methods {
-    function totalSupply() external returns uint256 envfree;
-    function balanceOf(address) external returns uint256 envfree;
-    function delegatee(address) external returns address envfree;
-    function delegatedVotingPower(address) external returns uint256 envfree;
+    function totalSupply() external returns (uint256) envfree;
+    function balanceOf(address) external returns (uint256) envfree;
+    function delegatee(address) external returns (address) envfree;
+    function delegatedVotingPower(address) external returns (uint256) envfree;
     function upgradeToAndCall(address, bytes) external => NONDET DELETE;
 }
 
@@ -38,8 +38,7 @@ ghost mapping(address => uint256) ghostZeroDelegateeBalances {
     init_state axiom (usum address account. ghostZeroDelegateeBalances[account]) == 0;
 }
 
-definition zeroVirtualVotingPower() returns mathint =
-    usum address account. ghostZeroDelegateeBalances[account];
+definition zeroVirtualVotingPower() returns mathint = usum address account. ghostZeroDelegateeBalances[account];
 
 // Slot is DelegationTokenStorage._delegatee.
 hook Sload address delegatee (slot 0x669be2f4ee1b0b5f3858e4135f31064efe8fa923b09bf21bf538f64f2c3e1100)[KEY address account] {
@@ -50,19 +49,20 @@ hook Sload address delegatee (slot 0x669be2f4ee1b0b5f3858e4135f31064efe8fa923b09
 hook Sstore (slot 0x669be2f4ee1b0b5f3858e4135f31064efe8fa923b09bf21bf538f64f2c3e1100)[KEY address account] address delegatee (address delegateeOld) {
     ghostZeroDelegateeBalances[account] = delegatee == 0 ? ghostBalances[account] : 0;
     mathint changeOfAccountVotesForA;
+
     // Track delegation changes from the parameterized address.
     if (delegateeOld == A && delegatee != A) {
-        require changeOfAccountVotesForA == - ghostBalances[account];
-    // Track delegation changes to the prameterized address.
+        require changeOfAccountVotesForA == -ghostBalances[account];
+        // Track delegation changes to the prameterized address.
     } else if (delegateeOld != A && delegatee == A) {
         require changeOfAccountVotesForA == ghostBalances[account];
     } else {
         require changeOfAccountVotesForA == 0;
     }
+
     // Update partial sums for x > to_mathint(account)
-    havoc sumsOfVotesDelegatedToA assuming
-        forall mathint x. sumsOfVotesDelegatedToA@new[x] ==
-        sumsOfVotesDelegatedToA@old[x] + (to_mathint(account) < x ? changeOfAccountVotesForA : 0);
+    havoc sumsOfVotesDelegatedToA assuming forall mathint x. sumsOfVotesDelegatedToA@new[x] == sumsOfVotesDelegatedToA@old[x] + (to_mathint(account) < x ? changeOfAccountVotesForA : 0);
+
     // Update ghost copy of DelegationTokenStorage._delegatee.
     ghostDelegatee[account] = delegatee;
 }
@@ -91,32 +91,29 @@ hook Sload uint256 balance (slot 0x52c63247e1f47db19d5ce0460030c497f067ca4cebf71
 // Slot is ERC20Storage._balances slot
 hook Sstore (slot 0x52c63247e1f47db19d5ce0460030c497f067ca4cebf71ba98eeadabe20bace00)[KEY address account] uint256 newValue (uint256 oldValue) {
     ghostZeroDelegateeBalances[account] = ghostDelegatee[account] == 0 ? newValue : 0;
+
     // Update partial sum of balances, for x > to_mathint(account)
     // Track balance changes in balances.
-    havoc sumOfBalances assuming
-        forall mathint x. sumOfBalances@new[x] ==
-            sumOfBalances@old[x] + (to_mathint(account) < x ? newValue - oldValue : 0);
+    havoc sumOfBalances assuming forall mathint x. sumOfBalances@new[x] == sumOfBalances@old[x] + (to_mathint(account) < x ? newValue - oldValue : 0);
+
     // Update partial sums of votes delegated to the parameterized address, for x > to_mathint(account)
     // Track balance changes when the delegatee is the parameterized address.
     if (ghostDelegatee[account] == A) {
-        havoc sumsOfVotesDelegatedToA assuming
-            forall mathint x. sumsOfVotesDelegatedToA@new[x] ==
-                sumsOfVotesDelegatedToA@old[x] + (to_mathint(account) < x ? newValue - oldValue : 0);
+        havoc sumsOfVotesDelegatedToA assuming forall mathint x. sumsOfVotesDelegatedToA@new[x] == sumsOfVotesDelegatedToA@old[x] + (to_mathint(account) < x ? newValue - oldValue : 0);
     }
+
     // Update ghost copy of ERC20Storage._balances.
     ghostBalances[account] = newValue;
 }
 
 invariant zeroVirtualVotingPowerMatchesBalances()
-    forall address account. ghostZeroDelegateeBalances[account] ==
-        (ghostDelegatee[account] == 0 ? ghostBalances[account] : 0);
+    forall address account. ghostZeroDelegateeBalances[account] == (ghostDelegatee[account] == 0 ? ghostBalances[account] : 0);
 
 invariant sumOfBalancesStartsAtZero()
     sumOfBalances[0] == 0;
 
 invariant sumOfBalancesGrowsCorrectly()
-    forall address addr. sumOfBalances[to_mathint(addr) + 1] ==
-        sumOfBalances[to_mathint(addr)] + ghostBalances[addr];
+    forall address addr. sumOfBalances[to_mathint(addr) + 1] == sumOfBalances[to_mathint(addr)] + ghostBalances[addr];
 
 invariant sumOfBalancesMonotone()
     forall mathint i. forall mathint j. i <= j => sumOfBalances[i] <= sumOfBalances[j]
@@ -129,7 +126,7 @@ invariant sumOfBalancesMonotone()
 
 // Check that the sum of balances equals the total supply.
 invariant totalSupplyIsSumOfBalances()
-    sumOfBalances[2^160] == to_mathint(totalSupply())
+    sumOfBalances[2 ^ 160] == to_mathint(totalSupply())
     {
         preserved {
             requireInvariant sumOfBalancesStartsAtZero();
@@ -139,7 +136,7 @@ invariant totalSupplyIsSumOfBalances()
     }
 
 invariant balancesLTEqTotalSupply()
-    forall address a. ghostBalances[a] <= sumOfBalances[2^160]
+    forall address a. ghostBalances[a] <= sumOfBalances[2 ^ 160]
     {
         preserved {
             requireInvariant sumOfBalancesStartsAtZero();
@@ -150,7 +147,7 @@ invariant balancesLTEqTotalSupply()
     }
 
 invariant twoBalancesLTEqTotalSupply()
-    forall address a. forall address b. a != b => ghostBalances[a] + ghostBalances[b] <= sumOfBalances[2^160]
+    forall address a. forall address b. a != b => ghostBalances[a] + ghostBalances[b] <= sumOfBalances[2 ^ 160]
     {
         preserved {
             requireInvariant balancesLTEqTotalSupply();

@@ -61,7 +61,7 @@ jobs:
         with:
           version: nightly
 
-      - name: Run Forge build
+      - name: Run forge build
         run: |
           forge build --sizes
 
@@ -84,7 +84,7 @@ jobs:
         with:
           version: nightly
 
-      - name: Run Forge tests
+      - name: Run forge test
         run: |
           forge test --deny warnings -vvv
         env:

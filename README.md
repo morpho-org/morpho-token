@@ -57,4 +57,4 @@ $ forge test
 
 ## License
 
-Files authored for this repository are licensed under MIT (see [`LICENSE`](./LICENSE)). Code copied from other projects retains its upstream license (see [`THIRD-PARTY-NOTICES.md`](./THIRD-PARTY-NOTICES.md)).
+All files are under `MIT` (see [`LICENSE`](./LICENSE)).

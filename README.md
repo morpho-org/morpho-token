@@ -57,4 +57,4 @@ $ forge test
 
 ## License
 
-The Morpho token is licensed under `GPL-2.0-or-later`, see [`LICENSE`](./LICENSE).
+All files are under `MIT` (see [`LICENSE`](./LICENSE)).

@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-2.0-or-later
+// SPDX-License-Identifier: MIT
 
 // True when a CALL has been placed.
 persistent ghost bool hasExternalCall {

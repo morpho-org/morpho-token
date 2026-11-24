@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 // This is spec is taken from the Open Zeppelin repositories at https://github.com/OpenZeppelin/openzeppelin-contracts/blob/448efeea6640bbbc09373f03fbc9c88e280147ba/certora/specs/ERC20.spec, and patched to support the DelegationToken.
 
 import "Delegation.spec";

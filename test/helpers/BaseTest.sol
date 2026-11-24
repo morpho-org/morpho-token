@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-2.0-or-later
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
 import {Test} from "../../lib/forge-std/src/Test.sol";
@@ -12,7 +12,6 @@ import {UUPSUpgradeable} from "../../lib/openzeppelin-contracts-upgradeable/cont
 // TODO: Test the following:
 // - Test every paths
 // - Test migration flow
-// - Test bundler wrapping
 // - Test access control
 // - Test voting
 // - Test delegation

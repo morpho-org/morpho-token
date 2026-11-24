@@ -12,7 +12,6 @@ import {UUPSUpgradeable} from "../../lib/openzeppelin-contracts-upgradeable/cont
 // TODO: Test the following:
 // - Test every paths
 // - Test migration flow
-// - Test bundler wrapping
 // - Test access control
 // - Test voting
 // - Test delegation
